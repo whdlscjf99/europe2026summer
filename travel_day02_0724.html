@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>동유럽 여행 — DAY 2 부다페스트 전일</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p-blue:#7B9BB8;--p-green:#82A88F;--p-purple:#9B8DB8;
+  --p-orange:#C4956A;--p-navy:#6B7FA8;--p-night:#8A6FA0;
+  --p-transit:#7A9ABE;
+  --bg:#F6F4F1;--surface:#FFFFFF;--border:#E8E4DE;
+  --text:#1E1C1A;--muted:#5A5550;--soft:#888078;
+  --radius-card:12px;--radius-badge:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;color:var(--text);background:var(--bg);}
+.header{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-shrink:0;z-index:1000;}
+.brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;}
+.day-pill{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.day-select{font-family:inherit;font-size:11px;border:1px solid var(--border);border-radius:var(--radius-badge);padding:4px 10px;background:var(--surface);color:var(--text);cursor:pointer;outline:none;}
+.layout{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+#map{flex-shrink:0;height:calc(45vh - 52px);min-height:180px;position:relative;z-index:1;}
+#map .leaflet-tile-pane{filter:saturate(0.45) brightness(0.97) contrast(1.15);}
+.panel{flex:1;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 4px;}
+.tab{flex:1;padding:11px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--soft);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;}
+.tab.active{color:var(--text);border-bottom-color:var(--p-blue);}
+.tab-content{display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;}
+.tab-content.active{display:block;}
+.ttc-card{margin:14px 16px 0;background:#EEF4FA;border:1px solid #C8DAE8;border-radius:var(--radius-card);overflow:hidden;}
+.ttc-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;}
+.ttc-title{font-size:13px;font-weight:700;color:#2A4A6A;display:flex;align-items:center;gap:7px;}
+.ttc-chevron{font-size:12px;color:#5A7A9A;transition:transform .2s;}
+.ttc-body{padding:0 14px 12px;border-top:1px solid #C8DAE8;display:none;}
+.ttc-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #D8E8F0;font-size:12px;color:#2A3A4A;line-height:1.6;}
+.ttc-row:last-child{border-bottom:none;}
+.ttc-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.ttc-badge.pass{background:#E8EEF8;color:#3060A0;}
+.ttc-badge.warn{background:#FFF0E8;color:#9A4010;}
+.ttc-warn{background:#FFF8E8;border:1px solid #E8D890;border-radius:8px;padding:7px 10px;margin-top:8px;font-size:11px;color:#7A6010;line-height:1.6;}
+.ttc-compare{margin-top:10px;border:1px solid #D8E8F0;border-radius:8px;overflow:hidden;}
+.ttc-compare-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-bottom:1px solid #E8F0F8;font-size:11.5px;color:#2A3A4A;}
+.ttc-compare-row:last-child{border-bottom:none;}
+.ttc-compare-row.winner{background:#EEF8F0;font-weight:700;color:#2A6A3A;}
+.ttc-compare-label{flex:1;}
+.ttc-compare-price{font-variant-numeric:tabular-nums;font-weight:600;color:#3A5A7A;}
+.weather-card{margin:14px 16px 0;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.wc-item{display:flex;align-items:center;gap:7px;}
+.wc-label{font-size:10px;color:#706860;display:block;margin-bottom:1px;}
+.wc-val{font-size:13px;font-weight:500;color:var(--text);}
+.timeline{padding:14px 16px 20px;}
+.tl-item{display:flex;position:relative;cursor:pointer;}
+.tl-axis{display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0;}
+.tl-pin{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;z-index:1;box-shadow:0 2px 8px rgba(0,0,0,.14);}
+.tl-pin.sight{background:var(--p-blue);}
+.tl-pin.food{background:var(--p-green);}
+.tl-pin.stay{background:var(--p-purple);}
+.tl-pin.night{background:var(--p-night);}
+.tl-pin.transit{background:var(--p-transit);}
+.tl-vline{width:1.5px;background:var(--border);flex:1;min-height:12px;}
+.tl-item:last-child .tl-vline{display:none;}
+.tl-body{flex:1;padding:2px 0 20px 12px;}
+.tl-time{font-size:10px;color:var(--soft);letter-spacing:.4px;margin-bottom:3px;}
+.tl-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.35;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tl-map-icon{font-size:13px;opacity:.6;text-decoration:none;flex-shrink:0;}
+.tl-desc{font-size:12px;color:#4A4540;line-height:1.7;margin-bottom:6px;}
+.tl-map-hint{font-size:10px;color:var(--soft);margin-top:2px;margin-bottom:4px;}
+.move-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:10px 13px;display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+.move-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text);line-height:1.6;}
+.mbadge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-badge);white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.mbadge.walk{background:#FEF3E2;color:#A06830;}
+.mbadge.transit{background:#E8EEF8;color:#506090;}
+.tl-meal-filled{background:#F0F8F2;border:1px solid #BFD9C8;border-radius:var(--radius-card);padding:10px 13px;margin-top:6px;display:none;}
+.tl-meal-filled-name{font-size:13px;font-weight:600;color:#3D7A55;margin-bottom:2px;}
+.tl-meal-filled-desc{font-size:11px;color:var(--muted);}
+.warn-banner{margin:14px 16px 0;background:#FFF0F0;border:1px solid #F0C8C8;border-radius:var(--radius-card);padding:10px 13px;font-size:12px;color:#8A2020;line-height:1.7;}
+.warn-banner.depart{background:#FFF8E8;border-color:#E8D080;color:#7A5800;}
+.info-inline{background:#F4FAF6;border-left:3px solid #82A88F;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#3A6A4A;line-height:1.6;}
+.warn-inline{background:#FFF8E8;border-left:3px solid #C4956A;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#7A5020;line-height:1.6;}
+.subtabs{display:flex;gap:6px;padding:10px 16px 0;}
+.subtab{font-size:12px;font-weight:500;padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-badge);cursor:pointer;color:var(--muted);background:var(--surface);}
+.subtab.active{background:var(--p-blue);color:#fff;border-color:var(--p-blue);}
+.subtab.korean.active{background:var(--p-green);border-color:var(--p-green);}
+.subcontent{display:none;padding:10px 16px 80px;}
+.subcontent.active{display:block;}
+.sec-lbl{font-size:10px;font-weight:600;letter-spacing:.8px;color:var(--soft);text-transform:uppercase;margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.sec-lbl:first-child{margin-top:4px;}
+.place-card{border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .18s;}
+.place-card.selected{border-color:var(--p-blue);background:#F0F4FA;}
+.place-card.selected.korean-card{border-color:var(--p-green);background:#F0F8F2;}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;}
+.card-name{font-size:13px;font-weight:600;line-height:1.4;color:var(--text);}
+.badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.badge.saved{background:#FEF5E8;color:#906030;font-weight:700;}
+.badge.ai{background:#F0EAF8;color:#7050A0;font-weight:700;}
+.badge.verified{background:#E8F5E8;color:#2A6A2A;font-weight:700;}
+.card-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.card-meta-item{font-size:11px;color:var(--muted);}
+.card-desc{font-size:12px;color:#4A4540;line-height:1.65;margin-bottom:6px;}
+.card-memo{font-size:11px;color:#5A7A5A;background:#F4FAF4;border:1px solid #C8DCC8;border-radius:8px;padding:5px 9px;margin-bottom:5px;}
+.card-tip{font-size:11px;color:#906030;background:#FEF5E8;border:1px solid #F0D8B0;border-radius:8px;padding:6px 10px;margin-top:4px;}
+.selected-notice{display:none;font-size:11px;color:#3D7A55;font-weight:600;margin-top:6px;}
+.place-card.selected .selected-notice{display:block;}
+.cafe-drawer{margin-top:8px;}
+.cafe-btn{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--p-blue);border:1px solid var(--border);border-radius:var(--radius-badge);padding:6px 12px;cursor:pointer;background:var(--bg);width:fit-content;}
+.cafe-list{display:none;margin-top:8px;}
+.cafe-list.open{display:block;}
+.cafe-item{border:1px solid var(--border);border-radius:var(--radius-card);padding:9px 12px;margin-bottom:6px;font-size:11.5px;}
+.cafe-name{font-weight:700;color:var(--text);margin-bottom:2px;}
+.cafe-meta{color:var(--muted);font-size:10.5px;margin-bottom:3px;}
+.cafe-desc{color:#4A4540;font-size:11px;line-height:1.5;}
+.gmap-btn{display:inline-block;font-size:11px;color:var(--p-blue);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-badge);margin-top:6px;}
+.mart-wrap{padding:14px 16px 80px;}
+.mart-card{border:1px solid var(--border);border-radius:var(--radius-card);padding:13px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .18s;}
+.mart-card.on-map{border-color:var(--p-blue);background:#F0F4FA;}
+.mart-name{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.mart-tag{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.4px;}
+.mart-tag.local{background:#E8F5E8;color:#2A6A2A;}
+.mart-tag.korean{background:#FEF0E8;color:#8A4010;}
+.mart-hours{font-size:11px;color:#3A7A3A;font-weight:600;margin-bottom:4px;}
+.mart-addr{font-size:11px;color:var(--muted);margin-bottom:5px;}
+.mart-desc{font-size:12px;color:#4A4540;line-height:1.65;}
+.legend{position:fixed;bottom:12px;left:12px;background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:11px;display:flex;flex-direction:column;gap:5px;z-index:500;box-shadow:0 2px 10px rgba(0,0,0,.08);pointer-events:none;}
+.leg-row{display:flex;align-items:center;gap:8px;color:#4A4540;}
+.leg-line{width:22px;height:3px;border-radius:2px;flex-shrink:0;}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.leg-sep{height:1px;background:var(--border);margin:1px 0;}
+@media(min-width:768px){
+  .layout{flex-direction:row;height:100vh;}
+  #map{flex:1;height:100%!important;min-height:unset;}
+  .panel{width:440px;flex:none;border-top:none;border-left:1px solid var(--border);}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="brand">2026 동유럽</span>
+    <span class="day-pill">Day 2 · 부다페스트 전일</span>
+  </div>
+  <select class="day-select" onchange="if(this.value)location.href=this.value">
+    <option value="travel_day01_0723.html">7/23 부다페스트 도착</option>
+    <option value="" selected>7/24 부다페스트 전일</option>
+    <option value="travel_day03_0725.html">7/25 부다→빈 이동</option>
+    <option value="travel_day04_0726.html">7/26 빈 전일</option>
+    <option value="travel_day05_0727.html">7/27 빈 전일</option>
+    <option value="travel_day06_0728.html">7/28 빈→잘츠 이동</option>
+    <option value="travel_day07_0729.html">7/29 잘츠부르크</option>
+    <option value="travel_day08_0730.html">7/30 할슈타트</option>
+    <option value="travel_day09_0731.html">7/31 잘츠→바트이슐</option>
+    <option value="travel_day10_0801.html">8/1 바트이슐</option>
+    <option value="travel_day11_0802.html">8/2 바트이슐→CK</option>
+    <option value="travel_day12_0803.html">8/3 체스키크룸로프</option>
+    <option value="travel_day13_0804.html">8/4 CK→프라하</option>
+    <option value="travel_day14_0805.html">8/5 프라하 전일</option>
+    <option value="travel_day15_0806.html">8/6 프라하 출발</option>
+  </select>
+</div>
+
+<div class="layout">
+  <div id="map">
+    <div class="legend">
+      <div class="leg-row"><div class="leg-line" style="border-top:2px dashed var(--p-navy);background:none;"></div>버스·지하철</div>
+      <div class="leg-row"><div class="leg-line" style="background:var(--p-orange);"></div>도보</div>
+      <div class="leg-sep"></div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-blue)"></div>관광</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-green)"></div>식당</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-purple)"></div>숙소</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-night)"></div>야경</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('timeline',this)">📋 일정</div>
+      <div class="tab" onclick="switchTab('lunch',this)">🍽 점심</div>
+      <div class="tab" onclick="switchTab('dinner',this)">🌙 저녁</div>
+      <div class="tab" onclick="switchTab('mart',this)">🛒 마트</div>
+    </div>
+
+    <!-- 일정 탭 -->
+    <div id="tab-timeline" class="tab-content active">
+
+      <div class="weather-card">
+        <div class="wc-item"><span style="font-size:16px;" id="wc-icon">🌤</span><div><span class="wc-label">날씨</span><span class="wc-val" id="wc-wx">로딩 중</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌡</span><div><span class="wc-label">기온</span><span class="wc-val" id="wc-temp">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌅</span><div><span class="wc-label">일출</span><span class="wc-val" id="wc-rise">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌇</span><div><span class="wc-label">일몰</span><span class="wc-val" id="wc-set">—</span></div></div>
+      </div>
+
+      <!-- 교통권 드로어 -->
+      <div class="ttc-card">
+        <div class="ttc-header" onclick="toggleTTC()">
+          <div class="ttc-title">🎫 부다페스트 교통권 안내</div>
+          <div class="ttc-chevron" id="ttc-chevron">▾</div>
+        </div>
+        <div class="ttc-body" id="ttc-body">
+          <div class="ttc-row">
+            <span class="ttc-badge pass">추천</span>
+            <div>
+              <strong>24시간 종이 티켓 2,500 HUF/인</strong> (지하철역 BKK 자판기)<br>
+              보라색 대형 자판기 · 카드·현금 가능<br>
+              구매 후 개찰기에 찍고 통과 (미찍으면 벌금)
+            </div>
+          </div>
+          <div class="ttc-row">
+            <span class="ttc-badge warn">주의</span>
+            <div>
+              단회권(500 HUF) × 6회 = 3,000 HUF<br>
+              24시간권 2,500 HUF → <strong>오늘 500 HUF 절약</strong>
+            </div>
+          </div>
+          <div class="ttc-compare">
+            <div class="ttc-compare-row"><span class="ttc-compare-label">Budapest Card (관광포함 올인원)</span><span class="ttc-compare-price">27,990~29,990 HUF</span></div>
+            <div class="ttc-compare-row"><span class="ttc-compare-label">72시간 순수 교통카드 (BKK)</span><span class="ttc-compare-price">5,500 HUF</span></div>
+            <div class="ttc-compare-row winner"><span class="ttc-compare-label">✅ 결론: 교통카드만 + 명소 개별 구매</span><span class="ttc-compare-price">약 24,000 HUF 절감</span></div>
+          </div>
+          <div class="ttc-warn">
+            ⚠️ Budapest Card는 명소 입장권 포함 가격이지만 실제로 가는 명소만 따지면 개별 구매가 훨씬 저렴<br>
+            ⚠️ 앱 QR 오류 사례 있음 → 자판기 종이 티켓 권장
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline">
+
+        <div class="tl-item" data-map-key="hotel" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">①</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">08:10 출발</div>
+            <div class="tl-name">B40 숙소 출발 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=B40+Green+ApartRooms+Baross+utca+40+Budapest" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              지하철역 BKK 자판기에서 <strong>24시간 종이 티켓 구매 (2,500 HUF/인)</strong><br>
+              Rákóczi tér역 (숙소 도보 3분) 또는 Blaha Lujza tér역 탑승
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 M2 지하철</span>Blaha Lujza tér 탑승 → Batthyány tér 하차 → 도보 15분 언덕길 (총 약 30~35분)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item" data-map-key="fisherman" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">②</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">09:00~10:20</div>
+            <div class="tl-name">어부의 요새 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJE7OKIlfBQUcReqFJjlWJJeE" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              하부 테라스 <strong>무료</strong> / 상부 타워 <strong>1,700 HUF/인</strong><br>
+              국회의사당·다뉴브강·페스트 도심 파노라마<br>
+              와이프 저장 ✅
+            </div>
+            <div class="warn-inline">⚠️ 현장 카드 결제만, 현금 불가 · 아침 일찍 방문해야 인파 적음</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">도보</span>어부의 요새 → 마차시 성당 · 도보 3분</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item" data-map-key="matthias" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">③</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">10:30~12:00</div>
+            <div class="tl-name">마차시 성당 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJt_Y0B1fBQUcRxNh2nBMuqhE" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              예약 완료 ☑ · <strong>3,400 HUF/인</strong> (연간 유효)<br>
+              내부 모자이크 타일·스테인드글라스 압권
+            </div>
+            <div class="warn-inline">⚠️ 복장 필수: 어깨·무릎 반드시 가릴 것 (민소매·반바지 입장 거부)<br>모자 탈모 필수 · 스카프/카디건 미리 준비 · 플래시 사진 금지</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 M2 지하철</span>Batthyány tér 탑승 → Blaha Lujza tér 하차 → 도보 5분 → 고즈두 마켓 (총 약 15분)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 점심 (선택) -->
+        <div class="tl-item" id="tl-item-lunch" onclick="flyToLunch(this)">
+          <div class="tl-axis"><div class="tl-pin food">④</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">12:00~13:00</div>
+            <div class="tl-name">점심식사 <span style="font-size:11px;font-weight:400;color:var(--soft);">— 점심 탭에서 선택</span></div>
+            <div class="tl-map-hint">🗺 점심 탭에서 식당 선택 후 지도에 반영</div>
+            <div class="tl-desc">마차시 성당 근처 또는 고즈두 마켓 내·주변 식당 선택 가능</div>
+            <div id="tl-lunch-filled" class="tl-meal-filled">
+              <div class="tl-meal-filled-name" id="tl-lunch-filled-name"></div>
+              <div class="tl-meal-filled-desc" id="tl-lunch-filled-desc"></div>
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 M2</span>Batthyány tér 탑승 → Blaha Lujza tér 하차 → 도보 5분 → 고즈두 마켓 (총 약 15분)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 고즈두 마켓 -->
+        <div class="tl-item" data-map-key="gozsdu" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">⑤</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">13:00~14:30</div>
+            <div class="tl-name">고즈두 빈티지 마켓 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Gozsdu+Market+Budapest+Kiraly+utca" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Gozsdu udvar · Király utca 13 · 유대인지구 내 아케이드형 복합 공간<br>
+              와이프 저장 ✅ · 금·토·일 빈티지 마켓 오픈<br>
+              고즈두 내·주변 식당 선택 시 여기서 점심 해결 가능
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇+🚌 환승</span>Blaha Lujza tér 탑승 M2 → Astoria 하차 → 트램 47/49 Astoria 탑승 → Szent Gellért tér 하차 → 버스 27 탑승 → Busuló Juhász 하차 (총 약 25~30분)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item" data-map-key="gellert" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">⑥</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">15:00~17:30</div>
+            <div class="tl-name">겔레르트 언덕 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJzfTQulfBQUcRuvSzRHKLPpA" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              정상까지 도보 20~30분 · 부다페스트 전경 360도 뷰<br>
+              자유의 여신상 (Citadella) · 강 건너 국회의사당 조망
+            </div>
+            <div class="warn-inline">⚠️ 그늘 없음 — 물 충분히 챙길 것 / 버스 27번 배차 간격 10~15분</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚋 트램 47/49</span>Szent Gellért tér 탑승 → 유대인지구 방향 하차 (약 12~15분) → 저녁식사</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item" id="tl-item-dinner" onclick="flyToDinner(this)">
+          <div class="tl-axis"><div class="tl-pin food">⑦</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">18:00~19:00</div>
+            <div class="tl-name">저녁식사 <span style="font-size:11px;font-weight:400;color:var(--soft);">— 저녁 탭에서 선택</span></div>
+            <div class="tl-map-hint">🗺 저녁 탭에서 식당 선택 후 지도에 반영</div>
+            <div class="tl-desc">저녁 탭에서 식당을 선택하면 여기에 자동 표시됩니다</div>
+            <div id="tl-dinner-filled" class="tl-meal-filled">
+              <div class="tl-meal-filled-name" id="tl-dinner-filled-name"></div>
+              <div class="tl-meal-filled-desc" id="tl-dinner-filled-desc"></div>
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">도보</span>저녁 후 → 심플라 케르트 · Kazinczy utca 14 · 도보 5분 이내</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item" data-map-key="szimpla" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin night">⑧</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">19:00~22:00</div>
+            <div class="tl-name">심플라 케르트 루인펍 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJFUhpgGXBQUcRMt_O9qdlTH8" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              부다페스트 루인펍의 원조 · Kazinczy utca 14<br>
+              와이프 저장: Beer People ✅ (루인펍 구역 인근)<br>
+              현금 선호 · 여름 성수기 매우 혼잡 · 19:00 전 입장 권장
+            </div>
+            <div class="info-inline">💡 Beer People는 같은 루인펍 구역 인근 다른 바 — 심플라와 동선 동일, 분위기 보고 선택</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 M2 지하철</span>Astoria 또는 Blaha Lujza tér 탑승 → Blaha Lujza tér 하차 → 도보 5분 → 숙소 복귀 (약 15분)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item" data-map-key="hotel" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">⑨</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">22:00~22:30</div>
+            <div class="tl-name">B40 숙소 복귀 + 짐 정리 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=B40+Green+ApartRooms+Baross+utca+40+Budapest" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">내일 켈레티역 출발 전 짐 완전히 싸두기</div>
+            <div class="warn-inline">⚠️ 내일 08:35 켈레티역 출발 (도보 25분 소요) → <strong>08:05 이전 숙소 출발</strong> 필수<br>B40 조기 체크아웃(09:10 이전) 절차 사전 확인</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 내일 출발 안내 카드 -->
+      <div class="warn-banner depart" style="margin-bottom:20px;">
+        ⏰ <strong>내일 (7/25) 08:05 출발 필수</strong><br>
+        켈레티역까지 도보 약 25분 (짐 있음 기준) · 09:40 OBB 기차 출발<br>
+        오늘 밤 짐 완전히 싸두기 · B40 체크아웃 절차 확인 (09:10 이전)
+      </div>
+
+    </div>
+
+    <!-- 점심 탭 -->
+    <div id="tab-lunch" class="tab-content">
+      <div class="subtabs">
+        <div class="subtab active" onclick="switchSub('sub-lunch-local',this,'lunch')">🍴 현지식</div>
+        <div class="subtab korean" onclick="switchSub('sub-lunch-korean',this,'lunch')">🥢 아시안</div>
+      </div>
+
+      <div id="sub-lunch-local" class="subcontent active">
+        <div class="sec-lbl">📍 마차시 성당 근처 — 선택 시 화살표 경유</div>
+
+        <div class="place-card" id="lc-menza" onclick="selectLunch(this,'menza')">
+          <div class="card-header">
+            <div class="card-name">멘자 레스토랑 (Menza)</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.4</span></div>
+          </div>
+          <div class="card-memo">💬 "한국인에게 인기 많은 음식점"</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Liszt Ferenc tér 2 · 고즈두 도보 8분</span>
+            <span class="card-meta-item">⏰ 10:00~24:00</span>
+          </div>
+          <div class="card-desc">헝가리 전통 요리 현대적 재해석 · 구글 20,000건 리뷰 · 망갈레차 돼지고기·오리 스테이크·굴라쉬 추천 · 1970년대 복고 인테리어</div>
+          <div class="card-tip">💡 한국인 부다페스트 맛집 1순위 · 점심 메뉴 저렴 · 예약 권장</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/place/Menza/@47.5003,19.0645,17z/data=!4m2!3m1!1s0x4741dc6e9b62d4d5:0x361daa1bec9740fe" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-parasztkonyha_l" onclick="selectLunch(this,'parasztkonyha_l')">
+          <div class="card-header">
+            <div class="card-name">Parasztkonyha Restaurant</div>
+            <div class="badges"><span class="badge verified">⭐ 4.7</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Október 6. u. 3 · 마차시 도보 5분</span>
+            <span class="card-meta-item">⏰ ~22:00</span>
+          </div>
+          <div class="card-desc">헝가리 전통 가정식 · TripAdvisor 483리뷰 4.7점 · 굴라쉬·치킨 파프리카시</div>
+          <div class="card-tip">💡 마차시 성당 바로 근처 · 예약 권장</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/place/Parasztkonyha+Restaurant/@47.4995428,19.0513501,17z/data=!4m6!3m5!1s0x4741dd441a0670b3:0x8df4d20a3d6c6386" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-bestia_l" onclick="selectLunch(this,'bestia_l')">
+          <div class="card-header">
+            <div class="card-name">Bestia Budapest</div>
+            <div class="badges"><span class="badge verified">⭐ 4.5</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Október 6. u. 47 · 성당 바로 옆</span>
+            <span class="card-meta-item">⏰ 12:00~23:00</span>
+          </div>
+          <div class="card-desc">현대 유럽 그릴·헝가리 요리 · 오픈키친 · 굴라쉬·포크립 한국어 리뷰 극찬</div>
+          <div class="card-tip">💡 성당 관람 후 바로 연결되는 최고의 위치</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Bestia+Restaurant+Budapest+Szent+Istvan+ter+9" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="sec-lbl">📍 고즈두 마켓 내·주변 — 마켓 쇼핑 겸해서</div>
+
+        <div class="place-card" id="lc-elysee" onclick="selectLunch(this,'elysee')">
+          <div class="card-header">
+            <div class="card-name">Elysée Bistro</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 유대인지구 내</span>
+            <span class="card-meta-item">⏰ 12:00~22:00</span>
+          </div>
+          <div class="card-desc">모던 유럽 비스트로 · 합리적인 점심 코스 · 유대인지구 분위기와 잘 어울리는 공간</div>
+          <div class="card-tip">💡 고즈두 마켓 쇼핑 중간 쉬기 좋은 위치 · 화살표는 변하지 않음</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Elysee+Bistro+Budapest+Belgrad+rakpart" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-madhouse" onclick="selectLunch(this,'madhouse')">
+          <div class="card-header">
+            <div class="card-name">MADHOUSE BISTRO</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 유대인지구 내</span>
+            <span class="card-meta-item">⏰ 11:30~22:00</span>
+          </div>
+          <div class="card-desc">부다페스트 모던 비스트로 · 창의적인 플레이팅 · 점심 세트 합리적</div>
+          <div class="card-tip">💡 인스타그램용 비주얼 맛집 · 분위기 좋은 공간</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Madhouse+Bistro+Budapest" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-greatmarket" onclick="selectLunch(this,'greatmarket')">
+          <div class="card-header">
+            <div class="card-name">그레이트 마켓홀 내 식당 (Központi Vásárcsarnok)</div>
+            <div class="badges"><span class="badge verified">⭐ 구경+식사</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Fővám tér 1~3 · 트램 47/49</span>
+            <span class="card-meta-item">⏰ 월~토 06:00~18:00 / 일 08:00~15:00</span>
+          </div>
+          <div class="card-desc">부다페스트 최대 실내 시장 · 와이프 저장 ✅ · 1층 랑고쉬(헝가리 튀김빵) · 2층 식당가 · 파프리카·헝가리 소시지 등 기념품 쇼핑도 가능</div>
+          <div class="card-tip">💡 겔레르트 언덕 가는 트램 동선과 자연스럽게 연결 · 랑고쉬 1,500~2,500 HUF로 가성비 점심</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJdx1GlmfBQUcRxrJKdAGMpgA" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div>
+
+      <div id="sub-lunch-korean" class="subcontent">
+        <div class="sec-lbl">🥢 아시안</div>
+
+        <div class="place-card korean-card" id="lc-pho" onclick="selectLunch(this,'pho')">
+          <div class="card-header">
+            <div class="card-name">Pho-Astoria Bistro</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-memo">💬 "부다페스트는 베트남 음식 맛집이라고 함"</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Kossuth Lajos u. 6 · Astoria역 근처</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+          </div>
+          <div class="card-desc">베트남 가족 비스트로 · 정통 베트남 쌀국수 · Restaurant Guru 4.8점</div>
+          <div class="card-tip">💡 유대인지구·겔레르트 이동 중간 Astoria역 근처 위치, 동선상 편리</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Pho+Astoria+Bistro+Budapest+Kossuth+Lajos+utca+6" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card korean-card" id="lc-parisi6" onclick="selectLunch(this,'parisi6')">
+          <div class="card-header">
+            <div class="card-name">Parisi6</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-memo">💬 "파프리카 치킨 추천?"</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 유대인지구 인근</span>
+            <span class="card-meta-item">⏰ 11:00~23:00</span>
+          </div>
+          <div class="card-desc">유럽·아시안 퓨전 · 파프리카 치킨이 대표 메뉴로 꼽힘</div>
+          <div class="card-tip">💡 헝가리 전통 파프리카 맛을 독특한 방식으로 즐길 수 있는 옵션</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Parisi6+Budapest+Kiraly+utca+6" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 저녁 탭 -->
+    <div id="tab-dinner" class="tab-content">
+      <div class="subtabs">
+        <div class="subtab active" onclick="switchSub('sub-dinner-local',this,'dinner')">🍴 현지식</div>
+        <div class="subtab korean" onclick="switchSub('sub-dinner-korean',this,'dinner')">🥢 아시안</div>
+      </div>
+
+      <div id="sub-dinner-local" class="subcontent active">
+        <div class="sec-lbl">🗺 유대인지구 주변 · 겔레르트 하산 후 연결</div>
+
+        <div class="place-card" id="dc-vakvarju" onclick="selectDinner(this,'vakvarju')">
+          <div class="card-header">
+            <div class="card-name">VakVarjú Étterem (까마귀식당)</div>
+            <div class="badges"><span class="badge verified">⭐ 4.4</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Paulay Ede u. 7 · 숙소 도보 5분</span>
+            <span class="card-meta-item">⏰ 12:00~23:00</span>
+          </div>
+          <div class="card-desc">헝가리 전통 가정식 · 피아노 라이브 연주 · TripAdvisor 1,596리뷰 · 오리 푸아그라·굴라쉬 · 빵 덮개 굴라쉬 유명</div>
+          <div class="card-tip">💡 짜지 않은 굴라쉬로 유명 · 한국인 방문 빈도 높음 · 예약 권장</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=VakVarju+Etterem+Budapest+Paulay+Ede+utca+7" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-menza" onclick="selectDinner(this,'menza')">
+          <div class="card-header">
+            <div class="card-name">멘자 레스토랑 (Menza)</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.4</span></div>
+          </div>
+          <div class="card-memo">💬 "한국인에게 인기 많은 음식점"</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Liszt Ferenc tér 2</span>
+            <span class="card-meta-item">⏰ 10:00~24:00</span>
+          </div>
+          <div class="card-desc">헝가리 전통 요리 현대적 재해석 · 구글 20,000건 리뷰 · 점심에 못 갔다면 저녁에 선택</div>
+          <div class="card-tip">💡 점심과 겹치지 않게 선택 · 심플라 케르트와 도보 10분 거리</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/place/Menza/@47.5003,19.0645,17z/data=!4m2!3m1!1s0x4741dc6e9b62d4d5:0x361daa1bec9740fe" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-mazeltov" onclick="selectDinner(this,'mazeltov')">
+          <div class="card-header">
+            <div class="card-name">Mazel Tov</div>
+            <div class="badges"><span class="badge verified">⭐ 4.5</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Akácfa u. 47 · 유대인지구 (심플라 도보 3분)</span>
+            <span class="card-meta-item">⏰ 12:00~24:00</span>
+          </div>
+          <div class="card-desc">중동·이스라엘 퓨전 · 흄무스·팔라펠·샤와르마 · 구글 2,200건+ 4.5점 · 실내 정원 루인바 분위기 · 라이브 재즈</div>
+          <div class="card-tip">💡 심플라 케르트 전 저녁으로 최적 위치 · 예약 필수 (성수기 매일 만석)</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Mazel+Tov+Budapest+Akacfa+utca+47" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-parasztkonyha" onclick="selectDinner(this,'parasztkonyha')">
+          <div class="card-header">
+            <div class="card-name">Parasztkonyha Restaurant</div>
+            <div class="badges"><span class="badge verified">⭐ 4.7</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Október 6. u. 3</span>
+            <span class="card-meta-item">⏰ ~22:00</span>
+          </div>
+          <div class="card-desc">헝가리 전통 가정식 · TripAdvisor 483리뷰 4.7점 · 굴라쉬·치킨 파프리카시 · 한국어 리뷰 다수</div>
+          <div class="card-tip">💡 첫날 못 갔다면 오늘의 선택 · 예약 권장 (성수기 대기 30분+)</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/place/Parasztkonyha+Restaurant/@47.4995428,19.0513501,17z/data=!4m6!3m5!1s0x4741dd441a0670b3:0x8df4d20a3d6c6386" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-bonnie" onclick="selectDinner(this,'bonnie')">
+          <div class="card-header">
+            <div class="card-name">Bonnie</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-memo">💬 "간이 살짝 짜다는 평이 있는 한데..."</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 유대인지구 내</span>
+            <span class="card-meta-item">⏰ ~23:00</span>
+          </div>
+          <div class="card-desc">와이프 저장 ✅ · 유대인지구 분위기 식당 · 간이 짜다는 후기 일부 있음, 취향 확인</div>
+          <div class="card-tip">💡 심플라 케르트와 동선상 편리한 위치</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Bonnie+Bar+Budapest" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div>
+
+      <div id="sub-dinner-korean" class="subcontent">
+        <div class="sec-lbl">🥢 아시안 · 베트남</div>
+
+        <div class="place-card korean-card" id="dc-pho" onclick="selectDinner(this,'pho_d')">
+          <div class="card-header">
+            <div class="card-name">Pho-Astoria Bistro</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-memo">💬 "부다페스트는 베트남 음식 맛집이라고 함"</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Kossuth Lajos u. 6</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+          </div>
+          <div class="card-desc">베트남 가족 비스트로 · 정통 쌀국수 · Restaurant Guru 4.8점 · 가볍고 담백</div>
+          <div class="card-tip">💡 헝가리 음식이 부담스러울 때 선택</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Pho+Astoria+Bistro+Budapest+Kossuth+Lajos+utca+6" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div style="background:#F4F9F4;border:1px dashed #B8D8C0;border-radius:var(--radius-card);padding:12px 14px;margin-bottom:10px;font-size:12px;color:#5A8A6A;line-height:1.7;">
+          🏠 숙소 주방 완비 — 내일 기차 이동 전 간단히 해먹기 가능. SPAR (도보 5분, 21:00까지)에서 장보기.
+        </div>
+      </div>
+    </div>
+
+    <!-- 마트 탭 -->
+    <div id="tab-mart" class="tab-content">
+      <div class="mart-wrap">
+        <div style="background:#FFF8E8;border:1px solid #E8D890;border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:#7A6010;line-height:1.7;">
+          💡 내일 기차 이동 (9:40 출발) — 열차 간식·생수·도시락 재료 오늘 미리 구매 권장
+        </div>
+
+        <div class="sec-lbl">🏪 현지 마트</div>
+        <div class="mart-card" onclick="toggleMart(this,'mart_spar')">
+          <div class="mart-name">SPAR <span class="mart-tag local">현지마트</span></div>
+          <div class="mart-hours">🕐 월~토 07:00~21:00 / 일 08:00~20:00</div>
+          <div class="mart-addr">📍 Kerepesi út 9 · 숙소(Baross utca 40) 도보 5분</div>
+          <div class="mart-desc">숙소에서 가장 가까운 마트 · 내일 기차 간식·생수 여기서 해결 권장</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=SPAR+Budapest+Kerepesi+ut+9" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="mart-card" onclick="toggleMart(this,'mart_cba')">
+          <div class="mart-name">CBA Príma <span class="mart-tag local">편의마트</span></div>
+          <div class="mart-hours">🕐 매일 06:00~22:00</div>
+          <div class="mart-addr">📍 숙소 반경 500m 내 다수 분포</div>
+          <div class="mart-desc">편의점 형태 소형 마트 · 생수·스낵·음료 빠르게 구매</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=CBA+Prima+Budapest+VIII+kerulet+Baross+utca" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="sec-lbl">🌏 한인·아시안 마트</div>
+        <div class="mart-card" onclick="toggleMart(this,'mart_korean')">
+          <div class="mart-name">Asia Center Budapest <span class="mart-tag korean">아시안마트</span></div>
+          <div class="mart-hours">🕐 매일 09:00~20:00</div>
+          <div class="mart-addr">📍 Kőbányai út 21 · 숙소에서 트램 또는 도보 20분</div>
+          <div class="mart-desc">라면·햇반·김치·고추장 등 한국 식재료 구비 · 유럽 내 빈(나크원)까지 가는 방법도 있으니 여기서 못 구하면 빈에서 해결 가능</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Asia+Center+Budapest+Kobanyai+ut+21" target="_blank">📍 구글지도</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const map = L.map('map', {zoomControl:false, tap:true}).setView([47.498, 19.040], 13);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:19
+}).addTo(map);
+L.control.zoom({position:'topright'}).addTo(map);
+
+const BLUE='#7B9BB8', GREEN='#82A88F', PURPLE='#9B8DB8', ORANGE='#C4956A',
+      NIGHT='#8A6FA0', NAVY='#6B7FA8', TRANSIT='#7A9ABE';
+
+const LL = {
+  hotel:      [47.4938, 19.0618],
+  fisherman:  [47.5018, 19.0341],
+  matthias:   [47.5016, 19.0343],
+  gozsdu:     [47.4993, 19.0604],
+  gellert:    [47.4875, 19.0474],
+  szimpla:    [47.4991, 19.0636],
+  // 점심 식당
+  parasztkonyha_l:[47.5002, 19.0545],
+  bestia_l:   [47.5003, 19.0540],
+  menza:      [47.5000, 19.0645],
+  elysee:     [47.4990, 19.0580],
+  madhouse:   [47.4988, 19.0610],
+  greatmarket:[47.4865, 19.0585],
+  pho:        [47.4975, 19.0530],
+  parisi6:    [47.4980, 19.0590],
+  // 저녁 식당
+  vakvarju:   [47.4996, 19.0563],
+  mazeltov:   [47.4993, 19.0664],
+  parasztkonyha:[47.5002,19.0545],
+  bonnie:     [47.4995, 19.0620],
+  pho_d:      [47.4975, 19.0530],
+};
+
+const MK = {};
+
+function calcArrowAngle(from, to) {
+  const p1 = map.latLngToContainerPoint(L.latLng(from));
+  const p2 = map.latLngToContainerPoint(L.latLng(to));
+  return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + 90;
+}
+
+function makeArrowIcon(color, angle) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:22px;height:22px;transform:rotate(${angle}deg);transform-origin:11px 11px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));">
+      <svg width="22" height="22" viewBox="0 0 10 10">
+        <polygon points="5,0 9.5,10 5,7 0.5,10" fill="${color}" opacity="1"/>
+      </svg></div>`,
+    iconSize: [22, 22], iconAnchor: [11, 11]
+  });
+}
+
+function addLine(from, to, color, dash) {
+  if (!LL[from] || !LL[to]) return {setStyle:()=>{}, _arrow:{setOpacity:()=>{}}};
+  const line = L.polyline([LL[from], LL[to]], {
+    color, weight:3.5, opacity:.78, dashArray:dash?'6,5':null, lineCap:'round'
+  }).addTo(map);
+  const angle = calcArrowAngle(LL[from], LL[to]);
+  const arrow = L.marker(LL[to], {
+    icon: makeArrowIcon(color, angle),
+    interactive: false, zIndexOffset: -10
+  }).addTo(map);
+  line._arrow = arrow;
+  return line;
+}
+
+function _allLines() { return _baseLines.concat(lunchLines, dinnerLines); }
+const _baseLines = [];
+function refreshArrows() {
+  _allLines().forEach(l => {
+    if (!l || !l._from || !l._to || !l._arrow) return;
+    const angle = calcArrowAngle(l._from, l._to);
+    l._arrow.setIcon(makeArrowIcon(l._color, angle));
+  });
+}
+map.on('zoomend moveend', refreshArrows);
+
+function addTrackedLine(from, to, color, dash) {
+  const l = addLine(from, to, color, dash);
+  if (l && LL[from] && LL[to]) {
+    l._from = LL[from]; l._to = LL[to]; l._color = color;
+  }
+  return l;
+}
+
+function mkDropPin(num, color, label) {
+  const hasLabel = label && label.length > 0;
+  const totalW = hasLabel ? Math.min(220, label.length * 9 + 56) : 30;
+  return L.divIcon({
+    className: '',
+    html: `<div style="position:relative;display:flex;align-items:flex-start;gap:6px;width:${totalW}px;">
+      <div style="position:relative;width:30px;height:38px;flex-shrink:0;">
+        <div style="width:30px;height:30px;background:${color};border:2.5px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(0,0,0,.22);position:absolute;top:0;left:0;"></div>
+        <div style="position:absolute;top:4px;left:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white;font-family:'Noto Sans KR',sans-serif;z-index:2;">${num}</div>
+      </div>
+      ${hasLabel ? `<div style="margin-top:3px;background:white;border:1.5px solid #D8D2CA;border-radius:6px;padding:4px 9px;font-size:11.5px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:#1E1C1A;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.1);line-height:1.3;">${label}</div>` : ''}
+    </div>`,
+    iconSize: [totalW, 38], iconAnchor: [15, 38], popupAnchor: [0, -40]
+  });
+}
+
+// lunch_slot / dinner_slot은 선택 전 기본 위치 (마차시 근처 / 겔레르트 근처)
+LL['lunch_slot']  = [47.5004, 19.0540]; // 마차시 성당 바로 앞 (선택 전 표시 안 함)
+LL['dinner_slot'] = [47.4993, 19.0604]; // 고즈두 근처 (선택 전 표시 안 함)
+
+const FIXED = [
+  {k:'hotel',     num:'①', c:PURPLE, tip:'B40 숙소'},
+  {k:'fisherman', num:'②', c:BLUE,   tip:'어부의 요새'},
+  {k:'matthias',  num:'③', c:BLUE,   tip:'마차시 성당'},
+  {k:'gozsdu',    num:'⑤', c:BLUE,   tip:'고즈두 마켓'},
+  {k:'gellert',   num:'⑥', c:BLUE,   tip:'겔레르트 언덕'},
+  {k:'szimpla',   num:'⑧', c:NIGHT,  tip:'심플라 케르트'},
+];
+FIXED.forEach(p => { MK[p.k] = L.marker(LL[p.k], {icon: mkDropPin(p.num, p.c, p.tip)}).addTo(map); });
+
+const _boundsLL = [LL.hotel, LL.fisherman, LL.gozsdu, LL.gellert, LL.szimpla];
+map.fitBounds(_boundsLL, {padding:[48,48]});
+
+// 점심: 마차시→고즈두 기본선 (선택 시 마차시→식당→고즈두로 교체)
+// 저녁: 겔레르트→심플라 기본선 (선택 시 겔레르트→식당→심플라로 교체)
+let _lineMatthiasToGozsdu, _lineGellertToSzimpla;
+map.whenReady(() => {
+  setTimeout(() => {
+    map.invalidateSize();
+    map.fitBounds(_boundsLL, {padding:[48,48]});
+    _baseLines.push(addTrackedLine('hotel', 'fisherman', NAVY, false));
+    _baseLines.push(addTrackedLine('fisherman', 'matthias', ORANGE, true));
+    _lineMatthiasToGozsdu = addTrackedLine('matthias', 'gozsdu', NAVY, false);
+    _baseLines.push(_lineMatthiasToGozsdu);
+    _baseLines.push(addTrackedLine('gozsdu', 'gellert', NAVY, false));
+    _lineGellertToSzimpla = addTrackedLine('gellert', 'szimpla', NAVY, false);
+    _baseLines.push(_lineGellertToSzimpla);
+    _baseLines.push(addTrackedLine('szimpla', 'hotel', NAVY, false));
+  }, 120);
+});
+
+setTimeout(() => {
+  map.invalidateSize();
+  map.fitBounds(_boundsLL, {padding:[48,48]});
+}, 100);
+window.addEventListener('load', () => {
+  setTimeout(() => map.invalidateSize(), 200);
+});
+
+// ── 점심 식당 데이터 ───────────────────────────────────────────
+// zone: 'matthias' = 마차시 근처 → 화살표 교체
+//       'gozsdu'   = 고즈두 내/주변 → 화살표 변화 없음, 텍스트만
+const LUNCH_DATA = {
+  menza:       {zone:'matthias', tip:'멘자',          name:'멘자 레스토랑 (Menza)',      desc:'헝가리 현대식 · 구글 20,000건 · 망갈레차 돼지고기·오리 스테이크'},
+  parasztkonyha_l:{zone:'matthias', tip:'Parasztkonyha', name:'Parasztkonyha Restaurant', desc:'헝가리 가정식 · TripAdvisor 4.7 · 마차시 도보 5분'},
+  bestia_l:    {zone:'matthias', tip:'Bestia',        name:'Bestia Budapest',            desc:'현대 유럽 그릴 · 성당 옆 위치 · 오픈키친'},
+  elysee:      {zone:'gozsdu',   tip:'Elysée',        name:'Elysée Bistro',              desc:'모던 유럽 비스트로 · 유대인지구 내'},
+  madhouse:    {zone:'gozsdu',   tip:'MADHOUSE',      name:'MADHOUSE BISTRO',            desc:'모던 비스트로 · 창의적인 플레이팅 · 인스타 감성'},
+  greatmarket: {zone:'gozsdu',   tip:'그레이트마켓홀',  name:'그레이트 마켓홀 내 식당',    desc:'랑고쉬(헝가리 튀김빵) · 겔레르트 이동 트램 동선과 연결'},
+  pho:         {zone:'matthias', tip:'Pho-Astoria',   name:'Pho-Astoria Bistro',         desc:'베트남 쌀국수 · Restaurant Guru 4.8점 · Astoria역 근처'},
+  parisi6:     {zone:'gozsdu',   tip:'Parisi6',       name:'Parisi6',                    desc:'파프리카 치킨 · 유럽·아시안 퓨전 · 유대인지구'},
+};
+
+let selLunch = null;
+const lunchLines = [];
+
+function _clearLines(arr) {
+  arr.forEach(l => {
+    if (!l) return;
+    try { map.removeLayer(l); } catch(e) {}
+    if (l._arrow) { try { map.removeLayer(l._arrow); } catch(e) {} }
+  });
+  arr.length = 0;
+}
+function _removePin(key) {
+  if (MK[key]) { try { map.removeLayer(MK[key]); } catch(e) {} delete MK[key]; }
+}
+
+function selectLunch(el, key) {
+  document.querySelectorAll('#tab-lunch .place-card').forEach(c => c.classList.remove('selected'));
+  _clearLines(lunchLines);
+  _removePin('r_lunch');
+  // 기본 화살표 복원
+  if (_lineMatthiasToGozsdu) {
+    _lineMatthiasToGozsdu.setStyle({opacity:.78});
+    if (_lineMatthiasToGozsdu._arrow) _lineMatthiasToGozsdu._arrow.setOpacity(.78);
+  }
+  if (selLunch === key) {
+    selLunch = null;
+    document.getElementById('tl-lunch-filled').style.display = 'none';
+    return;
+  }
+  el.classList.add('selected');
+  selLunch = key;
+  const d = LUNCH_DATA[key];
+
+  if (d.zone === 'matthias') {
+    // 마차시 근처 → 화살표 교체: 마차시→식당→고즈두
+    if (_lineMatthiasToGozsdu) {
+      _lineMatthiasToGozsdu.setStyle({opacity:0});
+      if (_lineMatthiasToGozsdu._arrow) _lineMatthiasToGozsdu._arrow.setOpacity(0);
+    }
+    MK['r_lunch'] = L.marker(LL[key], {icon: mkDropPin('④', GREEN, d.name)}).addTo(map);
+    lunchLines.push(addTrackedLine('matthias', key, ORANGE, true));
+    lunchLines.push(addTrackedLine(key, 'gozsdu', NAVY, false));
+    map.panTo(LL[key]);
+  } else {
+    // 고즈두 내/주변 → 화살표 변화 없음, 고즈두 핀으로 이동만
+    map.panTo(LL.gozsdu);
+  }
+
+  document.getElementById('tl-lunch-filled').style.display = 'block';
+  document.getElementById('tl-lunch-filled-name').textContent = '🍽 점심 식사';
+  document.getElementById('tl-lunch-filled-desc').textContent = d.name + ' · ' + d.desc;
+}
+
+// ── 저녁 식당 데이터 ───────────────────────────────────────────
+const DINNER_DATA = {
+  vakvarju:      {c:GREEN, tip:'까마귀식당',    name:'VakVarjú Étterem (까마귀식당)',       desc:'헝가리 전통 · 피아노 라이브 · 빵 덮개 굴라쉬'},
+  menza:         {c:GREEN, tip:'멘자',          name:'멘자 레스토랑 (Menza)',               desc:'헝가리 현대식 · 구글 20,000건 · 망갈레차 돼지고기'},
+  mazeltov:      {c:GREEN, tip:'Mazel Tov',     name:'Mazel Tov',                          desc:'중동·이스라엘 퓨전 · 실내 정원 · 라이브 재즈'},
+  parasztkonyha: {c:GREEN, tip:'Parasztkonyha', name:'Parasztkonyha Restaurant',            desc:'헝가리 가정식 · TripAdvisor 4.7 · 굴라쉬'},
+  bonnie:        {c:GREEN, tip:'Bonnie',        name:'Bonnie',                             desc:'유대인지구 분위기 식당 · 간이 짤 수 있음'},
+  pho_d:         {c:GREEN, tip:'Pho-Astoria',   name:'Pho-Astoria Bistro',                 desc:'베트남 쌀국수 · 가볍고 담백'},
+};
+
+let selDinner = null;
+const dinnerLines = [];
+
+function selectDinner(el, key) {
+  document.querySelectorAll('#tab-dinner .place-card').forEach(c => c.classList.remove('selected'));
+  _clearLines(dinnerLines);
+  _removePin('r_dinner');
+  if (selDinner === key) {
+    selDinner = null;
+    if (_lineGellertToSzimpla) {
+      _lineGellertToSzimpla.setStyle({opacity:.78});
+      if (_lineGellertToSzimpla._arrow) _lineGellertToSzimpla._arrow.setOpacity(.78);
+    }
+    document.getElementById('tl-dinner-filled').style.display = 'none';
+    return;
+  }
+  el.classList.add('selected');
+  selDinner = key;
+  const d = DINNER_DATA[key];
+  if (_lineGellertToSzimpla) {
+    _lineGellertToSzimpla.setStyle({opacity:0});
+    if (_lineGellertToSzimpla._arrow) _lineGellertToSzimpla._arrow.setOpacity(0);
+  }
+  MK['r_dinner'] = L.marker(LL[key] || LL.gozsdu, {icon: mkDropPin('⑦', GREEN, d.name)}).addTo(map);
+  const l1 = addTrackedLine('gellert', key, NAVY, false);
+  const l2 = addTrackedLine(key, 'szimpla', ORANGE, true);
+  dinnerLines.push(l1, l2);
+  document.getElementById('tl-dinner-filled').style.display = 'block';
+  document.getElementById('tl-dinner-filled-name').textContent = '🌙 저녁 식사';
+  document.getElementById('tl-dinner-filled-desc').textContent = d.name + ' · ' + d.desc;
+  map.panTo(LL[key] || LL.gozsdu);
+}
+
+// ── 마트 핀 토글 ───────────────────────────────────────────────
+const martPins = {};
+function toggleMart(el, key) {
+  const coords = {
+    mart_spar:   [47.4910, 19.0672],
+    mart_cba:    [47.4935, 19.0610],
+    mart_korean: [47.4850, 19.0780],
+  };
+  const labels = {mart_spar:'SPAR', mart_cba:'CBA Príma', mart_korean:'Asia Center'};
+  if (martPins[key]) {
+    try { map.removeLayer(martPins[key]); } catch(e) {}
+    delete martPins[key];
+    el.classList.remove('on-map');
+  } else {
+    martPins[key] = L.marker(coords[key] || LL.hotel, {icon: mkDropPin('🛒', ORANGE, labels[key])}).addTo(map);
+    el.classList.add('on-map');
+    map.panTo(coords[key] || LL.hotel);
+  }
+}
+
+function flyToPin(el) {
+  const key = el.dataset.mapKey;
+  if (!key || !LL[key]) return;
+  const body = el.querySelector('.tl-body');
+  if (body) { body.style.background = '#E8F0FA'; setTimeout(() => { body.style.background = ''; }, 600); }
+  map.panTo(LL[key]);
+}
+function flyToLunch(el) {
+  const body = el.querySelector('.tl-body');
+  if (body) { body.style.background = '#E8F0FA'; setTimeout(() => { body.style.background = ''; }, 600); }
+  if (selLunch && LL[selLunch]) { map.panTo(LL[selLunch]); }
+  else { map.panTo(LL['matthias']); }
+}
+function flyToDinner(el) {
+  const body = el.querySelector('.tl-body');
+  if (body) { body.style.background = '#E8F0FA'; setTimeout(() => { body.style.background = ''; }, 600); }
+  if (selDinner && LL[selDinner]) { map.panTo(LL[selDinner]); }
+  else { map.panTo(LL['gellert']); }
+}
+
+// ── 핀 클릭 → 일정 스크롤 ──────────────────────────────────────
+FIXED.forEach(p => {
+  if (MK[p.k]) MK[p.k].on('click', () => {
+    const tl = document.getElementById('tab-timeline');
+    if (!tl.classList.contains('active')) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('[onclick*="timeline"]').classList.add('active');
+      tl.classList.add('active');
+    }
+    // 0:숙소출발 1:어부의요새 2:마차시 3:점심슬롯 4:고즈두 5:겔레르트 6:저녁슬롯 7:심플라 8:숙소복귀
+    const km = {hotel:0, fisherman:1, matthias:2, gozsdu:4, gellert:5, szimpla:7};
+    const idx = km[p.k];
+    const items = document.querySelectorAll('#tab-timeline .tl-item');
+    if (idx !== undefined && items[idx]) {
+      items[idx].scrollIntoView({behavior:'smooth', block:'center'});
+      items[idx].style.background = '#F0F4FA';
+      setTimeout(() => items[idx].style.background = '', 700);
+    }
+  });
+});
+
+function toggleTTC() {
+  const body = document.getElementById('ttc-body');
+  const chev = document.getElementById('ttc-chevron');
+  const isOpen = body.style.display === 'block';
+  if (isOpen) { body.style.display = 'none'; chev.style.transform = 'rotate(-90deg)'; }
+  else { body.style.display = 'block'; chev.style.transform = ''; }
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const target = document.getElementById('tab-' + name);
+  target.classList.add('active');
+  target.scrollTop = 0;
+  void target.offsetHeight;
+  setTimeout(() => map.invalidateSize(), 50);
+}
+
+function switchSub(id, el, group) {
+  document.getElementById('tab-' + group).querySelectorAll('.subtab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + group).querySelectorAll('.subcontent').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// ── 날씨 (7/24 부다페스트) ──────────────────────────────────────
+(async () => {
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.498&longitude=19.040&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FBudapest&forecast_days=16');
+    const d = await r.json();
+    const idx = d.daily.time.indexOf('2026-07-24');
+    if (idx < 0) throw new Error();
+    const wc = d.daily.weather_code[idx];
+    const mx = Math.round(d.daily.temperature_2m_max[idx]);
+    const mn = Math.round(d.daily.temperature_2m_min[idx]);
+    const rise = d.daily.sunrise[idx].slice(11, 16);
+    const set = d.daily.sunset[idx].slice(11, 16);
+    const icons = {0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',61:'🌧',80:'🌦',95:'⛈'};
+    const wx = {0:'맑음',1:'대체로 맑음',2:'구름 조금',3:'흐림',45:'안개',51:'이슬비',61:'비',80:'소나기',95:'뇌우'};
+    document.getElementById('wc-icon').textContent = icons[wc] || '🌤';
+    document.getElementById('wc-wx').textContent = wx[wc] || '맑음';
+    document.getElementById('wc-temp').textContent = `${mn}°~${mx}°C`;
+    document.getElementById('wc-rise').textContent = rise;
+    document.getElementById('wc-set').textContent = set;
+  } catch(e) { document.getElementById('wc-wx').textContent = '날씨 정보 없음'; }
+})();
+
+document.querySelectorAll('.tl-map-icon').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+document.querySelectorAll('.move-card').forEach(el => el.addEventListener('click', e => e.stopPropagation()));
+document.querySelectorAll('.gmap-btn').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+window.addEventListener('resize', () => map.invalidateSize());
+</script>
+</body>
+</html>

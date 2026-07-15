@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>동유럽 여행 — DAY 15 프라하 출발</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p-blue:#7B9BB8;--p-green:#82A88F;--p-purple:#9B8DB8;
+  --p-orange:#C4956A;--p-navy:#6B7FA8;
+  --bg:#F6F4F1;--surface:#FFFFFF;--border:#E8E4DE;
+  --text:#1E1C1A;--muted:#5A5550;--soft:#888078;
+  --radius-card:12px;--radius-badge:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;color:var(--text);background:var(--bg);}
+.header{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-shrink:0;z-index:1000;}
+.brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;}
+.day-pill{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.day-select{font-family:inherit;font-size:11px;border:1px solid var(--border);border-radius:var(--radius-badge);padding:4px 10px;background:var(--surface);color:var(--text);cursor:pointer;outline:none;}
+.layout{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+#map{flex-shrink:0;height:calc(45vh - 52px);min-height:180px;position:relative;z-index:1;}
+#map .leaflet-tile-pane{filter:saturate(0.45) brightness(0.97) contrast(1.15);}
+.panel{flex:1;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 4px;}
+.tab{flex:1;padding:11px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--soft);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;}
+.tab.active{color:var(--text);border-bottom-color:var(--p-blue);}
+.tab-content{display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;}
+.tab-content.active{display:block;}
+.weather-card{margin:14px 16px 0;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.wc-item{display:flex;align-items:center;gap:7px;}
+.wc-label{font-size:10px;color:#706860;display:block;margin-bottom:1px;}
+.wc-val{font-size:13px;font-weight:500;color:var(--text);}
+.timeline{padding:14px 16px 20px;}
+.tl-item{display:flex;position:relative;cursor:pointer;}
+.tl-axis{display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0;}
+.tl-pin{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;z-index:1;box-shadow:0 2px 8px rgba(0,0,0,.14);}
+.tl-pin.sight{background:var(--p-blue);}
+.tl-pin.food{background:var(--p-green);}
+.tl-pin.stay{background:var(--p-purple);}
+.tl-pin.transit{background:var(--p-navy);}
+.tl-vline{width:1.5px;background:var(--border);flex:1;min-height:12px;}
+.tl-item:last-child .tl-vline{display:none;}
+.tl-body{flex:1;padding:2px 0 20px 12px;}
+.tl-time{font-size:10px;color:var(--soft);letter-spacing:.4px;margin-bottom:3px;}
+.tl-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.35;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tl-map-icon{font-size:13px;opacity:.6;text-decoration:none;flex-shrink:0;}
+.tl-desc{font-size:12px;color:#4A4540;line-height:1.7;margin-bottom:6px;}
+.tl-map-hint{font-size:10px;color:var(--soft);margin-top:2px;margin-bottom:4px;}
+.move-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:10px 13px;display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+.move-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text);line-height:1.6;}
+.mbadge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-badge);white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.mbadge.walk{background:#FEF3E2;color:#A06830;}
+.mbadge.transit{background:#E8EEF8;color:#506090;}
+.mbadge.taxi{background:#FFF0E8;color:#9A4010;}
+.info-inline{background:#F4FAF6;border-left:3px solid #82A88F;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#3A6A4A;line-height:1.6;}
+.warn-inline{background:#FFF8E8;border-left:3px solid #C4956A;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#7A5020;line-height:1.6;}
+.subtabs{display:flex;gap:6px;padding:10px 16px 0;}
+.subtab{font-size:12px;font-weight:500;padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-badge);cursor:pointer;color:var(--muted);background:var(--surface);}
+.subtab.active{background:var(--p-blue);color:#fff;border-color:var(--p-blue);}
+.subcontent{display:none;padding:10px 16px 80px;}
+.subcontent.active{display:block;}
+.sec-lbl{font-size:10px;font-weight:600;letter-spacing:.8px;color:var(--soft);text-transform:uppercase;margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.sec-lbl:first-child{margin-top:4px;}
+.place-card{border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:10px;}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;}
+.card-name{font-size:13px;font-weight:600;line-height:1.4;color:var(--text);}
+.badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.badge.saved{background:#FEF5E8;color:#906030;font-weight:700;}
+.badge.ai{background:#F0EAF8;color:#7050A0;font-weight:700;}
+.badge.verified{background:#E8F5E8;color:#2A6A2A;font-weight:700;}
+.card-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.card-meta-item{font-size:11px;color:var(--muted);}
+.card-desc{font-size:12px;color:#4A4540;line-height:1.65;margin-bottom:6px;}
+.card-tip{font-size:11px;color:#906030;background:#FEF5E8;border:1px solid #F0D8B0;border-radius:8px;padding:6px 10px;margin-top:4px;}
+.gmap-btn{display:inline-block;font-size:11px;color:var(--p-blue);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-badge);margin-top:6px;}
+.flight-card{margin:14px 16px 0;border:1px solid #C8DAE8;border-radius:var(--radius-card);overflow:hidden;}
+.flight-header{background:#EEF4FA;padding:11px 14px;font-size:13px;font-weight:700;color:#2A4A6A;}
+.flight-body{padding:12px 14px;font-size:12px;color:var(--text);line-height:1.9;}
+.flight-row{display:flex;gap:8px;align-items:baseline;}
+.flight-label{font-size:10px;font-weight:600;color:var(--muted);min-width:48px;flex-shrink:0;}
+.legend{position:fixed;bottom:12px;left:12px;background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:11px;display:flex;flex-direction:column;gap:5px;z-index:500;box-shadow:0 2px 10px rgba(0,0,0,.08);pointer-events:none;}
+.leg-row{display:flex;align-items:center;gap:8px;color:#4A4540;}
+.leg-line{width:22px;height:3px;border-radius:2px;flex-shrink:0;}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.leg-sep{height:1px;background:var(--border);margin:1px 0;}
+@media(min-width:768px){
+  .layout{flex-direction:row;height:100vh;}
+  #map{flex:1;height:100%!important;min-height:unset;}
+  .panel{width:440px;flex:none;border-top:none;border-left:1px solid var(--border);}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="brand">2026 동유럽</span>
+    <span class="day-pill">Day 15 · 프라하 출발</span>
+  </div>
+  <select class="day-select" onchange="if(this.value)location.href=this.value">
+    <option value="travel_day01_0723.html">7/23 부다페스트 도착</option>
+    <option value="travel_day02_0724.html">7/24 부다페스트 전일</option>
+    <option value="travel_day03_0725.html">7/25 부다→빈 이동</option>
+    <option value="travel_day04_0726.html">7/26 빈 쇤브룬+레오폴트</option>
+    <option value="travel_day05_0727.html">7/27 빈 알베르티나+호프부르크</option>
+    <option value="travel_day06_0728.html">7/28 빈→잘츠 이동</option>
+    <option value="travel_day07_0729.html">7/29 잘츠부르크</option>
+    <option value="travel_day08_0730.html">7/30 할슈타트+다흐슈타인</option>
+    <option value="travel_day09_0731.html">7/31 잘츠→바트이슐</option>
+    <option value="travel_day10_0801.html">8/1 바트이슐 전일</option>
+    <option value="travel_day11_0802.html">8/2 바트이슐→CK</option>
+    <option value="travel_day12_0803.html">8/3 체스키크룸로프</option>
+    <option value="travel_day13_0804.html">8/4 CK→프라하</option>
+    <option value="travel_day14_0805.html">8/5 프라하 전일</option>
+    <option value="" selected>8/6 프라하 출발</option>
+  </select>
+</div>
+
+<div class="layout">
+  <div id="map">
+    <div class="legend">
+      <div class="leg-row"><div class="leg-line" style="background:var(--p-orange);"></div>도보</div>
+      <div class="leg-row"><div class="leg-line" style="border-top:2px dashed var(--p-navy);background:none;"></div>버스·지하철</div>
+      <div class="leg-sep"></div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-purple)"></div>숙소/공항</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-green)"></div>브런치</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('timeline',this)">📋 일정</div>
+      <div class="tab" onclick="switchTab('brunch',this)">☕ 브런치</div>
+    </div>
+
+    <!-- 일정 탭 -->
+    <div id="tab-timeline" class="tab-content active">
+
+      <div class="weather-card">
+        <div class="wc-item"><span style="font-size:16px;" id="wc-icon">🌤</span><div><span class="wc-label">날씨 (프라하)</span><span class="wc-val" id="wc-wx">로딩 중</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌡</span><div><span class="wc-label">기온</span><span class="wc-val" id="wc-temp">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌅</span><div><span class="wc-label">일출</span><span class="wc-val" id="wc-rise">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌇</span><div><span class="wc-label">일몰</span><span class="wc-val" id="wc-set">—</span></div></div>
+      </div>
+
+      <!-- 항공편 정보 -->
+      <div class="flight-card">
+        <div class="flight-header">✈️ 귀국 항공편</div>
+        <div class="flight-body">
+          <div class="flight-row"><span class="flight-label">출발</span>프라하 (PRG) 16:10 → 두바이 (DXB) 20:55</div>
+          <div class="flight-row"><span class="flight-label">경유</span>두바이 환승 → 인천 도착 (익일)</div>
+          <div class="flight-row"><span class="flight-label">공항</span>Václav Havel 공항 · 터미널 2</div>
+          <div class="flight-row"><span class="flight-label">체크인</span><strong>13:40까지 공항 도착 권장</strong> (출발 2시간 20분 전)</div>
+        </div>
+      </div>
+
+      <div class="timeline">
+
+        <!-- ① 체크아웃 -->
+        <div class="tl-item" data-map-key="grandhotel" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">①</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">11:00 체크아웃</div>
+            <div class="tl-name">Grand Hotel International 체크아웃 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Grand+Hotel+International+Praha+Dejvice+Dejvická+15" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">Koulova 1501/15 · 정규 체크아웃 11:00 · 짐 오늘 아침 완전히 정리</div>
+            <div class="warn-inline">⚠️ 짐 완전히 끌고 나와야 함 · 체크아웃 후 짐 보관 가능한지 현장 확인</div>
+          </div>
+        </div>
+
+        <!-- ② 브런치 -->
+        <div class="tl-item" data-map-key="dejvicka" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin food">②</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">11:00~12:30</div>
+            <div class="tl-name">브런치 — Dejvice 주변 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=brunch+cafe+Dejvice+Praha+6" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              호텔 근처(Dejvice) · 구시가지 이동 불가 (거리+시간)<br>
+              Dejvická 광장 주변 카페 다수 · 도보 10분 이내<br>
+              피로도 높으면 호텔 조식으로 대체 가능
+            </div>
+            <div class="info-inline">💡 브런치 탭에서 장소 확인 · 12:30 이전 완료 필수 · 짐은 카페에 끌고 가거나 호텔에 잠깐 맡기기</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge taxi">🚕 택시 권장</span>호텔 → 공항 · 13:10 출발 · 20~25분 · 약 400~600 CZK</div>
+              <div class="move-row"><span class="mbadge transit">🚇 대중교통</span>버스 119 → Nádraží Veleslavín → 지하철 A선 → 공항 · 12:40 출발 · 35~40분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ 공항 이동 -->
+        <div class="tl-item" data-map-key="airport" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin transit">③</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">택시 13:10 / 대중교통 12:40 출발</div>
+            <div class="tl-name">공항 이동 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJCy3UNdyUC0cRolEgwLfz4Lo" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              <strong>택시:</strong> 호텔 앞 출발 · 20~25분 · 약 400~600 CZK · 짐 많으면 택시 권장<br>
+              <strong>대중교통:</strong> Podbaba → 버스 119 → Nádraží Veleslavín (지하철 A선) → 공항 터미널 · 35~40분
+            </div>
+            <div class="warn-inline">⚠️ 캐리어 3개 + 백팩 3개 — 대중교통 혼잡 시 택시가 현실적 · Bolt/Uber 앱 미리 확인</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 대중교통 경로</span>Podbaba(버스119) → Nádraží Veleslavín역 → 지하철A선 → 공항 T2 · PID 1회권 or 24h권 잔여분 사용</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 공항 체크인 -->
+        <div class="tl-item" data-map-key="airport" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">④</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">13:40 공항 도착</div>
+            <div class="tl-name">프라하 공항 체크인 + 출국 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJCy3UNdyUC0cRolEgwLfz4Lo" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Václav Havel Airport · Terminal 2 · 에미레이트항공 카운터<br>
+              체크인 + 수하물 위탁 + 출국 심사 + 면세 쇼핑 · 여유 약 2시간 20분
+            </div>
+            <div class="info-inline">💡 남은 CZK → 면세점 또는 환전 · 체코 맥주·초콜릿·보헤미안 크리스탈 마지막 쇼핑 찬스</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">✈️ 탑승</span>EK 항공편 · 16:10 출발 · 두바이 경유 → 인천</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 출발 -->
+        <div class="tl-item">
+          <div class="tl-axis"><div class="tl-pin transit">⑤</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">16:10</div>
+            <div class="tl-name">✈️ 프라하 출발 → 두바이 경유 → 인천</div>
+            <div class="tl-desc">
+              PRG 16:10 → DXB 20:55 · 두바이 환승 후 인천행<br>
+              14박 15일 동유럽 여행 마무리 🎉
+            </div>
+            <div style="margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;font-size:12px;color:#4A4540;line-height:1.9;">
+              <div style="font-weight:700;margin-bottom:8px;color:var(--text);">🗺 전체 여정 요약</div>
+              부다페스트 3박 → 빈 3박 → 잘츠부르크 3박 → 바트이슐 2박 → 체스키크룸로프 2박 → 프라하 2박<br>
+              총 6개 도시 · 14박 15일
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 브런치 탭 -->
+    <div id="tab-brunch" class="tab-content">
+      <div style="margin:14px 16px 0;background:#EEF4FA;border:1px solid #C8DAE8;border-radius:var(--radius-card);padding:11px 14px;font-size:12px;color:#2A4A6A;line-height:1.7;">
+        📍 Grand Hotel 주변 (Dejvice) · <strong>12:30 이전 완료</strong> · 구시가지 이동 불가
+      </div>
+
+      <div class="subtabs">
+        <div class="subtab active" onclick="switchSub('sub-brunch-cafe',this,'brunch')">☕ 카페</div>
+        <div class="subtab" onclick="switchSub('sub-brunch-hotel',this,'brunch')">🏨 호텔 조식</div>
+      </div>
+
+      <div id="sub-brunch-cafe" class="subcontent active">
+        <div class="sec-lbl">💾 저장된 곳</div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">LT Café</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.4</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 숙소 근처 · Dejvice · 도보 5분</span>
+            <span class="card-meta-item">⏰ 08:00~21:00</span>
+          </div>
+          <div class="card-desc">카페·간단 식사 · 숙소 가장 가까운 저장 맛집 · 브런치 메뉴 있음</div>
+          <div class="card-memo" style="font-size:11px;color:#5A7A5A;background:#F4FAF4;border:1px solid #C8DCC8;border-radius:8px;padding:5px 9px;margin-bottom:5px;">💬 "숙소 근처1" (저장 메모)</div>
+          <div class="card-tip">💡 마지막 날 여유있게 · 짐 끌고 도보 5분 · 12:00까지 여유있게 브런치</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=LT+Cafe+Praha+Dejvice" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">Dejvické Theater Cafe</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Dejvická 광장 · 도보 10분</span>
+            <span class="card-meta-item">⏰ 09:00~22:00</span>
+          </div>
+          <div class="card-desc">카페·브런치 스타일 · Dejvická 광장 앞 · 여유있게 앉아서 마지막 커피</div>
+          <div class="card-memo" style="font-size:11px;color:#5A7A5A;background:#F4FAF4;border:1px solid #C8DCC8;border-radius:8px;padding:5px 9px;margin-bottom:5px;">💬 "갈만한곳2" (저장 메모)</div>
+          <div class="card-tip">💡 광장 분위기 즐기며 마지막 유럽 커피 · 짐 맡겨두고 가볍게</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Dejvicke+Theater+Cafe+Praha" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="sec-lbl">💡 AI 추천</div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">Café Savoy</div>
+            <div class="badges"><span class="badge ai">💡 추천</span><span class="badge verified">⭐ 4.6</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Vítězná 5 · 숙소 트램 15분</span>
+            <span class="card-meta-item">⏰ 08:00~22:30</span>
+          </div>
+          <div class="card-desc">프라하 최고 카페 중 하나 · 클래식 인테리어 · 에클레어·크루아상·풀브런치 · 여행 마지막 날 특별한 마무리</div>
+          <div class="card-tip">💡 짐 있으면 이동 번거로울 수 있음 · 시간+체력 여유 있을 때 · Dejvice 카페보다 격이 높음</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Cafe+Savoy+Praha+Vítězná+5" target="_blank">📍 구글지도</a>
+        </div>
+
+      </div>
+
+      <div id="sub-brunch-hotel" class="subcontent">
+        <div style="border:1px solid var(--border);border-radius:var(--radius-card);padding:16px;font-size:12px;color:#4A4540;line-height:1.9;margin-top:4px;">
+          <div style="font-weight:700;margin-bottom:8px;color:var(--text);">🏨 호텔 조식</div>
+          피로도 최고일 경우 호텔 조식이 가장 현실적인 선택<br>
+          짐 정리·체크아웃과 동선이 겹쳐 시간 절약<br>
+          체크아웃(11:00) 전 조식 먹고 → 짐 챙겨서 바로 출발<br><br>
+          <div style="font-size:11px;color:var(--muted);">Grand Hotel 조식 포함 여부 · 요금 · 운영 시간 → 체크인 시 확인</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const map = L.map('map', {zoomControl:false, tap:true}).setView([50.095, 14.340], 12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:19
+}).addTo(map);
+L.control.zoom({position:'topright'}).addTo(map);
+
+const BLUE='#7B9BB8', GREEN='#82A88F', PURPLE='#9B8DB8', ORANGE='#C4956A', NAVY='#6B7FA8';
+
+const LL = {
+  grandhotel: [50.1031, 14.3876],
+  dejvicka:   [50.1010, 14.3950],
+  veleslavin: [50.0999, 14.3388],
+  airport:    [50.1008, 14.2632],
+};
+
+const MK = {};
+
+function calcArrowAngle(from, to) {
+  const p1 = map.latLngToContainerPoint(L.latLng(from));
+  const p2 = map.latLngToContainerPoint(L.latLng(to));
+  return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + 90;
+}
+function makeArrowIcon(color, angle) {
+  return L.divIcon({className:'',html:`<div style="width:22px;height:22px;transform:rotate(${angle}deg);transform-origin:11px 11px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));"><svg width="22" height="22" viewBox="0 0 10 10"><polygon points="5,0 9.5,10 5,7 0.5,10" fill="${color}" opacity="1"/></svg></div>`,iconSize:[22,22],iconAnchor:[11,11]});
+}
+function addLine(from, to, color, dash) {
+  if(!LL[from]||!LL[to])return null;
+  const line=L.polyline([LL[from],LL[to]],{color,weight:3.5,opacity:.78,dashArray:dash?'6,5':null,lineCap:'round'}).addTo(map);
+  const arrow=L.marker(LL[to],{icon:makeArrowIcon(color,calcArrowAngle(LL[from],LL[to])),interactive:false,zIndexOffset:-10}).addTo(map);
+  line._arrow=arrow;
+  return line;
+}
+const _baseLines=[];
+function refreshArrows(){_baseLines.forEach(l=>{if(!l||!l._from||!l._to||!l._arrow)return;l._arrow.setIcon(makeArrowIcon(l._color,calcArrowAngle(l._from,l._to)));});}
+map.on('zoomend moveend',refreshArrows);
+function addTrackedLine(from,to,color,dash){
+  const l=addLine(from,to,color,dash);
+  if(l&&LL[from]&&LL[to]){l._from=LL[from];l._to=LL[to];l._color=color;}
+  return l;
+}
+
+function mkDropPin(num,color,label){
+  const hasLabel=label&&label.length>0;
+  const totalW=hasLabel?Math.min(220,label.length*9+56):30;
+  return L.divIcon({className:'',html:`<div style="position:relative;display:flex;align-items:flex-start;gap:6px;width:${totalW}px;"><div style="position:relative;width:30px;height:38px;flex-shrink:0;"><div style="width:30px;height:30px;background:${color};border:2.5px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(0,0,0,.22);position:absolute;top:0;left:0;"></div><div style="position:absolute;top:4px;left:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white;font-family:'Noto Sans KR',sans-serif;z-index:2;">${num}</div></div>${hasLabel?`<div style="margin-top:3px;background:white;border:1.5px solid #D8D2CA;border-radius:6px;padding:4px 9px;font-size:11.5px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:#1E1C1A;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.1);line-height:1.3;">${label}</div>`:''}</div>`,iconSize:[totalW,38],iconAnchor:[15,38]});
+}
+function mkTransitPin(emoji, label) {
+  return L.divIcon({className:'',html:`<div style="display:flex;align-items:flex-start;gap:6px;"><div style="width:30px;height:30px;background:${NAVY};border:2px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">${emoji}</div><div style="margin-top:3px;background:white;border:1.5px solid #C8DAE8;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:#1E1C1A;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.1);">${label}</div></div>`,iconSize:[200,32],iconAnchor:[15,15]});
+}
+
+MK['grandhotel'] = L.marker(LL.grandhotel, {icon:mkDropPin('①',PURPLE,'Grand Hotel')}).addTo(map);
+MK['dejvicka']   = L.marker(LL.dejvicka,   {icon:mkDropPin('②',GREEN, 'Dejvice 브런치')}).addTo(map);
+MK['veleslavin'] = L.marker(LL.veleslavin, {icon:mkTransitPin('🚇','Veleslavín역 (A선)')}).addTo(map);
+MK['airport']    = L.marker(LL.airport,    {icon:mkDropPin('④',PURPLE,'프라하 공항')}).addTo(map);
+
+const _boundsLL = [LL.grandhotel, LL.dejvicka, LL.veleslavin, LL.airport];
+map.fitBounds(_boundsLL, {padding:[48,48]});
+
+map.whenReady(()=>{
+  setTimeout(()=>{
+    map.invalidateSize();
+    map.fitBounds(_boundsLL,{padding:[48,48]});
+    _baseLines.push(addTrackedLine('grandhotel','dejvicka',ORANGE,false));
+    _baseLines.push(addTrackedLine('dejvicka','veleslavin',NAVY,true));
+    _baseLines.push(addTrackedLine('veleslavin','airport',NAVY,true));
+  },120);
+});
+setTimeout(()=>{map.invalidateSize();map.fitBounds(_boundsLL,{padding:[48,48]});},100);
+window.addEventListener('load',()=>{setTimeout(()=>map.invalidateSize(),200);});
+
+function flyToPin(el){
+  const key=el.dataset.mapKey;if(!key||!LL[key])return;
+  const body=el.querySelector('.tl-body');
+  if(body){body.style.background='#E8F0FA';setTimeout(()=>{body.style.background='';},600);}
+  map.panTo(LL[key]);
+}
+
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const target=document.getElementById('tab-'+name);
+  target.classList.add('active');target.scrollTop=0;
+  void target.offsetHeight;
+  setTimeout(()=>map.invalidateSize(),50);
+}
+function switchSub(id,el,group){
+  document.getElementById('tab-'+group).querySelectorAll('.subtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+group).querySelectorAll('.subcontent').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');document.getElementById(id).classList.add('active');
+}
+
+(async()=>{
+  try{
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=50.075&longitude=14.437&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FPrague&forecast_days=16');
+    const d=await r.json();
+    const idx=d.daily.time.indexOf('2026-08-06');
+    if(idx<0)throw new Error();
+    const wc=d.daily.weather_code[idx];
+    const mx=Math.round(d.daily.temperature_2m_max[idx]);
+    const mn=Math.round(d.daily.temperature_2m_min[idx]);
+    const rise=d.daily.sunrise[idx].slice(11,16);
+    const set=d.daily.sunset[idx].slice(11,16);
+    const icons={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',61:'🌧',80:'🌦',95:'⛈'};
+    const wx={0:'맑음',1:'대체로 맑음',2:'구름 조금',3:'흐림',45:'안개',51:'이슬비',61:'비',80:'소나기',95:'뇌우'};
+    document.getElementById('wc-icon').textContent=icons[wc]||'🌤';
+    document.getElementById('wc-wx').textContent=wx[wc]||'맑음';
+    document.getElementById('wc-temp').textContent=`${mn}°~${mx}°C`;
+    document.getElementById('wc-rise').textContent=rise;
+    document.getElementById('wc-set').textContent=set;
+  }catch(e){document.getElementById('wc-wx').textContent='날씨 정보 없음';}
+})();
+
+document.querySelectorAll('.tl-map-icon').forEach(a=>a.addEventListener('click',e=>e.stopPropagation()));
+document.querySelectorAll('.move-card').forEach(el=>el.addEventListener('click',e=>e.stopPropagation()));
+document.querySelectorAll('.gmap-btn').forEach(a=>a.addEventListener('click',e=>e.stopPropagation()));
+window.addEventListener('resize',()=>map.invalidateSize());
+</script>
+</body>
+</html>

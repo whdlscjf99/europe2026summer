@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>동유럽 여행 — DAY 8 할슈타트+다흐슈타인</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p-blue:#7B9BB8;--p-green:#82A88F;--p-purple:#9B8DB8;
+  --p-orange:#C4956A;--p-navy:#6B7FA8;
+  --bg:#F6F4F1;--surface:#FFFFFF;--border:#E8E4DE;
+  --text:#1E1C1A;--muted:#5A5550;--soft:#888078;
+  --radius-card:12px;--radius-badge:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;color:var(--text);background:var(--bg);}
+.header{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-shrink:0;z-index:1000;}
+.brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;}
+.day-pill{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.day-select{font-family:inherit;font-size:11px;border:1px solid var(--border);border-radius:var(--radius-badge);padding:4px 10px;background:var(--surface);color:var(--text);cursor:pointer;outline:none;}
+.layout{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+#map{flex-shrink:0;height:calc(45vh - 52px);min-height:180px;position:relative;z-index:1;}
+#map .leaflet-tile-pane{filter:saturate(0.45) brightness(0.97) contrast(1.15);}
+.panel{flex:1;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 4px;}
+.tab{flex:1;padding:11px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--soft);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;}
+.tab.active{color:var(--text);border-bottom-color:var(--p-blue);}
+.tab-content{display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;}
+.tab-content.active{display:block;}
+.weather-card{margin:14px 16px 0;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.wc-item{display:flex;align-items:center;gap:7px;}
+.wc-label{font-size:10px;color:#706860;display:block;margin-bottom:1px;}
+.wc-val{font-size:13px;font-weight:500;color:var(--text);}
+.warn-banner{margin:14px 16px 0;background:#FFF0F0;border:1px solid #F0C8C8;border-radius:var(--radius-card);padding:10px 13px;font-size:12px;color:#8A2020;line-height:1.7;}
+.timeline{padding:14px 16px 20px;}
+.tl-item{display:flex;position:relative;cursor:pointer;}
+.tl-axis{display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0;}
+.tl-pin{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;z-index:1;box-shadow:0 2px 8px rgba(0,0,0,.14);}
+.tl-pin.sight{background:var(--p-blue);}
+.tl-pin.food{background:var(--p-green);}
+.tl-pin.stay{background:var(--p-purple);}
+.tl-pin.transit{background:var(--p-navy);}
+.tl-vline{width:1.5px;background:var(--border);flex:1;min-height:12px;}
+.tl-item:last-child .tl-vline{display:none;}
+.tl-body{flex:1;padding:2px 0 20px 12px;}
+.tl-time{font-size:10px;color:var(--soft);letter-spacing:.4px;margin-bottom:3px;}
+.tl-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.35;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tl-map-icon{font-size:13px;opacity:.6;text-decoration:none;flex-shrink:0;}
+.tl-desc{font-size:12px;color:#4A4540;line-height:1.7;margin-bottom:6px;}
+.tl-map-hint{font-size:10px;color:var(--soft);margin-top:2px;margin-bottom:4px;}
+.move-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:10px 13px;display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+.move-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text);line-height:1.6;}
+.mbadge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-badge);white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.mbadge.walk{background:#FEF3E2;color:#A06830;}
+.mbadge.transit{background:#E8EEF8;color:#506090;}
+.tl-meal-filled{background:#F0F8F2;border:1px solid #BFD9C8;border-radius:var(--radius-card);padding:10px 13px;margin-top:6px;display:none;}
+.tl-meal-filled-name{font-size:13px;font-weight:600;color:#3D7A55;margin-bottom:2px;}
+.tl-meal-filled-desc{font-size:11px;color:var(--muted);}
+.info-inline{background:#F4FAF6;border-left:3px solid #82A88F;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#3A6A4A;line-height:1.6;}
+.warn-inline{background:#FFF8E8;border-left:3px solid #C4956A;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#7A5020;line-height:1.6;}
+.subtabs{display:flex;gap:6px;padding:10px 16px 0;}
+.subtab{font-size:12px;font-weight:500;padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-badge);cursor:pointer;color:var(--muted);background:var(--surface);}
+.subtab.active{background:var(--p-blue);color:#fff;border-color:var(--p-blue);}
+.subtab.korean.active{background:var(--p-green);border-color:var(--p-green);}
+.subcontent{display:none;padding:10px 16px 80px;}
+.subcontent.active{display:block;}
+.sec-lbl{font-size:10px;font-weight:600;letter-spacing:.8px;color:var(--soft);text-transform:uppercase;margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.sec-lbl:first-child{margin-top:4px;}
+.place-card{border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .18s;}
+.place-card.selected{border-color:var(--p-blue);background:#F0F4FA;}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;}
+.card-name{font-size:13px;font-weight:600;line-height:1.4;color:var(--text);}
+.badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.badge.saved{background:#FEF5E8;color:#906030;font-weight:700;}
+.badge.ai{background:#F0EAF8;color:#7050A0;font-weight:700;}
+.badge.verified{background:#E8F5E8;color:#2A6A2A;font-weight:700;}
+.card-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.card-meta-item{font-size:11px;color:var(--muted);}
+.card-desc{font-size:12px;color:#4A4540;line-height:1.65;margin-bottom:6px;}
+.card-tip{font-size:11px;color:#906030;background:#FEF5E8;border:1px solid #F0D8B0;border-radius:8px;padding:6px 10px;margin-top:4px;}
+.selected-notice{display:none;font-size:11px;color:#3D7A55;font-weight:600;margin-top:6px;}
+.place-card.selected .selected-notice{display:block;}
+.gmap-btn{display:inline-block;font-size:11px;color:var(--p-blue);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-badge);margin-top:6px;}
+.legend{position:fixed;bottom:12px;left:12px;background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:11px;display:flex;flex-direction:column;gap:5px;z-index:500;box-shadow:0 2px 10px rgba(0,0,0,.08);pointer-events:none;}
+.leg-row{display:flex;align-items:center;gap:8px;color:#4A4540;}
+.leg-line{width:22px;height:3px;border-radius:2px;flex-shrink:0;}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.leg-sep{height:1px;background:var(--border);margin:1px 0;}
+@media(min-width:768px){
+  .layout{flex-direction:row;height:100vh;}
+  #map{flex:1;height:100%!important;min-height:unset;}
+  .panel{width:440px;flex:none;border-top:none;border-left:1px solid var(--border);}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="brand">2026 동유럽</span>
+    <span class="day-pill">Day 8 · 할슈타트+다흐슈타인</span>
+  </div>
+  <select class="day-select" onchange="if(this.value)location.href=this.value">
+    <option value="travel_day01_0723.html">7/23 부다페스트 도착</option>
+    <option value="travel_day02_0724.html">7/24 부다페스트 전일</option>
+    <option value="travel_day03_0725.html">7/25 부다→빈 이동</option>
+    <option value="travel_day04_0726.html">7/26 빈 쇤브룬+레오폴트</option>
+    <option value="travel_day05_0727.html">7/27 빈 알베르티나+호프부르크</option>
+    <option value="travel_day06_0728.html">7/28 빈→잘츠 이동</option>
+    <option value="travel_day07_0729.html">7/29 잘츠부르크</option>
+    <option value="" selected>7/30 할슈타트+다흐슈타인</option>
+    <option value="travel_day09_0731.html">7/31 잘츠→바트이슐</option>
+    <option value="travel_day10_0801.html">8/1 바트이슐</option>
+    <option value="travel_day11_0802.html">8/2 바트이슐→CK</option>
+    <option value="travel_day12_0803.html">8/3 체스키크룸로프</option>
+    <option value="travel_day13_0804.html">8/4 CK→프라하</option>
+    <option value="travel_day14_0805.html">8/5 프라하 전일</option>
+    <option value="travel_day15_0806.html">8/6 프라하 출발</option>
+  </select>
+</div>
+
+<div class="layout">
+  <div id="map">
+    <div class="legend">
+      <div class="leg-row"><div class="leg-line" style="border-top:2px dashed var(--p-navy);background:none;"></div>버스</div>
+      <div class="leg-row"><div class="leg-line" style="background:var(--p-orange);"></div>도보</div>
+      <div class="leg-sep"></div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-blue)"></div>관광</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-green)"></div>식당</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-purple)"></div>숙소</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('timeline',this)">📋 일정</div>
+      <div class="tab" onclick="switchTab('lunch',this)">🍽 점심</div>
+      <div class="tab" onclick="switchTab('mart',this)">🛒 귀가</div>
+    </div>
+
+    <!-- 일정 탭 -->
+    <div id="tab-timeline" class="tab-content active">
+
+      <div class="weather-card">
+        <div class="wc-item"><span style="font-size:16px;" id="wc-icon">🌤</span><div><span class="wc-label">날씨 (할슈타트)</span><span class="wc-val" id="wc-wx">로딩 중</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌡</span><div><span class="wc-label">기온</span><span class="wc-val" id="wc-temp">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌅</span><div><span class="wc-label">일출</span><span class="wc-val" id="wc-rise">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌇</span><div><span class="wc-label">일몰</span><span class="wc-val" id="wc-set">—</span></div></div>
+      </div>
+
+      <div class="warn-banner">
+        ⛰️ 다흐슈타인 정상 기온 <strong>12~17°C</strong> — 바람막이·후리스 필수 (어제 밤 챙겨두기)<br>
+        🚌 버스 전용 경로 — 기차 운행 없음 (7/11~8/2 공사) · 소금광산 현재 미개장
+      </div>
+
+      <div class="timeline">
+
+        <!-- ① 빌라 엘리사 출발 -->
+        <div class="tl-item" data-map-key="villa_elisa" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">①</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">08:20 출발</div>
+            <div class="tl-name">빌라 엘리사 출발 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Villa+Elisa+Salzburg+Elisabethkai+36" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Jahnstraße 14 · 아침 간단히 먹고 출발<br>
+              배낭 체크: 바람막이·후리스·여벌 상의·생수·간식
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">🚶 도보</span>빌라 엘리사 → 잘츠부르크 중앙역 · 7분</div>
+              <div class="move-row"><span class="mbadge transit">🚌 버스 150번</span>Hauptbahnhof B 정류장 탑승 → 바트이슐 환승 · €12.10/인 · 약 90분 · Guest Mobility Ticket 미적용 (구간 외)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ② 할슈타트 도착 -->
+        <div class="tl-item" data-map-key="hallstatt" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">②</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">11:00 도착</div>
+            <div class="tl-name">할슈타트 Lahn 도착 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJ4XzTnGMbbUcRMX7Y2c9Y6TU" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              바트이슐에서 541번 → Gosaumühle에서 543번 환승<br>
+              <strong>납골당 (Beinhaus)</strong> €2 현금 · 20~30분 · 마을 산책 + 호수 뷰
+            </div>
+            <div class="warn-inline">⚠️ 7/11~8/2 기차 공사 — 버스 경로만 운행 · 소금광산 현재 미개장</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">🚶 산책</span>납골당 → 마을 산책 → 점심 식당 · 약 30분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ 점심 슬롯 -->
+        <div class="tl-item" id="tl-item-lunch" onclick="flyToLunch(this)">
+          <div class="tl-axis"><div class="tl-pin food">③</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">11:30~12:25</div>
+            <div class="tl-name">점심식사 <span style="font-size:11px;font-weight:400;color:var(--soft);">— 점심 탭에서 선택</span></div>
+            <div class="tl-map-hint">🗺 점심 탭에서 식당 선택 후 지도에 반영</div>
+            <div class="tl-desc">할슈타트 마을 내 · <strong>12:30 버스 필수 → 점심 최대 1시간</strong></div>
+            <div id="tl-lunch-filled" class="tl-meal-filled">
+              <div class="tl-meal-filled-name" id="tl-lunch-filled-name"></div>
+              <div class="tl-meal-filled-desc" id="tl-lunch-filled-desc"></div>
+            </div>
+            <div class="warn-inline">⚠️ <strong>12:30 버스 탑승 필수</strong> — 늦으면 케이블카 시간 전체 밀림 · 12:25 자리에서 일어나기</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚌 버스 543번</span>할슈타트 Lahn 탑승 → 오버트라운 케이블카 탑승장 (Winkl 86) · 약 10~15분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 다흐슈타인 5핑거스 케이블카 -->
+        <div class="tl-item" data-map-key="dachstein" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">④</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">13:00~15:30</div>
+            <div class="tl-name">다흐슈타인 5핑거스 케이블카 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJwSTw0jMbbUcR5WkSHCUHy-E" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Winkl 86, Obertraun · <strong>온라인 예약 €46.70/인 (현장 €47.90)</strong><br>
+              케이블카 1·2구간 + 5핑거스 유리 플랫폼 + 정상 산책 · 약 2~2.5시간<br>
+              해발 2,700m · 할슈타트 호수·알프스 360° 전망
+            </div>
+            <div class="warn-inline">⚠️ 정상 기온 12~17°C — 바람막이·후리스 필수 · <strong>마지막 하산 케이블카 17:00 — 15:30 이전 탑승 필수</strong> · 소금광산 미개장</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚌 버스 543번</span>오버트라운 탑승 → 바트이슐 방향 · <strong>16:00 이전 탑승 필수</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 복귀 버스 -->
+        <div class="tl-item" data-map-key="villa_elisa" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin transit">⑤</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">16:00~18:45</div>
+            <div class="tl-name">복귀 버스 → 잘츠부르크 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Villa+Elisa+Salzburg+Elisabethkai+36" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              543번 → 바트이슐 → 150번 환승 → 잘츠부르크 중앙역<br>
+              18:45 잘츠부르크 도착 · 도보 7~10분 → 빌라 엘리사 복귀
+            </div>
+            <div class="warn-inline">⚠️ <strong>17:30 이전 탑승 필수</strong> (마지막 버스 18:16 역산) · 버스 놓치면 당일 복귀 불가</div>
+          </div>
+        </div>
+
+        <!-- ⑥ 빌라 엘리사 복귀 -->
+        <div class="tl-item" data-map-key="villa_elisa" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">⑥</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">18:45~</div>
+            <div class="tl-name">빌라 엘리사 복귀 + 씻기 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Villa+Elisa+Salzburg+Elisabethkai+36" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Jahnstraße 14 · 체력 소진일 — 저녁 간단히<br>
+              카피텔 광장 일 트리티코 야외 스크린 (20:00, 170분) — 체력 보고 결정
+            </div>
+            <div class="info-inline">💡 카피텔 광장 야외 상영 (무료) — 체력 여유 있으면 추천 · 내일 10:00 체크아웃 → 여유 있음</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 점심 탭 -->
+    <div id="tab-lunch" class="tab-content">
+      <div style="margin:14px 16px 0;background:#FFF0F0;border:1px solid #F0C8C8;border-radius:var(--radius-card);padding:11px 14px;font-size:12px;color:#8A2020;line-height:1.7;">
+        ⏱ <strong>점심 최대 1시간</strong> (11:30~12:25) · 12:30 버스 탑승 필수<br>
+        할슈타트 마을 식당은 전반적으로 느림 — 메뉴 미리 정하고 입장
+      </div>
+
+      <div class="subtabs">
+        <div class="subtab active" onclick="switchSub('sub-lunch-local',this,'lunch')">🍴 현지식</div>
+        <div class="subtab korean" onclick="switchSub('sub-lunch-korean',this,'lunch')">🍞 간편식</div>
+      </div>
+
+      <div id="sub-lunch-local" class="subcontent active">
+        <div class="sec-lbl">🍽 할슈타트 마을 식당</div>
+
+        <div class="place-card" id="lc-simony" onclick="selectLunch(this,'simony')">
+          <div class="card-header">
+            <div class="card-name">Gasthof Simony</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 할슈타트 마을 중심</span>
+            <span class="card-meta-item">⏰ 11:00~21:00</span>
+          </div>
+          <div class="card-desc">할슈타트 호숫가 전망 레스토랑 · 오스트리아 가정식·생선 요리 · 할슈타트 전통 분위기</div>
+          <div class="card-tip">💡 인기 식당 — 성수기 대기 가능 · 11:30 바로 입장해서 빠르게 주문 · 12:25 자리에서 일어나기</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Gasthof+Simony+Hallstatt+Marktplatz+105" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-umbrella" onclick="selectLunch(this,'umbrella')">
+          <div class="card-header">
+            <div class="card-name">Umbrella Bar</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.2</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 할슈타트 마을 내</span>
+            <span class="card-meta-item">⏰ 10:00~22:00</span>
+          </div>
+          <div class="card-desc">호수 뷰 바 겸 식당 · 간단한 식사·스낵·음료 · 가볍게 먹기 좋음</div>
+          <div class="card-tip">💡 식사보다 음료+스낵 중심 · 빠른 서비스 · 12:30 버스 맞추기 가장 수월한 선택</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Umbrella+Bar+Hallstatt" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-seecafe" onclick="selectLunch(this,'seecafe')">
+          <div class="card-header">
+            <div class="card-name">Seecafé</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.1</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 할슈타트 호숫가</span>
+            <span class="card-meta-item">⏰ 10:00~20:00</span>
+          </div>
+          <div class="card-desc">호수 직접 면한 카페·식당 · 케이크·커피·간단한 식사 · 할슈타트 최고 뷰 포인트 중 하나</div>
+          <div class="card-tip">💡 뷰는 최고 · 식사 속도 느릴 수 있음 — 12:30 버스 감안해서 여유 없으면 음료만</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Seecafe+Hallstatt" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div>
+
+      <div id="sub-lunch-korean" class="subcontent">
+        <div class="sec-lbl">🍞 간편 해결 (시간 절약 우선)</div>
+
+        <div class="place-card" id="lc-chimney" onclick="selectLunch(this,'chimney')">
+          <div class="card-header">
+            <div class="card-name">굴뚝빵 (Kürtőskalács)</div>
+            <div class="badges"><span class="badge ai">💡 추천</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 할슈타트 마을 노점</span>
+            <span class="card-meta-item">⏰ 상시 운영 (성수기)</span>
+          </div>
+          <div class="card-desc">헝가리식 굴뚝빵 · 즉석에서 구워줌 · 서서 먹기 가능 · 12:30 버스 여유롭게 맞춤</div>
+          <div class="card-tip">💡 가장 빠른 점심 대안 · Seecafé 앞 호수 뷰 보면서 서서 먹기 · 시간 압박 심할 때 최선</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Gasthof+Simony+Hallstatt+Marktplatz+105" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-bakery" onclick="selectLunch(this,'bakery')">
+          <div class="card-header">
+            <div class="card-name">마을 베이커리·샌드위치</div>
+            <div class="badges"><span class="badge ai">💡 추천</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 할슈타트 마을 내</span>
+            <span class="card-meta-item">⏰ 08:00~17:00</span>
+          </div>
+          <div class="card-desc">빵·샌드위치·음료 간단 구입 · 테이크아웃 후 이동하며 식사 · 12:30 버스 여유 최대</div>
+          <div class="card-tip">💡 케이블카 탑승 전 배낭에 넣어두면 정상에서도 먹을 수 있음</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJN0m8AjUbbUcRFaXqLCpV2Kc" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 마트/귀가 탭 -->
+    <div id="tab-mart" class="tab-content">
+      <div style="padding:14px 16px 80px;">
+        <div style="background:#FFF8E8;border:1px solid #E8D890;border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:#7A6010;line-height:1.7;">
+          💡 오늘은 당일치기 — 귀가 후 저녁은 숙소 취사 or 간단히<br>
+          EUROSPAR (빌라 엘리사 도보 5분) · 20:00 닫힘 주의 · 18:45 귀가라면 충분
+        </div>
+
+        <div style="font-size:10px;font-weight:600;letter-spacing:.8px;color:var(--soft);text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border);">🌙 귀가 후 저녁 옵션</div>
+
+        <div style="border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px;">EUROSPAR 장보기 후 숙소 취사</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">📍 빌라 엘리사 도보 5분 · 🕐 ~20:00</div>
+          <div style="font-size:12px;color:#4A4540;line-height:1.65;">18:45 귀가 → 19:00~19:30 마트 · 오늘 체력 소진 → 간단한 식사 권장</div>
+        </div>
+
+        <div style="border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px;">카피텔 광장 야외 스크린 (선택)</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">📍 Kapitelplatz · 🕐 20:00 시작 (170분) · 무료</div>
+          <div style="font-size:12px;color:#4A4540;line-height:1.65;">일 트리티코 오페라 · 어제 살로메와 같은 야외 스크린 시리즈 · 체력 여유 있으면 추천</div>
+        </div>
+
+        <div style="font-size:10px;font-weight:600;letter-spacing:.8px;color:var(--soft);text-transform:uppercase;margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);">📦 내일 체크리스트</div>
+        <div style="border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;font-size:12px;color:#4A4540;line-height:1.9;">
+          내일 10:00 빌라 엘리사 체크아웃 → 잘츠→바트이슐 이동<br>
+          ☐ 짐 정리 (오늘 밤)<br>
+          ☐ SPAR 장보기 — 바트이슐 에어컨 없음, 체스키 마트 불편 → 미리 구입<br>
+          ☐ 살츠카머구트 SommerCard 수령 여부 확인 (체크인 시 발급)
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// 할슈타트 + 다흐슈타인 중심 지도
+const map = L.map('map', {zoomControl:false, tap:true}).setView([47.545, 13.625], 12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:19
+}).addTo(map);
+L.control.zoom({position:'topright'}).addTo(map);
+
+const BLUE='#7B9BB8', GREEN='#82A88F', PURPLE='#9B8DB8', ORANGE='#C4956A', NAVY='#6B7FA8';
+
+const LL = {
+  villa_elisa: [47.8158, 13.0474],
+  hallstatt:   [47.5621, 13.6494],
+  dachstein:   [47.5197, 13.6069],
+  // 점심 식당
+  simony:      [47.5621, 13.6494],
+  umbrella:    [47.5618, 13.6498],
+  seecafe:     [47.5625, 13.6490],
+  chimney:     [47.5621, 13.6494],
+  bakery:      [47.5620, 13.6490],
+};
+
+const MK = {};
+
+function calcArrowAngle(from, to) {
+  const p1 = map.latLngToContainerPoint(L.latLng(from));
+  const p2 = map.latLngToContainerPoint(L.latLng(to));
+  return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + 90;
+}
+
+function makeArrowIcon(color, angle) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:22px;height:22px;transform:rotate(${angle}deg);transform-origin:11px 11px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));">
+      <svg width="22" height="22" viewBox="0 0 10 10">
+        <polygon points="5,0 9.5,10 5,7 0.5,10" fill="${color}" opacity="1"/>
+      </svg></div>`,
+    iconSize: [22, 22], iconAnchor: [11, 11]
+  });
+}
+
+function addLine(from, to, color, dash) {
+  if (!LL[from] || !LL[to]) return null;
+  const line = L.polyline([LL[from], LL[to]], {
+    color, weight:3.5, opacity:.78, dashArray:dash?'6,5':null, lineCap:'round'
+  }).addTo(map);
+  const angle = calcArrowAngle(LL[from], LL[to]);
+  const arrow = L.marker(LL[to], {icon: makeArrowIcon(color, angle), interactive:false, zIndexOffset:-10}).addTo(map);
+  line._arrow = arrow;
+  return line;
+}
+
+const _baseLines = [];
+const lunchLines = [];
+function _allLines() { return _baseLines.concat(lunchLines); }
+
+function refreshArrows() {
+  _allLines().forEach(l => {
+    if (!l || !l._from || !l._to || !l._arrow) return;
+    const angle = calcArrowAngle(l._from, l._to);
+    l._arrow.setIcon(makeArrowIcon(l._color, angle));
+  });
+}
+map.on('zoomend moveend', refreshArrows);
+
+function addTrackedLine(from, to, color, dash) {
+  const l = addLine(from, to, color, dash);
+  if (l && LL[from] && LL[to]) { l._from = LL[from]; l._to = LL[to]; l._color = color; }
+  return l;
+}
+
+function mkDropPin(num, color, label) {
+  const hasLabel = label && label.length > 0;
+  const totalW = hasLabel ? Math.min(220, label.length * 9 + 56) : 30;
+  return L.divIcon({
+    className: '',
+    html: `<div style="position:relative;display:flex;align-items:flex-start;gap:6px;width:${totalW}px;">
+      <div style="position:relative;width:30px;height:38px;flex-shrink:0;">
+        <div style="width:30px;height:30px;background:${color};border:2.5px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(0,0,0,.22);position:absolute;top:0;left:0;"></div>
+        <div style="position:absolute;top:4px;left:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white;font-family:'Noto Sans KR',sans-serif;z-index:2;">${num}</div>
+      </div>
+      ${hasLabel ? `<div style="margin-top:3px;background:white;border:1.5px solid #D8D2CA;border-radius:6px;padding:4px 9px;font-size:11.5px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:#1E1C1A;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.1);line-height:1.3;">${label}</div>` : ''}
+    </div>`,
+    iconSize: [totalW, 38], iconAnchor: [15, 38], popupAnchor: [0, -40]
+  });
+}
+
+const FIXED = [
+  {k:'hallstatt', num:'②', c:BLUE,   tip:'할슈타트'},
+  {k:'dachstein', num:'④', c:BLUE,   tip:'다흐슈타인 5핑거스'},
+];
+FIXED.forEach(p => { MK[p.k] = L.marker(LL[p.k], {icon: mkDropPin(p.num, p.c, p.tip)}).addTo(map); });
+
+// 빌라 엘리사는 잘츠부르크라 지도에 포함 안 함 (flyToPin만)
+const _boundsLL = [LL.hallstatt, LL.dachstein];
+map.fitBounds(_boundsLL, {padding:[60,60]});
+
+let _lineHallstattToDachstein;
+
+map.whenReady(() => {
+  setTimeout(() => {
+    map.invalidateSize();
+    map.fitBounds(_boundsLL, {padding:[60,60]});
+    _lineHallstattToDachstein = addTrackedLine('hallstatt', 'dachstein', NAVY, true);
+    if (_lineHallstattToDachstein) _baseLines.push(_lineHallstattToDachstein);
+    _baseLines.push(addTrackedLine('dachstein', 'hallstatt', NAVY, true));
+  }, 120);
+});
+
+setTimeout(() => { map.invalidateSize(); map.fitBounds(_boundsLL, {padding:[60,60]}); }, 100);
+window.addEventListener('load', () => { setTimeout(() => map.invalidateSize(), 200); });
+
+// ── 점심 데이터 ────────────────────────────────────────────────
+const LUNCH_DATA = {
+  simony:  {name:'Gasthof Simony',     desc:'할슈타트 전통 식당 · 11:30 바로 입장 · 12:25 자리에서 일어나기'},
+  umbrella:{name:'Umbrella Bar',       desc:'가볍게 음료+스낵 · 빠른 서비스 · 12:30 버스 여유'},
+  seecafe: {name:'Seecafé',            desc:'호수 뷰 카페 · 케이크+커피 · 시간 여유 없으면 음료만'},
+  chimney: {name:'굴뚝빵 노점',          desc:'즉석 굴뚝빵 · 서서 먹기 · 12:30 버스 가장 여유롭게 맞춤'},
+  bakery:  {name:'마을 베이커리·샌드위치', desc:'테이크아웃 · 케이블카 탑승 전 배낭에 넣기 · 시간 압박 최소'},
+};
+
+let selLunch = null;
+
+function _clearLines(arr) {
+  arr.forEach(l => {
+    if (!l) return;
+    try { map.removeLayer(l); } catch(e) {}
+    if (l._arrow) { try { map.removeLayer(l._arrow); } catch(e) {} }
+  });
+  arr.length = 0;
+}
+function _removePin(key) {
+  if (MK[key]) { try { map.removeLayer(MK[key]); } catch(e) {} delete MK[key]; }
+}
+
+function selectLunch(el, key) {
+  document.querySelectorAll('#tab-lunch .place-card').forEach(c => c.classList.remove('selected'));
+  _clearLines(lunchLines);
+  _removePin('r_lunch');
+  if (_lineHallstattToDachstein) {
+    _lineHallstattToDachstein.setStyle({opacity:.78});
+    if (_lineHallstattToDachstein._arrow) _lineHallstattToDachstein._arrow.setOpacity(.78);
+  }
+  if (selLunch === key) {
+    selLunch = null;
+    document.getElementById('tl-lunch-filled').style.display = 'none';
+    return;
+  }
+  el.classList.add('selected');
+  selLunch = key;
+  const d = LUNCH_DATA[key];
+  if (_lineHallstattToDachstein) {
+    _lineHallstattToDachstein.setStyle({opacity:0});
+    if (_lineHallstattToDachstein._arrow) _lineHallstattToDachstein._arrow.setOpacity(0);
+  }
+  MK['r_lunch'] = L.marker(LL[key] || LL.hallstatt, {icon: mkDropPin('③', GREEN, d.name)}).addTo(map);
+  lunchLines.push(addTrackedLine('hallstatt', key, ORANGE, false));
+  lunchLines.push(addTrackedLine(key, 'dachstein', NAVY, true));
+
+  document.getElementById('tl-lunch-filled').style.display = 'block';
+  document.getElementById('tl-lunch-filled-name').textContent = '🍽 점심 식사';
+  document.getElementById('tl-lunch-filled-desc').textContent = d.name + ' · ' + d.desc;
+  map.panTo(LL[key] || LL.hallstatt);
+}
+
+function flyToPin(el) {
+  const key = el.dataset.mapKey;
+  if (!key || !LL[key]) return;
+  const body = el.querySelector('.tl-body');
+  if (body) { body.style.background = '#E8F0FA'; setTimeout(() => { body.style.background = ''; }, 600); }
+  if (key === 'villa_elisa') { map.setView([47.8158, 13.0474], 13); }
+  else { map.panTo(LL[key]); }
+}
+function flyToLunch(el) {
+  const body = el.querySelector('.tl-body');
+  if (body) { body.style.background = '#E8F0FA'; setTimeout(() => { body.style.background = ''; }, 600); }
+  if (selLunch && LL[selLunch]) { map.panTo(LL[selLunch]); }
+  else { map.panTo(LL['hallstatt']); }
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const target = document.getElementById('tab-' + name);
+  target.classList.add('active');
+  target.scrollTop = 0;
+  void target.offsetHeight;
+  setTimeout(() => map.invalidateSize(), 50);
+}
+function switchSub(id, el, group) {
+  document.getElementById('tab-' + group).querySelectorAll('.subtab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + group).querySelectorAll('.subcontent').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// 날씨 (7/30 할슈타트)
+(async () => {
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.562&longitude=13.649&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FVienna&forecast_days=16');
+    const d = await r.json();
+    const idx = d.daily.time.indexOf('2026-07-30');
+    if (idx < 0) throw new Error();
+    const wc = d.daily.weather_code[idx];
+    const mx = Math.round(d.daily.temperature_2m_max[idx]);
+    const mn = Math.round(d.daily.temperature_2m_min[idx]);
+    const rise = d.daily.sunrise[idx].slice(11, 16);
+    const set = d.daily.sunset[idx].slice(11, 16);
+    const icons = {0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',61:'🌧',80:'🌦',95:'⛈'};
+    const wx = {0:'맑음',1:'대체로 맑음',2:'구름 조금',3:'흐림',45:'안개',51:'이슬비',61:'비',80:'소나기',95:'뇌우'};
+    document.getElementById('wc-icon').textContent = icons[wc] || '🌤';
+    document.getElementById('wc-wx').textContent = wx[wc] || '맑음';
+    document.getElementById('wc-temp').textContent = `${mn}°~${mx}°C`;
+    document.getElementById('wc-rise').textContent = rise;
+    document.getElementById('wc-set').textContent = set;
+  } catch(e) { document.getElementById('wc-wx').textContent = '날씨 정보 없음'; }
+})();
+
+document.querySelectorAll('.tl-map-icon').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+document.querySelectorAll('.move-card').forEach(el => el.addEventListener('click', e => e.stopPropagation()));
+document.querySelectorAll('.gmap-btn').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+window.addEventListener('resize', () => map.invalidateSize());
+</script>
+</body>
+</html>

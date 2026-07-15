@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>동유럽 여행 — DAY 3 부다페스트→빈 이동</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p-blue:#7B9BB8;--p-green:#82A88F;--p-purple:#9B8DB8;
+  --p-orange:#C4956A;--p-navy:#6B7FA8;--p-night:#8A6FA0;
+  --p-transit:#7A9ABE;
+  --bg:#F6F4F1;--surface:#FFFFFF;--border:#E8E4DE;
+  --text:#1E1C1A;--muted:#5A5550;--soft:#888078;
+  --radius-card:12px;--radius-badge:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;color:var(--text);background:var(--bg);}
+.header{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-shrink:0;z-index:1000;}
+.brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;}
+.day-pill{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.day-select{font-family:inherit;font-size:11px;border:1px solid var(--border);border-radius:var(--radius-badge);padding:4px 10px;background:var(--surface);color:var(--text);cursor:pointer;outline:none;}
+.layout{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+#map{flex-shrink:0;height:calc(45vh - 52px);min-height:180px;position:relative;z-index:1;}
+#map .leaflet-tile-pane{filter:saturate(0.45) brightness(0.97) contrast(1.15);}
+.panel{flex:1;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 4px;}
+.tab{flex:1;padding:11px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--soft);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;}
+.tab.active{color:var(--text);border-bottom-color:var(--p-blue);}
+.tab-content{display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;}
+.tab-content.active{display:block;}
+/* TTC 카드 */
+.ttc-card{margin:14px 16px 0;background:#EEF4FA;border:1px solid #C8DAE8;border-radius:var(--radius-card);overflow:hidden;}
+.ttc-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;}
+.ttc-title{font-size:13px;font-weight:700;color:#2A4A6A;display:flex;align-items:center;gap:7px;}
+.ttc-chevron{font-size:12px;color:#5A7A9A;transition:transform .2s;}
+.ttc-body{padding:0 14px 12px;border-top:1px solid #C8DAE8;display:none;}
+.ttc-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #D8E8F0;font-size:12px;color:#2A3A4A;line-height:1.6;}
+.ttc-row:last-child{border-bottom:none;}
+.ttc-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.ttc-badge.train{background:#E8EEF8;color:#3060A0;}
+.ttc-badge.pass{background:#EEF8EE;color:#2A6A2A;}
+.ttc-badge.warn{background:#FFF0E8;color:#9A4010;}
+.ttc-badge.walk{background:#F2EEF8;color:#6040A0;}
+.ttc-warn{background:#FFF8E8;border:1px solid #E8D890;border-radius:8px;padding:7px 10px;margin-top:8px;font-size:11px;color:#7A6010;line-height:1.6;}
+.ttc-compare{margin-top:10px;border:1px solid #D8E8F0;border-radius:8px;overflow:hidden;}
+.ttc-compare-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-bottom:1px solid #E8F0F8;font-size:11.5px;color:#2A3A4A;}
+.ttc-compare-row:last-child{border-bottom:none;}
+.ttc-compare-row.winner{background:#EEF8F0;font-weight:700;color:#2A6A3A;}
+.ttc-compare-row.loser{background:#FFF8F0;}
+.ttc-compare-label{flex:1;}
+.ttc-compare-price{font-variant-numeric:tabular-nums;font-weight:600;color:#3A5A7A;}
+.ttc-section-label{font-size:10px;font-weight:700;letter-spacing:.6px;color:#5A7A9A;text-transform:uppercase;padding:8px 0 4px;border-bottom:1px solid #D8E8F0;margin-bottom:4px;}
+/* 날씨 */
+.weather-card{margin:14px 16px 0;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.wc-item{display:flex;align-items:center;gap:7px;}
+.wc-label{font-size:10px;color:#706860;display:block;margin-bottom:1px;}
+.wc-val{font-size:13px;font-weight:500;color:var(--text);}
+/* 타임라인 */
+.timeline{padding:14px 16px 20px;}
+.tl-item{display:flex;position:relative;cursor:pointer;}
+.tl-axis{display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0;}
+.tl-pin{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;z-index:1;box-shadow:0 2px 8px rgba(0,0,0,.14);}
+.tl-pin.sight{background:var(--p-blue);}
+.tl-pin.food{background:var(--p-green);}
+.tl-pin.stay{background:var(--p-purple);}
+.tl-pin.night{background:var(--p-night);}
+.tl-pin.transit{background:var(--p-transit);}
+.tl-vline{width:1.5px;background:var(--border);flex:1;min-height:12px;}
+.tl-item:last-child .tl-vline{display:none;}
+.tl-body{flex:1;padding:2px 0 20px 12px;}
+.tl-time{font-size:10px;color:var(--soft);letter-spacing:.4px;margin-bottom:3px;}
+.tl-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.35;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tl-map-icon{font-size:13px;opacity:.6;text-decoration:none;flex-shrink:0;}
+.tl-desc{font-size:12px;color:#4A4540;line-height:1.7;margin-bottom:6px;}
+.tl-map-hint{font-size:10px;color:var(--soft);margin-top:2px;margin-bottom:4px;}
+.move-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:10px 13px;display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+.move-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text);line-height:1.6;}
+.mbadge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-badge);white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.mbadge.walk{background:#FEF3E2;color:#A06830;}
+.mbadge.transit{background:#E8EEF8;color:#506090;}
+.mbadge.train{background:#E8EEF8;color:#2A4A9A;}
+.tl-meal-filled{background:#F0F8F2;border:1px solid #BFD9C8;border-radius:var(--radius-card);padding:10px 13px;margin-top:6px;display:none;}
+.tl-meal-filled-name{font-size:13px;font-weight:600;color:#3D7A55;margin-bottom:2px;}
+.tl-meal-filled-desc{font-size:11px;color:var(--muted);}
+.tl-meal-slot{background:#F8F4EE;border:1px dashed #C4B09A;border-radius:8px;padding:8px 12px;margin-top:8px;}
+.tl-meal-label{font-size:12px;font-weight:600;color:#7A5A3A;margin-bottom:2px;}
+.tl-meal-hint{font-size:10.5px;color:var(--soft);}
+.meal-tip-banner{margin:10px 16px 4px;background:#EEF4F0;border:1px solid #C0D8CA;border-radius:8px;padding:8px 12px;font-size:11.5px;color:#3A6A50;line-height:1.6;}
+.warn-banner{margin:14px 16px 0;background:#FFF0F0;border:1px solid #F0C8C8;border-radius:var(--radius-card);padding:10px 13px;font-size:12px;color:#8A2020;line-height:1.7;}
+.warn-banner.depart{background:#FFF8E8;border-color:#E8D080;color:#7A5800;}
+.info-inline{background:#F4FAF6;border-left:3px solid #82A88F;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#3A6A4A;line-height:1.6;}
+.warn-inline{background:#FFF8E8;border-left:3px solid #C4956A;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#7A5020;line-height:1.6;}
+/* 식당 탭 */
+.subtabs{display:flex;gap:6px;padding:10px 16px 0;}
+.subtab{font-size:12px;font-weight:500;padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-badge);cursor:pointer;color:var(--muted);background:var(--surface);}
+.subtab.active{background:var(--p-blue);color:#fff;border-color:var(--p-blue);}
+.subtab.korean.active{background:var(--p-green);border-color:var(--p-green);}
+.subcontent{display:none;padding:10px 16px 80px;}
+.subcontent.active{display:block;}
+.sec-lbl{font-size:10px;font-weight:600;letter-spacing:.8px;color:var(--soft);text-transform:uppercase;margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.sec-lbl:first-child{margin-top:4px;}
+.place-card{border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .18s;}
+.place-card.selected{border-color:var(--p-blue);background:#F0F4FA;}
+.place-card.selected.korean-card{border-color:var(--p-green);background:#F0F8F2;}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;}
+.card-name{font-size:13px;font-weight:600;line-height:1.4;color:var(--text);}
+.badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.badge.saved{background:#FEF5E8;color:#906030;font-weight:700;}
+.badge.ai{background:#F0EAF8;color:#7050A0;font-weight:700;}
+.badge.verified{background:#E8F5E8;color:#2A6A2A;font-weight:700;}
+.card-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.card-meta-item{font-size:11px;color:var(--muted);}
+.card-desc{font-size:12px;color:#4A4540;line-height:1.65;margin-bottom:6px;}
+.card-memo{font-size:11px;color:#5A7A5A;background:#F4FAF4;border:1px solid #C8DCC8;border-radius:8px;padding:5px 9px;margin-bottom:5px;}
+.card-tip{font-size:11px;color:#906030;background:#FEF5E8;border:1px solid #F0D8B0;border-radius:8px;padding:6px 10px;margin-top:4px;}
+.selected-notice{display:none;font-size:11px;color:#3D7A55;font-weight:600;margin-top:6px;}
+.place-card.selected .selected-notice{display:block;}
+/* 마트 */
+.mart-wrap{padding:14px 16px 80px;}
+.mart-card{border:1px solid var(--border);border-radius:var(--radius-card);padding:13px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .18s;}
+.mart-card.on-map{border-color:var(--p-blue);background:#F0F4FA;}
+.mart-name{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.mart-tag{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.4px;}
+.mart-tag.local{background:#E8F5E8;color:#2A6A2A;}
+.mart-tag.korean{background:#FEF0E8;color:#8A4010;}
+.mart-hours{font-size:11px;color:#3A7A3A;font-weight:600;margin-bottom:4px;}
+.mart-addr{font-size:11px;color:var(--muted);margin-bottom:5px;}
+.mart-desc{font-size:12px;color:#4A4540;line-height:1.65;}
+/* 범례 */
+.legend{position:fixed;bottom:12px;left:12px;background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:11px;display:flex;flex-direction:column;gap:5px;z-index:500;box-shadow:0 2px 10px rgba(0,0,0,.08);pointer-events:none;}
+.leg-row{display:flex;align-items:center;gap:8px;color:#4A4540;}
+.leg-line{width:22px;height:3px;border-radius:2px;flex-shrink:0;}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.leg-sep{height:1px;background:var(--border);margin:1px 0;}
+.gmap-btn{display:inline-block;font-size:11px;color:var(--p-blue);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-badge);margin-top:6px;}
+@media(min-width:768px){
+  .layout{flex-direction:row;height:100vh;}
+  #map{flex:1;height:100%!important;min-height:unset;}
+  .panel{width:440px;flex:none;border-top:none;border-left:1px solid var(--border);}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="brand">2026 동유럽</span>
+    <span class="day-pill">Day 3 · 부다페스트 → 빈</span>
+  </div>
+  <select class="day-select" onchange="if(this.value)location.href=this.value">
+    <option value="travel_day01_0723.html">7/23 부다페스트 도착</option>
+    <option value="travel_day02_0724.html">7/24 부다페스트 전일</option>
+    <option value="" selected>7/25 부다→빈 이동</option>
+    <option value="travel_day04_0726.html">7/26 빈 전일</option>
+    <option value="travel_day05_0727.html">7/27 빈 전일</option>
+    <option value="travel_day06_0728.html">7/28 빈→잘츠 이동</option>
+    <option value="travel_day07_0729.html">7/29 잘츠부르크</option>
+    <option value="travel_day08_0730.html">7/30 할슈타트</option>
+    <option value="travel_day09_0731.html">7/31 잘츠→바트이슐</option>
+    <option value="travel_day10_0801.html">8/1 바트이슐</option>
+    <option value="travel_day11_0802.html">8/2 바트이슐→CK</option>
+    <option value="travel_day12_0803.html">8/3 체스키크룸로프</option>
+    <option value="travel_day13_0804.html">8/4 CK→프라하</option>
+    <option value="travel_day14_0805.html">8/5 프라하 전일</option>
+    <option value="travel_day15_0806.html">8/6 프라하 출발</option>
+  </select>
+</div>
+
+<div class="layout">
+  <div id="map">
+    <div class="legend">
+      <div class="leg-row"><div class="leg-line" style="border-top:2px dashed var(--p-navy);background:none;"></div>열차·지하철</div>
+      <div class="leg-row"><div class="leg-line" style="background:var(--p-orange);"></div>도보</div>
+      <div class="leg-sep"></div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-transit)"></div>교통거점</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-purple)"></div>숙소</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-blue)"></div>관광</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-green)"></div>식당</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('timeline',this)">📋 일정</div>
+      <div class="tab" onclick="switchTab('lunch',this)">🍽 점심</div>
+      <div class="tab" onclick="switchTab('dinner',this)">🌙 저녁</div>
+      <div class="tab" onclick="switchTab('mart',this)">🛒 마트</div>
+    </div>
+
+    <!-- 일정 탭 -->
+    <div id="tab-timeline" class="tab-content active">
+
+      <div class="warn-banner depart">
+        🚂 오늘 08:35 B40 출발 — 전날 밤 짐 완전히 싸두기 필수 / 켈레티역 도보 약 20분 (짐 있으면 25분)
+      </div>
+
+      <div class="weather-card">
+        <div class="wc-item"><span style="font-size:16px;" id="wc-icon">🌤</span><div><span class="wc-label">날씨(빈)</span><span class="wc-val" id="wc-wx">로딩 중</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌡</span><div><span class="wc-label">기온</span><span class="wc-val" id="wc-temp">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌅</span><div><span class="wc-label">일출</span><span class="wc-val" id="wc-rise">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌇</span><div><span class="wc-label">일몰</span><span class="wc-val" id="wc-set">—</span></div></div>
+      </div>
+
+      <!-- 열차 교통 드로어 -->
+      <div class="ttc-card">
+        <div class="ttc-header" onclick="toggleTTC('ttc-train')">
+          <div class="ttc-title">🚆 켈레티역 → 빈 중앙역 + 빈 교통권</div>
+          <div class="ttc-chevron" id="ttc-train-chev">▾</div>
+        </div>
+        <div class="ttc-body" id="ttc-train-body">
+          <div class="ttc-section-label">열차 정보</div>
+          <div class="ttc-row">
+            <span class="ttc-badge train">ÖBB 기차</span>
+            <div>
+              부다페스트 켈레티역 <strong>09:40 출발</strong> → 빈 중앙역(Wien Hbf) <strong>12:20 도착</strong><br>
+              소요 2시간 40분 · <strong>ÖBB 결제 완료 ✅</strong><br>
+              출발 20~60분 전 전광판에서 플랫폼(Gleis) 확인
+              <div class="ttc-warn">⚠️ 켈레티역 짐 보관소 있음 (단, 오늘은 출발역이라 불필요) / 빈 중앙역 도착 후 무료 Wi-Fi 가능</div>
+            </div>
+          </div>
+          <div class="ttc-row">
+            <span class="ttc-badge walk">숙소 이동</span>
+            <div>
+              빈 중앙역 → 아디나 호텔 (Rechte Wienzeile 3A)<br>
+              <strong>도보 약 10~12분</strong> (900m) · 짐 맡기기 (체크인 15:00)
+            </div>
+          </div>
+
+          <div class="ttc-section-label" style="margin-top:10px;">빈 교통권 비교</div>
+          <div class="ttc-compare">
+            <div class="ttc-compare-row winner">
+              <span class="ttc-compare-label">🅰 ÖBB앱 7일 디지털권 €25.20/인<br><span style="font-size:10px;font-weight:400;color:#3A6A4A;">개별 입장: 벨베데레 €19.50 + 레오폴트 €18 + 쇤브룬 €38 + 알베르티나 €22 = €97.50</span><br><span style="font-size:10px;font-weight:700;">7일권 €75.60 (3인) + 개별 €97.50 = 총 <span style="color:#1A5A2A;">€173.1</span></span></span>
+              <span class="ttc-compare-price">3인 €75.60</span>
+            </div>
+            <div class="ttc-compare-row loser">
+              <span class="ttc-compare-label">🅱 Vienna City Card 72h €37/인<br><span style="font-size:10px;font-weight:400;color:#7A5020;">교통 포함 + 명소 할인 (~10~15%) 적용 시</span><br><span style="font-size:10px;font-weight:700;">City Card €111 (3인) + 개별(할인) ≈ €88 = 총 <span style="color:#9A4010;">€199</span> 내외</span></span>
+              <span class="ttc-compare-price">3인 €111</span>
+            </div>
+            <div class="ttc-compare-row" style="background:#F0F4FA;font-size:11px;color:#3A5A7A;">
+              <span class="ttc-compare-label">✅ 결론: 7일권이 약 €25 절약. 어느 쪽이든 큰 차이 없으나 절약 원하면 7일권 추천.<br>⚠️ 2026.1.1부로 48h·72h 단독권 폐지 — 24시간(€10.20) 또는 7일권만 존재</span>
+            </div>
+          </div>
+          <div class="ttc-warn" style="margin-top:8px;">
+            ÖBB 앱 미리 설치 · 7일권은 탑승 당일 앱에서 활성화 / 이미 열차 안에서 켜도 OK<br>
+            WienMobil 앱보다 ÖBB 앱이 더 안정적
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline">
+
+        <!-- ① 켈레티역 출발 -->
+        <div class="tl-item" data-map-key="adina" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin transit">①</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">08:35 출발</div>
+            <div class="tl-name">B40 숙소 출발 → 켈레티역 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJHc0p23bBQUcRY7QGSr8rTrA" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              도보 약 20분 (1.5km) · 짐 있으면 25분 — 여유 있게 출발<br>
+              M4 지하철 이용 시: Rákóczi tér 탑승 → Keleti pályaudvar 하차 (약 5분)
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">도보 20분</span>B40 (Baross utca 40) → 부다페스트 켈레티역</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ② OBB 기차 -->
+        <div class="tl-item" data-map-key="keleti" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin transit">②</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">09:10 도착 / 09:40 출발</div>
+            <div class="tl-name">켈레티역 ÖBB 열차 탑승 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJHc0p23bBQUcRY7QGSr8rTrA" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              09:40 출발 → 빈 중앙역 12:20 도착 · 소요 2시간 40분<br>
+              전광판에서 플랫폼(Gleis) 확인 (출발 20~60분 전 표시)<br>
+              <strong>ÖBB 예약 완료 ✅</strong> — 좌석 지정석, 편하게 탑승
+            </div>
+            <div class="info-inline">🚆 차내 식당칸(Speisewagen) 있음 · 간식·음료 구입 가능 / 또는 출발 전 켈레티역 편의점에서 미리 구매 권장</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge train">ÖBB 열차</span>켈레티역 09:40 → 빈 중앙역 Wien Hauptbahnhof 12:20 · 약 2h 40m</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ 빈 중앙역 도착 -->
+        <div class="tl-item" data-map-key="wien_hbf" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin transit">③</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">12:20 도착</div>
+            <div class="tl-name">빈 중앙역 (Wien Hauptbahnhof) <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJlU2SCR0HbUcRWoifYt6WBQM" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              역 내 BILLA·Bäckerei·카페 등 다양 · 환전소 있음<br>
+              <strong>빈 교통권 구매 (ÖBB 앱 7일권 €25.20/인)</strong> — 역 도착 즉시 앱에서 활성화 권장
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">도보 10~12분</span>빈 중앙역 → 아디나 아파트먼트 (Rechte Wienzeile 3A) · 900m</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 아디나 숙소 짐 맡기기 -->
+        <div class="tl-item" data-map-key="adina" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">④</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">12:30</div>
+            <div class="tl-name">아디나 아파트먼트 — 짐 맡기기 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Adina+Apartment+Hotel+Vienna+Right+Bank+Wienzeile" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Rechte Wienzeile 3A · 체크인 15:00<br>
+              프런트에 짐 보관 요청 (Gepäckaufbewahrung / Luggage storage)<br>
+              <strong>체크인 15:00 이후</strong> — 오늘은 짐만 맡기고 출발
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">도보 12~15분</span>아디나 → 벨베데레 상궁 입구 (Prinz Eugen-Straße 27)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 점심 -->
+        <div class="tl-item" data-map-key="belvedere" onclick="flyToLunch(this)">
+          <div class="tl-axis"><div class="tl-pin food">⑤</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">12:50~13:40</div>
+            <div class="tl-name">점심식사 — 벨베데레 주변 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=restaurant+near+Belvedere+Palace+Vienna" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 점심 탭에서 식당 선택 후 지도에 반영</div>
+            <div class="tl-desc">점심 탭에서 식당을 선택하면 여기에 자동 표시됩니다</div>
+            <div id="tl-lunch-filled" class="tl-meal-filled">
+              <div class="tl-meal-filled-name" id="tl-lunch-filled-name"></div>
+              <div class="tl-meal-filled-desc" id="tl-lunch-filled-desc"></div>
+            </div>
+            <div class="warn-inline">⏰ 14:00 벨베데레 입장 슬롯 — 13:40까지 식사 마치고 도보 이동 (도보 12~15분)</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">도보 12~15분</span>식당 → 벨베데레 상궁 입구 (Prinz Eugen-Straße 27)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ 벨베데레 -->
+        <div class="tl-item" data-map-key="belvedere" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">⑥</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">14:00~15:30</div>
+            <div class="tl-name">벨베데레 상궁 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJlRrOvQ0HbUcREMIVe9l_fEA" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              <strong>예약 완료 ✅</strong> · GYG GYGRFQL3AW7N · €19.50/인<br>
+              클림트 〈키스〉 원화 소장 · 오스트리아 최대 바로크 궁전 정원<br>
+              약 1시간 30분 관람
+            </div>
+            <div class="warn-inline">⚠️ 백팩·큰 가방 입장 불가 (짐은 아디나에 맡겨둔 상태) · 소지품은 작은 핸드백·크로스백만 · 음식·셀카봉 반입 불가</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">트램 D</span>Schloss Belvedere 탑승 → Opering 하차 · 약 9~12분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑦ 슈테판 대성당·케른트너 거리 -->
+        <div class="tl-item" data-map-key="stephansdom" onclick="flyToDinner(this)">
+          <div class="tl-axis"><div class="tl-pin sight">⑦</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">15:30~19:00</div>
+            <div class="tl-name">슈테판 대성당 + 케른트너 거리 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJJ_4D8UoHbUcRNMCFxIKVsMs" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              슈테판 대성당 외관 관람 (무료) — 내부 탑 등반 별도<br>
+              케른트너 거리(Kärntner Straße) 도보 쇼핑거리 · 그라벤 · 황금 지붕 골목<br>
+              <strong>아디나 체크인(15:00)은 이미 됐으니 관람 후 편하게</strong>
+            </div>
+            <div class="info-inline">☕ 카페 첸트랄(Café Central) — 1876년 창업 · 슈테판 도보 10분 · 케이크+커피 약 €15/인</div>
+            <div class="tl-meal-slot">
+              <div class="tl-meal-label">🌙 저녁식사 — 저녁 탭에서 식당 선택</div>
+              <div class="tl-meal-hint">식당 선택 시 지도 동선이 경유지로 자동 업데이트됩니다</div>
+              <div id="tl-dinner-filled" class="tl-meal-filled" style="display:none;">
+                <div class="tl-meal-filled-name" id="tl-dinner-filled-name"></div>
+                <div class="tl-meal-filled-desc" id="tl-dinner-filled-desc"></div>
+              </div>
+            </div>
+            <div class="move-card" id="move-to-rathaus">
+              <div class="move-row"><span class="mbadge transit">지하철 U2</span>식당 → Rathaus 하차 · 약 10~15분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑧ 시청사 광장 필름 페스티벌 -->
+        <div class="tl-item" data-map-key="rathaus" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin night">⑧</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">19:30 도착 / 21:10 영화 시작</div>
+            <div class="tl-name">시청사 광장 — 필름 페스티벌 🎬 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJIWvfLUoHbUcRWxJSrCp3iIk" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              <strong>무료 야외 영화 ✅</strong> · 좌석 예약 없음 · Rathausplatz<br>
+              국제 음식 스탠드 11:00~23:00 운영 — 저녁 여기서 해결 가능<br>
+              영화 시작: 일몰 후 약 <strong>21:10~21:20</strong> (7/25 일몰 약 20:53)<br>
+              중앙 좌석은 빨리 채워짐 — <strong>19:30 도착 권장</strong>
+            </div>
+            <div class="warn-inline">⚠️ 7/25 상영작 현장 확인 (매일 다른 공연) · 시청사 광장 잔디에 돗자리 가능 · 비 예보 시 간이 우산 지참</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">지하철 U2</span>Rathaus 탑승 → Karlsplatz 환승 → U1 → 아디나 인근 하차 · 약 18~22분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑨ 아디나 복귀 -->
+        <div class="tl-item" data-map-key="adina" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">⑨</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">23:30</div>
+            <div class="tl-name">아디나 아파트먼트 복귀 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Adina+Apartment+Hotel+Vienna+Right+Bank+Wienzeile" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              야간 배차 약 7~8분 간격 · 이미 체크인된 상태<br>
+              내일 Day 4: 08:30 출발 (쇤브룬 궁전 오픈 전 도착 목표)
+            </div>
+            <div class="warn-inline">⚠️ 내일 08:30 출발 — 오늘 밤 시청사 영화 감상 후 귀환. U2→U4 환승으로 숙소 바로 인근까지 가능</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 다음날 조기출발 경고 -->
+      <div class="warn-banner depart" style="margin-bottom:14px;">
+        ⏰ 내일(Day 4) 08:30 출발 — 쇤브룬+레오폴트+빈 시내 전일 일정 / 체력 관리 위해 오늘은 일찍 귀환 권장
+      </div>
+
+    </div><!-- /tab-timeline -->
+
+    <!-- 점심 탭 -->
+    <div id="tab-lunch" class="tab-content">
+      <div class="subtabs">
+        <div class="subtab active" onclick="switchSub('sub-lunch-local',this,'lunch')">🍴 현지식</div>
+        <div class="subtab korean" onclick="switchSub('sub-lunch-korean',this,'lunch')">🥢 아시안</div>
+      </div>
+
+      <!-- 현지식 -->
+      <div id="sub-lunch-local" class="subcontent active">
+        <div style="margin:10px 0 6px;padding:8px 12px;background:#FFF8E8;border:1px solid #E8D890;border-radius:8px;font-size:11px;color:#7A5800;line-height:1.6;">
+          ⏰ 벨베데레 14:00 슬롯 — 13:40까지 식사 마쳐야 함 (약 50분 여유).<br>벨베데레 주변 또는 아디나~벨베데레 동선상 식당 선택 권장.
+        </div>
+
+        <div class="sec-lbl">💡 AI 추천 · 벨베데레 주변</div>
+
+        <div class="place-card" id="lc-reinthaler" onclick="selectLunch(this,'reinthaler')">
+          <div class="card-header">
+            <div class="card-name">Reinthaler's Beisl</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Gluckgasse 5 · 슈테판 도보 5분</span>
+            <span class="card-meta-item">⏰ 11:00~23:00</span>
+            <span class="card-meta-item">💶 €12~18/인</span>
+          </div>
+          <div class="card-desc">오스트리아 전통 Beisl(비슬) · 슈니첼·타펠슈피츠 · 빈 현지인이 가는 곳으로 관광화 덜 됨 · 영어 메뉴 있음</div>
+          <div class="card-tip">💡 아디나 ~ 벨베데레 동선 중간 위치. 12:50 도착 → 13:30 출발해도 충분</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Reinithalers+Beisl+Wien+Dorotheergasse+4" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-schnitzelbeisl" onclick="selectLunch(this,'schnitzelbeisl')">
+          <div class="card-header">
+            <div class="card-name">슈니첼 비르트 (Wienerschnitzel Wirt)</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-memo">💬 "슈니첼이 저렴하고 맛있다고 함. 합석시키는 분위기. 마늘 슈니첼 굿"</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Schönbrunner Str. 근방</span>
+            <span class="card-meta-item">⏰ 11:30~22:00</span>
+            <span class="card-meta-item">💶 €10~15/인</span>
+          </div>
+          <div class="card-desc">합리적인 가격의 슈니첼 전문점 · 마늘 슈니첼 추천 · 합석 문화 있음</div>
+          <div class="card-tip">💡 벨베데레 가는 동선에서 약간 벗어남. 빠르게 먹고 이동 가능한 곳</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Wienerschnitzel+Wirt+Wien+Schönbrunner+Str" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-huth" onclick="selectLunch(this,'huth')">
+          <div class="card-header">
+            <div class="card-name">Huth Gastwirtschaft</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.5</span></div>
+          </div>
+          <div class="card-memo">💬 "슈니첼 존맛 크랜베리잼 추가추가"</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Schellinggasse 5 · 나슈마르크트 근처</span>
+            <span class="card-meta-item">⏰ 11:30~22:00</span>
+            <span class="card-meta-item">💶 €13~20/인</span>
+          </div>
+          <div class="card-desc">빈 전통 가스트하우스 · 크랜베리잼과 함께 먹는 슈니첼로 유명 · 현지인 단골 多</div>
+          <div class="card-tip">💡 나슈마르크트 쪽이라 벨베데레 방향 동선에서 자연스러움. 크랜베리잼은 반드시 추가.</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Huth+Gastwirtschaft+Wien+Schleifmuhlgasse+3" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-belvedere_cafe" onclick="selectLunch(this,'belvedere_cafe')">
+          <div class="card-header">
+            <div class="card-name">벨베데레 내부 카페 (Café Residenz)</div>
+            <div class="badges"><span class="badge ai">💡 AI 추천</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 벨베데레 상궁 내부</span>
+            <span class="card-meta-item">⏰ 10:00~18:00</span>
+            <span class="card-meta-item">💶 €14~22/인</span>
+          </div>
+          <div class="card-desc">입장 후 궁 내부 카페에서 식사 · 별도 입장료 없이 카페만 이용 가능 · 수프+빵+음료 조합 추천</div>
+          <div class="card-tip">💡 14:00 입장 전 외부에서 간단히 먹고, 내부 카페는 관람 중 휴식으로 활용하는 방법도 있음</div>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div><!-- /sub-lunch-local -->
+
+      <!-- 아시안 -->
+      <div id="sub-lunch-korean" class="subcontent">
+        <div style="margin:10px 0 6px;padding:8px 12px;background:#F0F8F2;border:1px solid #C8DCC8;border-radius:8px;font-size:11px;color:#3A6A4A;line-height:1.6;">
+          ⏰ 시간이 빡빡하므로 아디나 인근 또는 벨베데레 동선상 식당 선택 권장
+        </div>
+
+        <div class="sec-lbl">💾 저장됨 · 빈 아시안</div>
+
+        <div class="place-card korean-card" id="lc-tofu" onclick="selectLunch(this,'tofu')">
+          <div class="card-header">
+            <div class="card-name">Tofu und Chili</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 빈 4구 근방</span>
+            <span class="card-meta-item">⏰ 11:30~22:00</span>
+            <span class="card-meta-item">💶 €10~15/인</span>
+          </div>
+          <div class="card-desc">아시안 퓨전 · 두부 요리 중심 · 가볍고 담백한 점심으로 적합 · 가성비 좋음</div>
+          <div class="card-tip">💡 벨베데레 가는 동선에서 가까움. 빠른 점심에 적합.</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Tofu+und+Chili+Wien+Gumpendorfer+Str" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card korean-card" id="lc-ostmeer" onclick="selectLunch(this,'ostmeer')">
+          <div class="card-header">
+            <div class="card-name">Ostmeer</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.2</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 빈 시내</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+            <span class="card-meta-item">💶 €10~16/인</span>
+          </div>
+          <div class="card-desc">아시안 퓨전 레스토랑 · 볶음밥·면 요리 · 한국인 방문 후기 있음</div>
+          <div class="card-tip">💡 빈 첫날 아시안이 당기면 선택. 벨베데레 이동 전 적당한 중간 지점.</div>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card korean-card" id="lc-viebunna" onclick="selectLunch(this,'viebunna')">
+          <div class="card-header">
+            <div class="card-name">비엔나 분식 (Vienna Bunshik)</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 빈 시내</span>
+            <span class="card-meta-item">💶 €8~12/인</span>
+          </div>
+          <div class="card-desc">김밥·떡볶이·순대 등 한식 분식 · 교민 및 유학생 단골 · 빠른 식사 가능</div>
+          <div class="card-tip">💡 이동일 첫날 한식이 당기면. 위치 사전 확인 권장.</div>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div><!-- /sub-lunch-korean -->
+    </div><!-- /tab-lunch -->
+
+    <!-- 저녁 탭 -->
+    <div id="tab-dinner" class="tab-content">
+      <div class="subtabs">
+        <div class="subtab active" onclick="switchSub('sub-dinner-local',this,'dinner')">🍴 현지식</div>
+        <div class="subtab korean" onclick="switchSub('sub-dinner-korean',this,'dinner')">🥢 아시안</div>
+      </div>
+
+      <div class="meal-tip-banner">
+        💡 시청사 광장 이동 전 저녁식사 · 슈테판-라트하우스 사이 식당 위주 · 19:30 라트하우스 도착 목표
+      </div>
+
+      <!-- 현지식 -->
+      <div id="sub-dinner-local" class="subcontent active">
+
+        <div class="place-card" id="dc-reinthaler" onclick="selectDinner(this,'reinthaler')">
+          <div class="card-header">
+            <div class="card-name">Reinthaler's Beisl</div>
+            <div class="badges"><span class="badge ai">💡 AI 추천</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Gluckgasse 5 · 슈테판 도보 5분</span>
+            <span class="card-meta-item">⏰ 월~금 11:00~22:00 / 토 11:00~20:00 / 일 휴무 ⚠️</span>
+            <span class="card-meta-item">💶 €10~14/인</span>
+          </div>
+          <div class="card-desc">빈 구시가 골목 안 소박한 가정식 비스트로 · 슈니첼·굴라시 · 관광객 덜한 로컬 분위기</div>
+          <div class="card-tip">💡 19:00 전 입장 권장 — 일찍 닫음 · 일요일 휴무 주의</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Reinithalers+Beisl+Wien+Dorotheergasse+4" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-huth" onclick="selectDinner(this,'huth')">
+          <div class="card-header">
+            <div class="card-name">Huth Gastwirtschaft</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.5</span></div>
+          </div>
+          <div class="card-memo">💬 "슈니첼 존맛 크랜베리잼 추가추가"</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Schellinggasse 5 · 슈테판 도보 8분</span>
+            <span class="card-meta-item">⏰ 11:00~23:00</span>
+            <span class="card-meta-item">💶 €13~20/인</span>
+          </div>
+          <div class="card-desc">빈 전통 가스트하우스 · 슈니첼 + 크랜베리잼 조합으로 유명 · 현지인 단골 多</div>
+          <div class="card-tip">💡 슈니첼 단품 + 크랜베리잼 추가 추천 · 저장된 곳</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Huth+Gastwirtschaft+Wien+Schleifmuhlgasse+3" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-falkensteiner" onclick="selectDinner(this,'falkensteiner')">
+          <div class="card-header">
+            <div class="card-name">Falkensteiner Stüberl</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-memo">💬 "인종차별 없고 친절하다 / 고기 잡내+인종차별 후기 오락가락 · 후기에 한국인 많음"</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Wallnerstraße 4 · 슈테판 도보 6분</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+            <span class="card-meta-item">💶 €12~18/인</span>
+          </div>
+          <div class="card-desc">오스트리아 전통 요리 · 한국인 방문 후기 多 · 후기 편차 있음</div>
+          <div class="card-tip">💡 저장된 곳 · 후기 편차 있으니 참고</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Falkensteiner+Stüberl+Wien+Wollzeile" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-lips" onclick="selectDinner(this,'lips')">
+          <div class="card-header">
+            <div class="card-name">Lips of Vienna</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.4</span></div>
+          </div>
+          <div class="card-memo">💬 "Klein Steiermark보다 맛은 약간 아래라는 평 / 양념갈비 스타일"</div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Schulerstraße 2 · 슈테판 도보 3분</span>
+            <span class="card-meta-item">⏰ 12:00~23:00</span>
+            <span class="card-meta-item">💶 €18~28/인</span>
+          </div>
+          <div class="card-desc">양념갈비 스타일 BBQ 립 전문 · 구시가지 위치라 라트하우스 이동 바로 가능</div>
+          <div class="card-tip">💡 예약 권장 · 저장된 곳</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Lips+of+Vienna+Wien+Bäckerstrasse" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-rathaus_stand" onclick="selectDinner(this,'rathaus')">
+          <div class="card-header">
+            <div class="card-name">시청사 광장 푸드 스탠드</div>
+            <div class="badges"><span class="badge ai">💡 가장 간편</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Rathausplatz · 현장 해결</span>
+            <span class="card-meta-item">⏰ 11:00~23:00 (페스티벌 기간)</span>
+            <span class="card-meta-item">💶 €8~14/인</span>
+          </div>
+          <div class="card-desc">필름 페스티벌 기간 국제 음식 스탠드 운영 · 별도 이동 없이 현장에서 바로 해결 · 다양한 국적 음식</div>
+          <div class="card-tip">💡 별도 이동 없이 현장 해결 — 가장 간편한 선택</div>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div><!-- /sub-dinner-local -->
+
+      <!-- 아시안 -->
+      <div id="sub-dinner-korean" class="subcontent">
+
+        <div class="place-card korean-card" id="dc-ostmeer" onclick="selectDinner(this,'ostmeer')">
+          <div class="card-header">
+            <div class="card-name">Ostmeer</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.2</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Marxergasse 24 · 슈테판 도보 15분 또는 U3</span>
+            <span class="card-meta-item">⏰ 12:00~22:00</span>
+            <span class="card-meta-item">💶 €10~16/인</span>
+          </div>
+          <div class="card-desc">아시안 퓨전 레스토랑 · 볶음밥·면 요리 · 저장된 곳</div>
+          <div class="card-tip">💡 거리 있으므로 18:00 전 입장 권장 · 19:30 라트하우스 도착 역산 필수</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Ostmeer+Restaurant+Wien+Rechte+Wienzeile" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card korean-card" id="dc-tofu" onclick="selectDinner(this,'tofu')">
+          <div class="card-header">
+            <div class="card-name">Tofu und Chili</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Waaggasse 9 · 나슈마르크트 근처</span>
+            <span class="card-meta-item">⏰ 11:30~22:00</span>
+            <span class="card-meta-item">💶 €10~15/인</span>
+          </div>
+          <div class="card-desc">두부 중심 한식·중식 퓨전 · 가볍고 담백 · 아디나 근처라 숙소 들렀다가 이동 시 유리</div>
+          <div class="card-tip">💡 슈테판에서 거리 있음 — 아디나 방향 동선일 때 유리</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Tofu+und+Chili+Wien+Gumpendorfer+Str" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card korean-card" id="dc-viebunna" onclick="selectDinner(this,'viebunna')">
+          <div class="card-header">
+            <div class="card-name">비엔나 분식</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Währinger Straße 12 · 슈테판 북쪽</span>
+            <span class="card-meta-item">⏰ 11:00~21:00</span>
+            <span class="card-meta-item">💶 €6~12/인</span>
+          </div>
+          <div class="card-desc">김밥·떡볶이 등 분식 위주 · 가성비 · 저장된 곳</div>
+          <div class="card-tip">💡 라트하우스 방향 동선상 위치 — 이동 자연스러움</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Vienna+Bungsik+Wien" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div><!-- /sub-dinner-korean -->
+
+    </div><!-- /tab-dinner -->
+
+    <!-- 마트 탭 -->
+    <div id="tab-mart" class="tab-content">
+      <div class="mart-wrap">
+        <div style="margin-bottom:12px;padding:8px 12px;background:#F0F4FA;border:1px solid #C8DAE8;border-radius:8px;font-size:11px;color:#3A5A7A;line-height:1.6;">
+          📍 빈 도착 첫날 — 숙소 인근 마트에서 간식·생수·내일 아침거리 구매 권장 (내일 일찍 출발)
+        </div>
+
+        <div class="mart-card" onclick="toggleMart(this,'billa')">
+          <div class="mart-name">BILLA <span class="mart-tag local">슈퍼마켓</span></div>
+          <div class="mart-hours">🕐 07:30~20:00 (일 07:30~18:00)</div>
+          <div class="mart-addr">📍 빈 중앙역 내 + 빈 시내 곳곳</div>
+          <div class="mart-desc">오스트리아 대표 슈퍼마켓 체인 · 중앙역 내 지점은 도착 직후 바로 이용 가능 · 빵·유제품·음료·스낵 다양 · 저렴하고 편리</div>
+        </div>
+
+        <div class="mart-card" onclick="toggleMart(this,'spar_wien')">
+          <div class="mart-name">SPAR <span class="mart-tag local">슈퍼마켓</span></div>
+          <div class="mart-hours">🕐 07:00~21:00 (지점마다 다름)</div>
+          <div class="mart-addr">📍 빈 시내 각처 (아디나 근처 지점 있음)</div>
+          <div class="mart-desc">빌라와 함께 빈 양대 슈퍼마켓 · 숙소 주변 지점 앱에서 검색 권장 · 과일·채소·가공식품 저렴</div>
+        </div>
+
+        <div class="mart-card" onclick="toggleMart(this,'nakwon')">
+          <div class="mart-name">NAKWON SUPERMARKT <span class="mart-tag korean">한인마트</span></div>
+          <div class="mart-hours">🕐 10:00~19:00 (일 12:00~18:00)</div>
+          <div class="mart-addr">📍 Zieglergasse 12, 1070 Wien · 지하철 U3 Zieglergasse 하차 도보 2분</div>
+          <div class="mart-desc">빈 유일 검증된 한인마트 · 라면·고추장·김·참치캔·즉석밥 구비 · 한국 과자류도 있음 · 가격은 한국보다 약 2~3배</div>
+        </div>
+
+        <div class="mart-card" onclick="toggleMart(this,'naschmarkt')">
+          <div class="mart-name">나슈마르크트 (Naschmarkt) <span class="mart-tag local">시장</span></div>
+          <div class="mart-hours">🕐 월~금 06:00~19:30 / 토 06:00~18:00 / 일 휴무</div>
+          <div class="mart-addr">📍 Wienzeile · 지하철 U4 Kettenbrückengasse 하차 도보 1분</div>
+          <div class="mart-desc">빈 최대 야외 시장 · 채소·과일·치즈·올리브·빵 · 아디나에서 도보 5분 거리 · 7/25 토요일 오픈 ✅ (토요일 가장 활기참) · 당일 아침 방문 가능하나 오늘은 이미 저녁 늦게 도착</div>
+        </div>
+
+      </div>
+    </div><!-- /tab-mart -->
+
+  </div><!-- /panel -->
+</div><!-- /layout -->
+
+<script>
+const map = L.map('map', {zoomControl:true, attributionControl:false});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  maxZoom:19, subdomains:'abcd'
+}).addTo(map);
+
+const BLUE='#7B9BB8', GREEN='#82A88F', PURPLE='#9B8DB8',
+      ORANGE='#C4956A', NAVY='#6B7FA8', NIGHT='#8A6FA0', TRANSIT='#7A9ABE';
+
+// 좌표 (부다페스트→빈: 광역 표시)
+const LL = {
+  keleti:       [47.4997, 19.0838],  // 켈레티역 (참조용, 지도 밖)
+  wien_hbf:     [48.1851, 16.3763],  // 빈 중앙역
+  adina:        [48.1933, 16.3677],  // 아디나 숙소
+  belvedere:    [48.1914, 16.3806],  // 벨베데레 상궁
+  stephansdom:  [48.2085, 16.3731],  // 슈테판 대성당
+  rathaus:      [48.2102, 16.3574],  // 시청사 광장
+  // 점심 식당들
+  reinthaler:    [48.2039, 16.3718],
+  schnitzelbeisl:[48.1930, 16.3520],
+  huth:          [48.1977, 16.3658],
+  belvedere_cafe:[48.1914, 16.3806],
+  tofu:          [48.1966, 16.3672],
+  ostmeer:       [48.1990, 16.3700],
+  viebunna:      [48.2000, 16.3680],
+  // 저녁 식당들
+  falkensteiner: [48.2101, 16.3672],
+  lips:          [48.2083, 16.3747],
+  // reinthaler, huth, tofu, ostmeer, viebunna 공유
+  // 마트
+  nakwon:       [48.2002, 16.3476],
+  naschmarkt:   [48.1966, 16.3666],
+};
+
+const MK = {};
+
+function calcArrowAngle(from, to) {
+  const p1 = map.latLngToContainerPoint(L.latLng(from));
+  const p2 = map.latLngToContainerPoint(L.latLng(to));
+  return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + 90;
+}
+function makeArrowIcon(color, angle) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:22px;height:22px;transform:rotate(${angle}deg);transform-origin:11px 11px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));"><svg width="22" height="22" viewBox="0 0 10 10"><polygon points="5,0 9.5,10 5,7 0.5,10" fill="${color}" opacity="1"/></svg></div>`,
+    iconSize:[22,22], iconAnchor:[11,11]
+  });
+}
+function addLine(from, to, color, dash) {
+  if (!LL[from] || !LL[to]) return {setStyle:()=>{}, _arrow:{setOpacity:()=>{}}};
+  const line = L.polyline([LL[from], LL[to]], {color, weight:3.5, opacity:.78, dashArray:dash?'6,5':null, lineCap:'round'}).addTo(map);
+  const angle = calcArrowAngle(LL[from], LL[to]);
+  const arrow = L.marker(LL[to], {icon:makeArrowIcon(color, angle), interactive:false, zIndexOffset:-10}).addTo(map);
+  line._arrow = arrow;
+  return line;
+}
+const _baseLines = [];
+const lunchLines = [];
+const dinnerLines = [];
+function _allLines() { return _baseLines.concat(lunchLines, dinnerLines); }
+function refreshArrows() {
+  _allLines().forEach(l => {
+    if (!l || !l._from || !l._to || !l._arrow) return;
+    l._arrow.setIcon(makeArrowIcon(l._color, calcArrowAngle(l._from, l._to)));
+  });
+}
+map.on('zoomend moveend', refreshArrows);
+function addTrackedLine(from, to, color, dash) {
+  const l = addLine(from, to, color, dash);
+  if (l && LL[from] && LL[to]) { l._from=LL[from]; l._to=LL[to]; l._color=color; }
+  return l;
+}
+
+function mkDropPin(num, color, label) {
+  const hasLabel = label && label.length > 0;
+  const totalW = hasLabel ? Math.min(220, label.length*9+56) : 30;
+  return L.divIcon({
+    className:'',
+    html:`<div style="position:relative;display:flex;align-items:flex-start;gap:6px;width:${totalW}px;">
+      <div style="position:relative;width:30px;height:38px;flex-shrink:0;">
+        <div style="width:30px;height:30px;background:${color};border:2.5px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(0,0,0,.22);position:absolute;top:0;left:0;"></div>
+        <div style="position:absolute;top:4px;left:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white;font-family:'Noto Sans KR',sans-serif;z-index:2;">${num}</div>
+      </div>
+      ${hasLabel?`<div style="margin-top:3px;background:white;border:1.5px solid #D8D2CA;border-radius:6px;padding:4px 9px;font-size:11.5px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:#1E1C1A;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.1);line-height:1.3;">${label}</div>`:''}
+    </div>`,
+    iconSize:[totalW,38], iconAnchor:[15,38], popupAnchor:[0,-40]
+  });
+}
+
+// 고정 핀 (빈 위치만 — 켈레티역은 지도 밖이라 제외)
+const FIXED = [
+  {k:'keleti',      num:'①', c:TRANSIT, tip:'켈레티역 (부다페스트)'},
+  {k:'wien_hbf',    num:'③', c:TRANSIT, tip:'빈 중앙역'},
+  {k:'adina',       num:'④', c:PURPLE,  tip:'아디나 숙소'},
+  {k:'belvedere',   num:'⑥', c:BLUE,    tip:'벨베데레 상궁'},
+  {k:'stephansdom', num:'⑦', c:BLUE,    tip:'슈테판 대성당'},
+  {k:'rathaus',     num:'⑧', c:NIGHT,   tip:'시청사 야외영화'},
+];
+FIXED.forEach(p => { MK[p.k] = L.marker(LL[p.k], {icon:mkDropPin(p.num, p.c, p.tip)}).addTo(map); });
+
+// 기본 뷰: 빈 중심 (켈레티는 포함하지 않음 — 이동일 특성상 목적지 기준)
+const _boundsLL = [LL.wien_hbf, LL.adina, LL.belvedere, LL.stephansdom, LL.rathaus];
+map.fitBounds(_boundsLL, {padding:[48,48]});
+
+// 점심→벨베데레 기본선 변수
+let _lineAdina5, _line5toBel, _lineStephToRathaus;
+
+map.whenReady(() => {
+  setTimeout(() => {
+    map.invalidateSize();
+    map.fitBounds(_boundsLL, {padding:[48,48]});
+    // 켈레티→빈 이동 라인 (점선) — 뷰포트 밖 좌표라 화살표 각도를 수동 고정
+    const _lineKeletiToWien = addLine('keleti', 'wien_hbf', TRANSIT, true);
+    if (_lineKeletiToWien) {
+      // 화살표 각도: 빈 근처 두 점(헝가리 국경→빈) 기준으로 고정 계산
+      const _fixFrom = [48.0, 16.8];  // 국경 근처
+      const _fixTo   = LL.wien_hbf;
+      _lineKeletiToWien._from = _fixFrom;
+      _lineKeletiToWien._to   = _fixTo;
+      _lineKeletiToWien._color = TRANSIT;
+      _baseLines.push(_lineKeletiToWien);
+    }
+    _baseLines.push(addTrackedLine('wien_hbf', 'adina', ORANGE, true));
+    _lineAdina5 = addTrackedLine('adina', 'belvedere', ORANGE, true);
+    _baseLines.push(_lineAdina5);
+    _baseLines.push(addTrackedLine('belvedere', 'stephansdom', NAVY, false));
+    _lineStephToRathaus = addTrackedLine('stephansdom', 'rathaus', NAVY, false);
+    _baseLines.push(_lineStephToRathaus);
+    _baseLines.push(addTrackedLine('rathaus', 'adina', NAVY, false));
+  }, 120);
+});
+
+setTimeout(() => { map.invalidateSize(); map.fitBounds(_boundsLL, {padding:[48,48]}); }, 100);
+window.addEventListener('load', () => { setTimeout(() => map.invalidateSize(), 200); });
+
+// 점심 식당 데이터
+const LUNCH_DATA = {
+  reinthaler:    {c:GREEN, tip:'Reinthaler\'s Beisl', name:"Reinthaler's Beisl", desc:'오스트리아 전통 Beisl · 슈니첼·타펠슈피츠 · 현지인 단골'},
+  schnitzelbeisl:{c:GREEN, tip:'슈니첼 비르트',       name:'슈니첼 비르트',       desc:'저렴한 슈니첼 전문점 · 마늘 슈니첼 추천'},
+  huth:          {c:GREEN, tip:'Huth',                name:'Huth Gastwirtschaft', desc:'슈니첼 존맛 · 크랜베리잼 추가 필수 · 현지인 단골'},
+  belvedere_cafe:{c:GREEN, tip:'벨베데레 카페',        name:'Café Residenz (벨베데레 내)', desc:'궁 내부 카페 · 관람 전후 식사 가능'},
+  tofu:          {c:GREEN, tip:'Tofu und Chili',      name:'Tofu und Chili',      desc:'아시안 퓨전 · 두부 요리 · 가볍고 담백'},
+  ostmeer:       {c:GREEN, tip:'Ostmeer',             name:'Ostmeer',             desc:'아시안 퓨전 · 볶음밥·면 · 한국인 방문 후기'},
+  viebunna:      {c:GREEN, tip:'비엔나 분식',          name:'비엔나 분식',          desc:'김밥·떡볶이 · 교민 단골 한식 분식'},
+};
+
+let selLunch = null;
+
+function _clearLines(arr) {
+  arr.forEach(l => {
+    if (!l) return;
+    try { map.removeLayer(l); } catch(e) {}
+    if (l._arrow) { try { map.removeLayer(l._arrow); } catch(e) {} }
+  });
+  arr.length = 0;
+}
+function _removePin(key) {
+  if (MK[key]) { try { map.removeLayer(MK[key]); } catch(e) {} delete MK[key]; }
+}
+
+function selectLunch(el, key) {
+  document.querySelectorAll('#tab-lunch .place-card').forEach(c => c.classList.remove('selected'));
+  _clearLines(lunchLines);
+  _removePin('r_lunch');
+  if (selLunch === key) {
+    selLunch = null;
+    if (_lineAdina5) { _lineAdina5.setStyle({opacity:.78}); if (_lineAdina5._arrow) _lineAdina5._arrow.setOpacity(.78); }
+    document.getElementById('tl-lunch-filled').style.display='none';
+    return;
+  }
+  el.classList.add('selected');
+  selLunch = key;
+  const d = LUNCH_DATA[key];
+  // 기본선 숨기기
+  if (_lineAdina5) { _lineAdina5.setStyle({opacity:0}); if (_lineAdina5._arrow) _lineAdina5._arrow.setOpacity(0); }
+  // 식당 핀 추가
+  MK['r_lunch'] = L.marker(LL[key]||LL.adina, {icon:mkDropPin('⑤', GREEN, d.name)}).addTo(map);
+  // 아디나→식당→벨베데레 선 추가
+  lunchLines.push(addTrackedLine('adina', key, ORANGE, true));
+  lunchLines.push(addTrackedLine(key, 'belvedere', NAVY, false));
+  // 타임라인 채우기
+  document.getElementById('tl-lunch-filled').style.display='block';
+  document.getElementById('tl-lunch-filled-name').textContent = '🍽 점심 식사';
+  document.getElementById('tl-lunch-filled-desc').textContent = d.name + ' · ' + d.desc;
+  map.panTo(LL[key]||LL.adina);
+}
+
+const DINNER_DATA = {
+  reinthaler:    { name:'Reinthaler\'s Beisl',    tip:'오스트리아 가정식', desc:'슈니첼·굴라시 €10~14 · 빈 구시가 골목 로컬 분위기 · 19:00 전 입장 권장'},
+  huth:          { name:'Huth Gastwirtschaft',    tip:'슈니첼 존맛',      desc:'슈니첼 + 크랜베리잼 추가 추천 · 저장된 곳'},
+  falkensteiner: { name:'Falkensteiner Stüberl',  tip:'오스트리아',       desc:'친절한 후기 · 한국인 후기 많음 · 저장된 곳 — 편차 있으니 참고'},
+  lips:          { name:'Lips of Vienna',          tip:'BBQ 립',           desc:'양념갈비 스타일 BBQ 립 · 예약 권장 · 저장된 곳'},
+  rathaus:       { name:'시청사 광장 푸드 스탠드', tip:'현장 해결',        desc:'국제 음식 스탠드 · 별도 이동 없이 현장에서 바로 해결'},
+  ostmeer:       { name:'Ostmeer',                tip:'아시안 퓨전',      desc:'아시안 퓨전 · 저장된 곳 · 18:00 전 입장 권장'},
+  tofu:          { name:'Tofu und Chili',          tip:'한식·중식',        desc:'두부 중심 한식·중식 퓨전 · 가볍게 먹기 좋음'},
+  viebunna:      { name:'비엔나 분식',             tip:'한식',             desc:'김밥·떡볶이 등 분식 · 가성비 · 저장된 곳'},
+};
+
+let selDinner = null;
+function selectDinner(el, key) {
+  document.querySelectorAll('#tab-dinner .place-card').forEach(c => c.classList.remove('selected'));
+  _clearLines(dinnerLines);
+  _removePin('r_dinner');
+  if (selDinner === key) {
+    selDinner = null;
+    // 기본선 복원
+    if (_lineStephToRathaus) { _lineStephToRathaus.setStyle({opacity:.78}); if (_lineStephToRathaus._arrow) _lineStephToRathaus._arrow.setOpacity(.78); }
+    document.getElementById('tl-dinner-filled').style.display = 'none';
+    return;
+  }
+  el.classList.add('selected');
+  selDinner = key;
+  const d = DINNER_DATA[key];
+  // stephansdom→rathaus 기본선 숨기기
+  if (_lineStephToRathaus) { _lineStephToRathaus.setStyle({opacity:0}); if (_lineStephToRathaus._arrow) _lineStephToRathaus._arrow.setOpacity(0); }
+  // 식당 핀 추가
+  MK['r_dinner'] = L.marker(LL[key]||LL.stephansdom, {icon:mkDropPin('🌙', GREEN, d.name)}).addTo(map);
+  // 식당이 rathaus 자체인 경우(현장 해결)는 기본선 그대로 유지, 경유선만 생략
+  if (key !== 'rathaus') {
+    dinnerLines.push(addTrackedLine('stephansdom', key, ORANGE, true));
+    dinnerLines.push(addTrackedLine(key, 'rathaus', NAVY, false));
+  } else {
+    // rathaus 선택 시 기본선 복원 (이동 없음)
+    if (_lineStephToRathaus) { _lineStephToRathaus.setStyle({opacity:.78}); if (_lineStephToRathaus._arrow) _lineStephToRathaus._arrow.setOpacity(.78); }
+  }
+  // 타임라인 채우기
+  document.getElementById('tl-dinner-filled').style.display = 'block';
+  document.getElementById('tl-dinner-filled-name').textContent = '🌙 저녁 식사';
+  document.getElementById('tl-dinner-filled-desc').textContent = d.name + ' · ' + d.desc;
+  map.panTo(LL[key]||LL.stephansdom);
+}
+
+// 마트 핀 토글
+const martPins = {};
+function toggleMart(el, key) {
+  const coords = {
+    billa:     [48.1851, 16.3763],
+    spar_wien: [48.1930, 16.3680],
+    nakwon:    [48.2002, 16.3476],
+    naschmarkt:[48.1966, 16.3666],
+  };
+  const labels = {billa:'BILLA', spar_wien:'SPAR', nakwon:'NAKWON 한인마트', naschmarkt:'나슈마르크트'};
+  if (martPins[key]) {
+    try { map.removeLayer(martPins[key]); } catch(e) {}
+    delete martPins[key];
+    el.classList.remove('on-map');
+  } else {
+    martPins[key] = L.marker(coords[key]||LL.adina, {icon:mkDropPin('🛒', ORANGE, labels[key])}).addTo(map);
+    el.classList.add('on-map');
+    map.panTo(coords[key]||LL.adina);
+  }
+}
+
+function flyToPin(el) {
+  const key = el.dataset.mapKey;
+  if (!key || !LL[key]) return;
+  const body = el.querySelector('.tl-body');
+  if (body) { body.style.background='#E8F0FA'; setTimeout(()=>{ body.style.background=''; }, 600); }
+  map.panTo(LL[key]);
+}
+function flyToLunch(el) {
+  const body = el.querySelector('.tl-body');
+  if (body) { body.style.background='#E8F0FA'; setTimeout(()=>{ body.style.background=''; }, 600); }
+  // 식당 선택됐으면 해당 핀으로, 아니면 벨베데레 근처로
+  if (selLunch && LL[selLunch]) { map.panTo(LL[selLunch]); }
+  else { map.panTo(LL['belvedere']); }
+}
+function flyToDinner(el) {
+  const body = el.querySelector('.tl-body');
+  if (body) { body.style.background='#E8F0FA'; setTimeout(()=>{ body.style.background=''; }, 600); }
+  if (selDinner && LL[selDinner]) { map.panTo(LL[selDinner]); }
+  else { map.panTo(LL['stephansdom']); }
+}
+
+// 핀 클릭 → 일정 탭 스크롤
+FIXED.forEach(p => {
+  if (MK[p.k]) MK[p.k].on('click', () => {
+    const tl = document.getElementById('tab-timeline');
+    if (!tl.classList.contains('active')) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('[onclick*="timeline"]').classList.add('active');
+      tl.classList.add('active');
+    }
+    const km = {wien_hbf:2, adina:3, belvedere:5, stephansdom:6, rathaus:7};
+    const idx = km[p.k];
+    const items = document.querySelectorAll('#tab-timeline .tl-item');
+    if (idx !== undefined && items[idx]) {
+      items[idx].scrollIntoView({behavior:'smooth', block:'center'});
+      items[idx].style.background='#F0F4FA';
+      setTimeout(()=>items[idx].style.background='', 700);
+    }
+  });
+});
+
+function toggleTTC(id) {
+  const body = document.getElementById(id+'-body');
+  const chev = document.getElementById(id+'-chev');
+  const isOpen = body.style.display === 'block';
+  if (isOpen) { body.style.display='none'; chev.style.transform='rotate(-90deg)'; }
+  else { body.style.display='block'; chev.style.transform='rotate(0deg)'; }
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const target = document.getElementById('tab-'+name);
+  target.classList.add('active');
+  target.scrollTop = 0;
+  void target.offsetHeight;
+  setTimeout(() => map.invalidateSize(), 50);
+}
+function switchSub(id, el, group) {
+  document.getElementById('tab-'+group).querySelectorAll('.subtab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+group).querySelectorAll('.subcontent').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// 날씨 (7/25 빈)
+(async () => {
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=48.2082&longitude=16.3738&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FVienna&forecast_days=16');
+    const d = await r.json();
+    const idx = d.daily.time.indexOf('2026-07-25');
+    if (idx < 0) throw new Error();
+    const wc = d.daily.weather_code[idx];
+    const mx = Math.round(d.daily.temperature_2m_max[idx]);
+    const mn = Math.round(d.daily.temperature_2m_min[idx]);
+    const rise = d.daily.sunrise[idx].slice(11,16);
+    const set  = d.daily.sunset[idx].slice(11,16);
+    const icons = {0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',61:'🌧',80:'🌦',95:'⛈'};
+    const wx   = {0:'맑음',1:'대체로 맑음',2:'구름 조금',3:'흐림',45:'안개',51:'이슬비',61:'비',80:'소나기',95:'뇌우'};
+    document.getElementById('wc-icon').textContent = icons[wc]||'🌤';
+    document.getElementById('wc-wx').textContent   = wx[wc]||'맑음';
+    document.getElementById('wc-temp').textContent = `${mn}°~${mx}°C`;
+    document.getElementById('wc-rise').textContent = rise;
+    document.getElementById('wc-set').textContent  = set;
+  } catch(e) { document.getElementById('wc-wx').textContent='날씨 정보 없음'; }
+})();
+
+document.querySelectorAll('.tl-map-icon').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+document.querySelectorAll('.move-card').forEach(el => el.addEventListener('click', e => e.stopPropagation()));
+document.querySelectorAll('.gmap-btn').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+window.addEventListener('resize', () => map.invalidateSize());
+</script>
+</body>
+</html>

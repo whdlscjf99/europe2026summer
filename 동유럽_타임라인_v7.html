@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>동유럽 여행 타임라인 2026 v5</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --text-main: #f1f5f9;
+    --text-sub: #cbd5e1;
+    --text-muted: #64748b;
+    --accent: #3b82f6;
+
+    --budapest: #1e2d45;
+    --budapest-acc: #3B5FC0;
+    --wien: #1a2e22;
+    --wien-acc: #2E7D52;
+    --salzburg: #2d2010;
+    --salzburg-acc: #C07830;
+    --hallstatt: #0f2433;
+    --hallstatt-acc: #1B7EA6;
+    --badischl: #1e1433;
+    --badischl-acc: #6B48C0;
+    --ck: #2d1015;
+    --ck-acc: #C03050;
+    --prague: #2a1f08;
+    --prague-acc: #A07020;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Malgun Gothic', '맑은 고딕', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    min-height: 100vh;
+    padding: 28px 20px 48px;
+  }
+
+  .page-header { text-align: center; margin-bottom: 28px; }
+  .page-header h1 { font-size: 1.6rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; }
+  .page-header p { font-size: 0.82rem; color: var(--text-muted); margin-top: 5px; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; margin-bottom: 24px;
+  }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--text-muted); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 16px; max-width: 1440px; margin: 0 auto;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+
+  .card-head {
+    padding: 12px 16px 10px;
+    display: flex; align-items: flex-start; gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-num {
+    font-size: 0.65rem; font-weight: 700; color: #FFF;
+    border-radius: 5px; padding: 2px 7px; white-space: nowrap; margin-top: 2px;
+  }
+  .head-info { flex: 1; }
+  .head-date { font-size: 0.9rem; font-weight: 700; color: var(--text-main); line-height: 1.2; }
+  .head-city { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+  .badge-move {
+    font-size: 0.62rem; padding: 2px 7px; border-radius: 20px;
+    background: #1e3a5f; color: #93c5fd; border: 1px solid #1d4ed8;
+    font-weight: 600; white-space: nowrap; align-self: flex-start; margin-top: 2px;
+  }
+
+  .timeline { padding: 10px 16px 12px; }
+  .tl-row {
+    display: flex; gap: 10px; padding: 5px 0;
+    border-bottom: 1px dashed #1e293b; align-items: flex-start;
+  }
+  .tl-row:last-child { border-bottom: none; }
+  .tl-time {
+    font-size: 0.68rem; color: var(--text-muted);
+    min-width: 44px; padding-top: 2px;
+    font-variant-numeric: tabular-nums; font-weight: 500;
+  }
+  .tl-body { font-size: 0.76rem; color: var(--text-sub); line-height: 1.5; flex: 1; }
+
+  .tag {
+    display: inline-block; font-size: 0.6rem; font-weight: 700;
+    padding: 1px 5px; border-radius: 3px;
+    margin-right: 3px; vertical-align: middle; letter-spacing: 0.02em;
+  }
+  .t-book { background: #3f1515; color: #fca5a5; }
+  .t-pass { background: #1e3a5f; color: #93c5fd; }
+  .t-warn { background: #3f2a08; color: #fbbf24; }
+  .t-free { background: #14532d; color: #86efac; }
+  .t-done { background: #14532d; color: #86efac; font-size: 0.65rem; }
+
+  .warn-block {
+    display: block; margin-top: 5px;
+    padding: 4px 8px;
+    background: rgba(251,191,36,.08);
+    border-left: 2px solid rgba(251,191,36,.4);
+    border-radius: 0 4px 4px 0;
+    font-size: 0.67rem; color: #fbbf24; line-height: 1.55;
+  }
+  .info-block {
+    display: block; margin-top: 5px;
+    padding: 4px 8px;
+    background: rgba(147,197,253,.07);
+    border-left: 2px solid rgba(147,197,253,.3);
+    border-radius: 0 4px 4px 0;
+    font-size: 0.67rem; color: #93c5fd; line-height: 1.55;
+  }
+
+  .card-note {
+    margin: 0 14px 12px;
+    padding: 7px 10px;
+    background: #1e2d45;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.7rem; color: #93c5fd; line-height: 1.5;
+  }
+
+  .c-bp .day-num { background: var(--budapest-acc); }
+  .c-bp .card-head { background: var(--budapest); }
+  .c-wi .day-num { background: var(--wien-acc); }
+  .c-wi .card-head { background: var(--wien); }
+  .c-sz .day-num { background: var(--salzburg-acc); }
+  .c-sz .card-head { background: var(--salzburg); }
+  .c-hl .day-num { background: var(--hallstatt-acc); }
+  .c-hl .card-head { background: var(--hallstatt); }
+  .c-bi .day-num { background: var(--badischl-acc); }
+  .c-bi .card-head { background: var(--badischl); }
+  .c-ck .day-num { background: var(--ck-acc); }
+  .c-ck .card-head { background: var(--ck); }
+  .c-pr .day-num { background: var(--prague-acc); }
+  .c-pr .card-head { background: var(--prague); }
+
+  .footer { text-align: center; color: var(--text-muted); font-size: 0.7rem; margin-top: 32px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>🗺️ 동유럽 여행 타임라인</h1>
+  <p>2026년 7월 23일(목) ~ 8월 6일(목) · 14박 15일 · 3인</p>
+</div>
+
+<div class="legend">
+  <div class="leg"><span class="tag t-book">예약필수</span>사전 예약/구매</div>
+  <div class="leg"><span class="tag t-pass">패스</span>패스·카드 사용</div>
+  <div class="leg"><span class="tag t-warn">주의</span>주의사항</div>
+  <div class="leg"><span class="tag t-free">무료</span>무료</div>
+  <div class="leg"><span class="tag t-done">☑ 완료</span>예약 완료</div>
+</div>
+
+<div class="grid">
+
+<!-- DAY 1 -->
+<div class="card c-bp">
+  <div class="card-head">
+    <div class="day-num">Day 1</div>
+    <div class="head-info">
+      <div class="head-date">7/23 (목)</div>
+      <div class="head-city">부다페스트 도착</div>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">13:55</div><div class="tl-body">부다페스트 공항 2B터미널 도착</div></div>
+    <div class="tl-row"><div class="tl-time">14:30</div><div class="tl-body"><strong>택시</strong> Főtaxi 공식 부스 (2B 출구 직후, 오른쪽) or Bolt 앱 호출 → B40 직행 (약 25~30분, €21~25 정액)
+      <span class="warn-block">⚠️ 미니밴 요청 필수 — 캐리어 3개+백팩 3개</span></div></div>
+    <div class="tl-row"><div class="tl-time">15:10</div><div class="tl-body">B40 (Baross utca 40) 체크인
+      <span class="warn-block">⚠️ 리셉션 16:00까지 — 여유 있음</span></div></div>
+    <div class="tl-row"><div class="tl-time">16:00</div><div class="tl-body">숙소(B40) 출발 → <strong>도보 20분</strong> or <strong>지하철 M2</strong> Blaha Lujza tér 탑승 → Deák Ferenc tér 하차 → 도보 5분 (지하철 이용 시 총 약 15~18분) → 성 이슈트반 대성당</div></div>
+    <div class="tl-row"><div class="tl-time">17:00</div><div class="tl-body">도보 1분 → Gelarto Rosa 장미 아이스크림 (대성당 광장 바로 앞)</div></div>
+    <div class="tl-row"><div class="tl-time">18:00</div><div class="tl-body">저녁식사 (대성당 주변)</div></div>
+    <div class="tl-row"><div class="tl-time">20:00</div><div class="tl-body"><strong>도보 약 10분</strong> (Vigadó tér 방향 800m) → <span class="tag t-done">☑</span> 레겐다 다뉴브강 야경 크루즈 20:15 출발 — <strong>Dock 7 (Vigadó tér, Jane Haining rakpart)</strong> · Reservation ID: 5118346 · 출발 15분 전 도착</div></div>
+    <div class="tl-row"><div class="tl-time">21:30</div><div class="tl-body"><strong>지하철 M2</strong> Deák Ferenc tér 탑승 → Batthyány tér 하차 (약 18~20분, 대기 포함) → 국회의사당 야경 (도보 5분)</div></div>
+    <div class="tl-row"><div class="tl-time">22:30</div><div class="tl-body"><strong>지하철 M2</strong> Batthyány tér 탑승 → Blaha Lujza tér 하차 → 도보 5분 → 숙소(B40) 복귀 (약 15~18분)</div></div>
+  </div>
+  <div class="card-note">⚡ 공항→숙소 택시 €21~25 / 100E버스 3인 €19 — 차이 미미, 짐 감안 택시 권장 · Főtaxi 부스: 2B 출구 오른쪽 / Bolt 앱 미리 설치+카드 등록 · 교통권: 2일차 지하철역 자판기에서 24시간 종이 티켓 2,500 HUF/인 구매, 1·3일차 단회권</div>
+</div>
+
+<!-- DAY 2 -->
+<div class="card c-bp">
+  <div class="card-head">
+    <div class="day-num">Day 2</div>
+    <div class="head-info">
+      <div class="head-date">7/24 (금)</div>
+      <div class="head-city">부다페스트</div>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">08:30</div><div class="tl-body">지하철역 개찰구 앞 BKK 자판기에서 24시간 종이 티켓 구매 (2,500 HUF/인) — 보라색 대형 자판기, 카드·현금 가능<br>
+      M2 Blaha Lujza tér 탑승 → Batthyány tér 하차 → 도보 15분 언덕길 (총 약 30분)</div></div>
+    <div class="tl-row"><div class="tl-time">09:00</div><div class="tl-body">어부의 요새 <span class="tag t-free">무료</span> 하부 테라스 / 상부 타워 1,700 HUF
+      <span class="warn-block">⚠️ 현장 카드 결제만, 현금 불가</span></div></div>
+    <div class="tl-row"><div class="tl-time">10:30</div><div class="tl-body">도보 3분 → <span class="tag t-done">☑</span> 마차시 성당 — 3,400 HUF/인 · 연간 유효 (날짜 유연)
+      <span class="warn-block">⚠️ 복장 필수: 어깨·무릎 반드시 가릴 것 (민소매·반바지 입장 거부) · 모자 탈모 필수 · 미준수 시 티켓 있어도 입장 불가 · 스카프/카디건 미리 준비 / 사진 촬영 허용(플래시 금지)</span></div></div>
+    <div class="tl-row"><div class="tl-time">12:00</div><div class="tl-body">점심식사 (부다 언덕 내 또는 하산 후)</div></div>
+    <div class="tl-row"><div class="tl-time">13:00</div><div class="tl-body">M2 Batthyány tér 탑승 → Blaha Lujza tér 하차 → 도보 5분 → 고즈두 빈티지 마켓 (Gozsdu udvar, Király utca 13) — 총 약 15분</div></div>
+    <div class="tl-row"><div class="tl-time">13:15</div><div class="tl-body">고즈두 빈티지 마켓 쇼핑</div></div>
+    <div class="tl-row"><div class="tl-time">15:00</div><div class="tl-body">M2 Blaha Lujza tér 탑승 → Astoria 하차 → 트램 47/49번 Astoria 탑승 → Szent Gellért tér 하차 → 버스 27번 탑승 → Busuló Juhász 하차 → 겔레르트 언덕 (환승 2회 포함 총 약 25~30분)
+      <span class="warn-block">⚠️ 그늘 없음 — 물 충분히 챙길 것 / 버스 27번은 배차 간격 10~15분</span></div></div>
+    <div class="tl-row"><div class="tl-time">15:30</div><div class="tl-body">겔레르트 언덕 관람 (정상까지 도보 20~30분)</div></div>
+    <div class="tl-row"><div class="tl-time">17:30</div><div class="tl-body">하산 → 트램 47/49번 Szent Gellért tér 탑승 → 유대인지구 하차 (약 12~15분)</div></div>
+    <div class="tl-row"><div class="tl-time">18:00</div><div class="tl-body">저녁식사</div></div>
+    <div class="tl-row"><div class="tl-time">19:00 전</div><div class="tl-body">도보 5분 이내 → 심플라 케르트 루인펍 (Kazinczy utca 14) — 현금 선호</div></div>
+    <div class="tl-row"><div class="tl-time">22:00~22:30</div><div class="tl-body">M2 Astoria or Blaha Lujza tér 탑승 → Blaha Lujza tér 하차 → 도보 5분 → 숙소 복귀 + 짐 정리 (약 15분)
+      <span class="warn-block">⚠️ 내일 08:35 켈레티역 출발 — 오늘 밤 짐 완전히 싸두기 / B40 조기 체크아웃(09:10 이전) 절차 확인</span></div></div>
+  </div>
+  <div class="card-note">⚡ 24시간권 손익: 탑승 6회 × 단회권 500 HUF = 3,000 HUF vs 24시간권 2,500 HUF → 5회 이상이면 이득, 오늘 500 HUF 절약 · 자판기: 지하철역 개찰구 앞 보라색 대형 BKK 자판기 — 구매 후 개찰기에 찍고 통과</div>
+</div>
+
+<!-- DAY 3 -->
+<div class="card c-wi">
+  <div class="card-head">
+    <div class="day-num">Day 3</div>
+    <div class="head-info">
+      <div class="head-date">7/25 (토)</div>
+      <div class="head-city">부다페스트 → 빈</div>
+    </div>
+    <div class="badge-move">이동일</div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">08:35</div><div class="tl-body">숙소(B40) 출발 → <strong>도보 약 20분</strong> → 켈레티역 (1.5km, 짐 있으면 25분 — 여유 있게 출발)</div></div>
+    <div class="tl-row"><div class="tl-time">09:10</div><div class="tl-body">켈레티역 도착, 전광판에서 플랫폼 확인 (출발 20~60분 전 표시)</div></div>
+    <div class="tl-row"><div class="tl-time">09:40</div><div class="tl-body"><strong>OBB 기차</strong> 출발 → 빈 중앙역 Wien Hauptbahnhof (약 2h 40m)</div></div>
+    <div class="tl-row"><div class="tl-time">12:20</div><div class="tl-body">빈 중앙역 도착
+      <span class="info-block">🎫 빈 교통권 — ÖBB 앱에서 7일권 €25.20/인 · 출발 전 미리 구매 권장 (WienMobil 앱보다 안정적) · 탑승 3회 이상이면 이득</span></div></div>
+    <div class="tl-row"><div class="tl-time">12:30</div><div class="tl-body"><strong>도보 약 10~12분</strong> → 아디나 호텔 (Rechte Wienzeile 3A) 짐 맡기기 (체크인 전 짐 보관 요청)</div></div>
+    <div class="tl-row"><div class="tl-time">12:50</div><div class="tl-body"><strong>도보 or 트램D</strong> → 벨베데레 주변 점심 + 대기 (슬롯 14:00)</div></div>
+    <div class="tl-row"><div class="tl-time">13:40</div><div class="tl-body"><strong>도보 약 12~15분</strong> → Prinz Eugen-Straße 27 입구 도착 (15분 전 도착 필수)
+      <span class="warn-block">⚠️ 백팩·큰 가방 반입 불가 — 짐은 아디나에 맡기고 소지품만 (내부 클로크룸·로커 무료 있으나 대형 짐 불가) · 음식·음료·셀카봉·삼각대 반입 불가 · 소지품은 작은 핸드백/크로스백만 가능 · €2 동전 준비(로커 사용 시, 반환식)</span></div></div>
+    <div class="tl-row"><div class="tl-time">14:00</div><div class="tl-body"><span class="tag t-done">☑</span> 벨베데레 상궁 — GYG GYGRFQL3AW7N · €19.50/인 (약 1.5시간)</div></div>
+    <div class="tl-row"><div class="tl-time">15:30</div><div class="tl-body"><strong>트램 D</strong> Schloss Belvedere 탑승 → Opering 하차 (약 9~12분) → 슈테판 대성당 외관 → 케른트너 거리(구시가지)</div></div>
+    <div class="tl-row"><div class="tl-time">19:30</div><div class="tl-body"><strong>지하철 U2</strong> 탑승 → Rathaus 하차 → 시청사 광장 (Rathausplatz) 도착
+      <span class="warn-block">⚠️ 중앙 좌석 일찍 채워짐 — 19:30 도착 권장 / 영화는 일몰 후 약 21:10~21:20 시작</span></div></div>
+    <div class="tl-row"><div class="tl-time">21:10</div><div class="tl-body"><span class="tag t-free">무료</span> 시청사 필름 페스티벌 야외 영화 시작 (무료·좌석 예약 없음 · 국제 음식 스탠드 11:00~23:00)</div></div>
+    <div class="tl-row"><div class="tl-time">23:30</div><div class="tl-body"><strong>지하철 U2</strong> Rathaus 탑승 → Karlsplatz 환승 → <strong>지하철 U1</strong> → 아디나 인근역 하차 (야간 배차 포함 약 18~22분) → 아디나 체크인</div></div>
+  </div>
+  <div class="card-note">⚡ 벨베데레 14:00 슬롯 — 짐은 아디나에 맡기고 소지품만 입장 · 시청사 영화 일몰 후 시작(약 21:10), 중앙 자리는 19:30 도착 권장</div>
+</div>
+
+<!-- DAY 4 -->
+<div class="card c-wi">
+  <div class="card-head">
+    <div class="day-num">Day 4</div>
+    <div class="head-info">
+      <div class="head-date">7/26 (일)</div>
+      <div class="head-city">빈</div>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">08:30</div><div class="tl-body">숙소(아디나) 출발 → <strong>지하철 U1</strong> Südtiroler Platz/Hauptbahnhof 탑승 → Karlsplatz 환승 → <strong>지하철 U4</strong> Hütteldorf 방향 → Schönbrunn 하차 → 도보 5분 (총 약 22~27분)
+      <span class="warn-block">⚠️ 09:30 슬롯 지각 즉시 실효·환불 없음 — 반드시 08:30 이전 출발</span></div></div>
+    <div class="tl-row"><div class="tl-time">09:30</div><div class="tl-body"><span class="tag t-done">☑</span> 쇤부른 Classic Pass 09:30~09:45 슬롯 — 주문번호 260712000247 · €49/인
+      <span class="warn-block">⚠️ A4 초과 백팩·여행가방·우산 전시실 반입 불가 → Group Center 무료 로커에 맡기기 (4자리 코드 설정, 별도 동전 불필요) · 음식·음료 반입 불가(밀봉 물병만 허용) · 삼각대·셀카봉 불가 · 복장 제한 없음</span></div></div>
+    <div class="tl-row"><div class="tl-time">11:00</div><div class="tl-body">글로리에테 전망대 (궁전에서 도보 15분 언덕) + 정원 자유 관람
+      <span class="warn-block">⚠️ 11:00~15:00 폭염 구간 — 그늘 없는 언덕길, 물 충분히 준비</span></div></div>
+    <div class="tl-row"><div class="tl-time">12:30</div><div class="tl-body">쇤브룬 퇴장</div></div>
+    <div class="tl-row"><div class="tl-time">13:00</div><div class="tl-body"><strong>지하철 U4</strong> Schönbrunn 탑승 → Karlsplatz 환승 → <strong>지하철 U2</strong> → MuseumsQuartier 하차 (약 18~22분) → 점심 (카페 레오폴트 또는 MQ 야외)
+      <div style="margin-top:5px;font-size:.67rem;color:#94a3b8;">🛍️ <strong style="color:#e2e8f0;">쇼핑 포인트:</strong> MuseumsQuartier 내 디자인숍 — 오스트리아 디자인 소품, 빈 감성 엽서·포스터, 친환경 제품</div></div></div>
+    <div class="tl-row"><div class="tl-time">14:30</div><div class="tl-body">도보 3분 → <span class="tag t-done">☑</span> 레오폴트 미술관 — Trip.com VQV-BG9P5R · Fast Track · 스마트폰 제시 (약 2시간)
+      <span class="info-block">🎒 백팩·큰 가방은 입구 클로크룸/로커에 보관 (무료) · 사진 촬영 허용(플래시·삼각대·셀카봉 불가) · 음식·음료 반입 불가(카페 레오폴트 이용) · 관람 중 음주 금지</span></div></div>
+    <div class="tl-row"><div class="tl-time">17:00</div><div class="tl-body"><strong>지하철 U2</strong> MuseumsQuartier 탑승 → Karlsplatz 환승 → <strong>지하철 U1</strong> → 숙소 인근 하차 (약 15~18분) → 숙소(아디나) 복귀 + 저녁/빨래</div></div>
+    <div class="tl-row"><div class="tl-time">21:00</div><div class="tl-body">도나우 운하 테라스바 (<strong>트램 2번</strong> 탑승, 약 20분) 또는 <strong>프라터 놀이공원</strong> (<strong>지하철 U1</strong> Praterstern역 하차, 약 15분 / 라이젠라트 대관람차 €10) — 선택</div></div>
+    <div class="tl-row"><div class="tl-time">23:00</div><div class="tl-body">숙소(아디나) 복귀</div></div>
+  </div>
+  <div class="card-note">⚡ 일요일 성수기 — 쇤브룬 슬롯 08:30 이전 출발 필수 · 글로리에테 언덕 더위 주의</div>
+</div>
+
+<!-- DAY 5 -->
+<div class="card c-wi">
+  <div class="card-head">
+    <div class="day-num">Day 5</div>
+    <div class="head-info">
+      <div class="head-date">7/27 (월)</div>
+      <div class="head-city">빈</div>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">09:40</div><div class="tl-body">숙소(아디나) 출발 → <strong>트램 D</strong> Schwarzenbergplatz 탑승 → Opering 하차 (약 12~15분) or <strong>도보 20분</strong> → 알베르티나 (Albertinaplatz 1)</div></div>
+    <div class="tl-row"><div class="tl-time">10:00</div><div class="tl-body">알베르티나 — GYG €19.90 · 이메일 바우처 스마트폰 제시
+      <span class="warn-block">⚠️ 사전에 이메일 바우처 수령 확인 필수 · 백팩·큰 가방 반입 불가 → 지하 무료 로커 보관(€1/€2 동전 반환식, 입구층은 유료) · 작은 가방은 어깨에 걸치는 형태로 허용 · 사진 촬영 허용(플래시·삼각대·셀카봉 불가) · 모바일 사용 금지(전시실 내)</span></div></div>
+    <div class="tl-row"><div class="tl-time">12:00</div><div class="tl-body"><strong>도보 5분</strong> → 점심 (미하엘 광장 주변)</div></div>
+    <div class="tl-row"><div class="tl-time">13:30</div><div class="tl-body"><strong>도보 5분</strong> → <span class="tag t-done">☑</span> 호프부르크 시시뮤지엄 13:30~13:45 슬롯 — 주문번호 260712000354 · €20/인 · Michaelerkuppel 입구
+      <span class="warn-block">⚠️ 🚨 보관함/클로크룸 없음(공식 확인) — 가방·짐 일체 반입 불가, 맡길 곳도 없음 · 반드시 알베르티나 로커에 짐 맡기고 소지품(폰·지갑·여권)만 들고 올 것 · 입구(Michaelerkuppel)와 출구(Ballhausplatz)가 달라 물건 분실 주의 · 삼각대·셀카봉·플래시 불가 · 음식·음료 불가</span></div></div>
+    <div class="tl-row"><div class="tl-time">15:30</div><div class="tl-body"><strong>도보 3분</strong> → 알베르티나 로커 짐 찾기 (18:00 마감 전) → 쇼핑
+      <div style="margin-top:5px;font-size:.67rem;color:#94a3b8;">🛍️ <strong style="color:#e2e8f0;">케른트너 거리(구시가지):</strong> 오스트리아 크리스탈(스와로프스키), 로덴 코트, 빈 도자기<br>
+      🛍️ <strong style="color:#e2e8f0;">나슈마르크트:</strong> 치즈·소시지·올리브, 향신료, 신선 과일 · 월~금 06:00~21:00 · 현금 선호<br>
+      🛍️ <strong style="color:#e2e8f0;">율리우스 마이늘:</strong> 오스트리아 초콜릿·과자, 빈 커피, 모차르트 쿠겔른 · 월~금 08:00~19:30</div></div></div>
+    <div class="tl-row"><div class="tl-time">18:30</div><div class="tl-body"><strong>트램 D</strong> Opering 탑승 → Schwarzenbergplatz 하차 (약 10~12분) → 숙소(아디나) 복귀 + 저녁</div></div>
+    <div class="tl-row"><div class="tl-time">19:45</div><div class="tl-body">숙소 출발 → <strong>트램 1번</strong> Schwarzenbergplatz 탑승 → Karlsplatz 하차 (약 5분) or <strong>도보 15분</strong> → 카를 성당 (Karlsplatz 10)
+      <span class="warn-block">⚠️ 19:45 입장 개시 / 공연 시작 후 입장 불가 — 여유 있게 출발</span></div></div>
+    <div class="tl-row"><div class="tl-time">20:15</div><div class="tl-body"><span class="tag t-done">☑</span> 비발디 사계 공연 — 75분 · 21:30 종료 · 복장 스마트 캐주얼 권장
+      <span class="warn-block">⚠️ 음식·음료 반입 불가 / 공연 중 퇴장 후 재입장 불가</span></div></div>
+    <div class="tl-row"><div class="tl-time">21:40</div><div class="tl-body"><strong>트램 1번</strong> Karlsplatz 탑승 → Schwarzenbergplatz 하차 (약 5분) → 숙소(아디나) 복귀</div></div>
+  </div>
+  <div class="card-note">⚡ 알베르티나 바우처 수령 사전 확인 · 로커 18:00 전 짐 찾기 · 호프부르크 13:30 슬롯 — 짐은 반드시 로커에 맡기고 입장 · 카를 성당 19:45 입장 개시 엄수</div>
+</div>
+
+<!-- DAY 6 -->
+<div class="card c-sz">
+  <div class="card-head">
+    <div class="day-num">Day 6</div>
+    <div class="head-info">
+      <div class="head-date">7/28 (화)</div>
+      <div class="head-city">빈 → 잘츠부르크</div>
+    </div>
+    <div class="badge-move">이동일</div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">09:00</div><div class="tl-body">숙소(아디나) 출발 → <strong>트램 D</strong> Schwarzenbergplatz 탑승 → Opering 하차 (약 10~12분) → <span class="tag t-done">☑</span> 카페 자허 (Philharmoniker Str. 4) 예약 완료
+      <span class="warn-block">⚠️ 노쇼 €15/인 · 3인 €45 자동 청구 — 취소 데드라인 예약 확인 이메일로 확인</span></div></div>
+    <div class="tl-row"><div class="tl-time">10:00</div><div class="tl-body">카페 자허 (약 1시간) — 작허토르테 + 커피</div></div>
+    <div class="tl-row"><div class="tl-time">11:00</div><div class="tl-body"><strong>도보 약 10~12분</strong> → 아디나 체크아웃 + 짐 픽업</div></div>
+    <div class="tl-row"><div class="tl-time">11:30</div><div class="tl-body"><strong>도보 약 10~12분</strong> (짐 있으면 15분) → 빈 중앙역 (Wien Hauptbahnhof) → <strong>OBB 기차</strong> 12:28 출발</div></div>
+    <div class="tl-row"><div class="tl-time">14:53</div><div class="tl-body">잘츠부르크 중앙역 (Salzburg Hauptbahnhof) 도착</div></div>
+    <div class="tl-row"><div class="tl-time">15:05</div><div class="tl-body"><strong>도보 약 7~10분</strong> → 빌라 엘리사 (Jahnstraße 14) 체크인 · 짐 내려놓기
+      <span class="info-block">🚌 Guest Mobility Ticket — 온라인 체크인 시 3인 입력하면 발급 · 잘츠부르크 대중교통 무제한 (25번 버스 포함) · 관광지 입장권 불포함<br>💶 개별 구매 합계: 헬브룬 €16.50 + 호엔잘츠부르크 €15.50 + 엘리베이터 €4.80 = €36.80/인 (Mobility Ticket 있으면 버스 무료 → 잘츠부르크 카드 불필요)</span></div></div>
+    <div class="tl-row"><div class="tl-time">16:00</div><div class="tl-body"><strong>도보 5분</strong> → EUROSPAR 장보기</div></div>
+    <div class="tl-row"><div class="tl-time">17:00</div><div class="tl-body">숙소(빌라 엘리사)에서 저녁 식사, 빨래</div></div>
+    <div class="tl-row"><div class="tl-time">18:45</div><div class="tl-body">숙소 출발 → <strong>도보 약 10~12분</strong> → 미라벨 정원 (Mirabellplatz) → 마카르트 다리</div></div>
+    <div class="tl-row"><div class="tl-time">19:45</div><div class="tl-body"><strong>도보 10분</strong> → 카피텔 광장 (Kapitelplatz)</div></div>
+    <div class="tl-row"><div class="tl-time">20:00</div><div class="tl-body"><span class="tag t-free">무료</span> 카피텔 광장 살로메 야외 스크린 (112분) — 리하르트 슈트라우스 오페라 / 2018년 잘츠부르크 공연 녹화 / 아스믹 그리고리안 주연 / 지휘 프란츠 벨저-뫼스트·빈 필하모닉 / 캐주얼 복장·서서 관람</div></div>
+    <div class="tl-row"><div class="tl-time">22:00</div><div class="tl-body"><strong>도보 약 10~12분</strong> → 숙소(빌라 엘리사) 복귀</div></div>
+  </div>
+  <div class="card-note">⚡ 이동일 피로 주의 · 카페 자허 취소 데드라인 예약 확인 이메일로 확인 · Guest Mobility Ticket 체크인 시 발급 여부 확인</div>
+</div>
+
+<!-- DAY 7 -->
+<div class="card c-sz">
+  <div class="card-head">
+    <div class="day-num">Day 7</div>
+    <div class="head-info">
+      <div class="head-date">7/29 (수)</div>
+      <div class="head-city">잘츠부르크</div>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">09:20</div><div class="tl-body">숙소(빌라 엘리사) 출발 → <strong>도보 7~10분</strong> → 잘츠부르크 중앙역 → <strong>버스 25번</strong> Hauptbahnhof B 정류장 탑승 (Mirabellplatz 경유, 약 22분) → 총 약 35~40분</div></div>
+    <div class="tl-row"><div class="tl-time">09:55</div><div class="tl-body">Schloss Hellbrunn 정류장 하차 → <span class="tag t-done">☑</span> 헬브룬 트릭분수 10:00 슬롯 — 인보이스 1784136 · €16.50/인 · 투어 50분
+      <span class="warn-block">⚠️ 10분 전 도착 필수 · 물 분수가 갑자기 터지는 장치 — 옷·신발 젖을 수 있음(여벌 준비 or 빠르게 마르는 소재 착용 권장) · 스마트폰·카메라 방수 보호 권장</span></div></div>
+    <div class="tl-row"><div class="tl-time">12:10</div><div class="tl-body"><strong>버스 25번</strong> Schloss Hellbrunn 탑승 (역방향) → Rathaus 하차 → <strong>도보 5분</strong> → FestungsBahn 탑승장 (Festungsgasse 4)</div></div>
+    <div class="tl-row"><div class="tl-time">12:40</div><div class="tl-body"><span class="tag t-done">☑</span> FestungsBahn 탑승 → 호엔잘츠부르크 성 — 시리얼번호 7/96/6508~6510 · Basicticket
+      <span class="info-block">🎒 큰 가방은 푸니쿨라 하역장 or 성 내부 로커 보관(€1/€2 동전 필요) · 내부 박물관 촬영 허용(플래시 불가, 개인용만) · 드론 금지 · 실외 구간은 일반 배낭 가능</span></div></div>
+    <div class="tl-row"><div class="tl-time">14:30</div><div class="tl-body">FestungsBahn 하산 → <strong>도보 5분</strong> → 게트라이데 거리 (모차르트 생가 외관, 쇼핑)</div></div>
+    <div class="tl-row"><div class="tl-time">16:00</div><div class="tl-body"><strong>도보 5분</strong> → 묀히스베르크 엘리베이터 탑승 (Anton-Neumayr-Platz) → 미술관 입장
+      <span class="warn-block">⚠️ 미술관 18:00 마감 — 관람 약 1.5시간, 늦어도 16:30 전 입장 / 엘리베이터 21:00 마감</span></div></div>
+    <div class="tl-row"><div class="tl-time">17:30</div><div class="tl-body"><strong>도보 5분</strong> → 아우구스티너 브로이 뮐른 (Lindhofstraße 7) — 현금만 · 셀프 주문 (약 2시간)</div></div>
+    <div class="tl-row"><div class="tl-time">19:40</div><div class="tl-body"><strong>도보 10분</strong> → 묀히스베르크 엘리베이터 재탑승 (Anton-Neumayr-Platz) → 야외 전망대 야경
+      <span class="warn-block">⚠️ 엘리베이터 21:00 마감 — 20:40 이전 탑승 필수</span></div></div>
+    <div class="tl-row"><div class="tl-time">20:40</div><div class="tl-body">엘리베이터 하산 (21:00 마감 전) → <strong>도보</strong> → 숙소(빌라 엘리사) 복귀</div></div>
+  </div>
+  <div class="card-note">⚡ 야외 이동 최다일 — 체력 관리 · 엘리베이터 21:00 마감, 20:40 탑승 필수 · Guest Mobility Ticket 미발급 시 24h 카드 €38 검토</div>
+</div>
+
+<!-- DAY 8 -->
+<div class="card c-hl">
+  <div class="card-head">
+    <div class="day-num">Day 8</div>
+    <div class="head-info">
+      <div class="head-date">7/30 (목)</div>
+      <div class="head-city">할슈타트 + 다흐슈타인 5핑거스 당일치기</div>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">08:20</div><div class="tl-body">숙소(빌라 엘리사) 출발 → <strong>도보 7분</strong> → 잘츠부르크 중앙역 <strong>버스 150번</strong> Hauptbahnhof B 정류장 탑승 (€12.10/인, 약 90분)</div></div>
+    <div class="tl-row"><div class="tl-time">10:00</div><div class="tl-body">바트이슐 환승 → 541번 → Gosaumühle에서 543번 환승</div></div>
+    <div class="tl-row"><div class="tl-time">11:00</div><div class="tl-body">할슈타트 Lahn 도착 → 납골당 €2 현금 (20~30분)
+      <span class="warn-block">⚠️ 7/11~8/2 기차 공사 — 경로 A(버스) 필수, 경로 B(기차) 운행 안 함</span></div></div>
+    <div class="tl-row"><div class="tl-time">11:30</div><div class="tl-body">마을 산책 + 호수 뷰 + 점심</div></div>
+    <div class="tl-row"><div class="tl-time">12:30</div><div class="tl-body">543번 버스 → 오버트라운 케이블카 탑승장 (Winkl 86, 약 10~15분)</div></div>
+    <div class="tl-row"><div class="tl-time">13:00</div><div class="tl-body"><span class="tag t-book">예약필수</span> 다흐슈타인 5핑거스 케이블카 탑승 — 온라인 €46.70 / 현장 €47.90
+      <span class="warn-block">⚠️ 정상 기온 12~17°C — 바람막이·후리스 필수 / 소금광산 현재 미개장</span></div></div>
+    <div class="tl-row"><div class="tl-time">13:00~15:30</div><div class="tl-body">케이블카 1·2구간 + 5핑거스 플랫폼 + 정상 산책 (약 2~2.5시간)
+      <span class="warn-block">⚠️ 마지막 상행 케이블카 17:00 — 15:30 이전 하산 탑승 필수 / 지체 시 버스 놓칠 수 있음</span></div></div>
+    <div class="tl-row"><div class="tl-time">15:30</div><div class="tl-body">케이블카 하산</div></div>
+    <div class="tl-row"><div class="tl-time">16:00</div><div class="tl-body">543번 버스 탑승 → 바트이슐 방향
+      <span class="warn-block">⚠️ 17:30 이전 탑승 필수 — 마지막 버스 18:16 역산 기준</span></div></div>
+    <div class="tl-row"><div class="tl-time">17:15</div><div class="tl-body">바트이슐 → 150번 버스 환승 → 잘츠부르크</div></div>
+    <div class="tl-row"><div class="tl-time">18:45</div><div class="tl-body">잘츠부르크 중앙역 도착 → <strong>도보 7~10분</strong> → 숙소(빌라 엘리사) 복귀 + 씻기</div></div>
+    <div class="tl-row"><div class="tl-time">20:00</div><div class="tl-body"><span class="tag t-free">무료</span> 카피텔 광장 일 트리티코 (170분) — 체력 보고 결정</div></div>
+  </div>
+  <div class="card-note">⚡ 5핑거스 15:30 이전 하산 탑승 필수 · 정상 바람막이·후리스 필수 · 버스 전용 경로 · 소금광산 미개장</div>
+</div>
+
+<!-- DAY 9 -->
+<div class="card c-bi">
+  <div class="card-head">
+    <div class="day-num">Day 9</div>
+    <div class="head-info">
+      <div class="head-date">7/31 (금)</div>
+      <div class="head-city">잘츠부르크 → 바트이슐</div>
+    </div>
+    <div class="badge-move">이동일</div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">10:00</div><div class="tl-body">숙소(빌라 엘리사) 체크아웃</div></div>
+    <div class="tl-row"><div class="tl-time">10:10</div><div class="tl-body"><strong>도보 7분</strong> → 잘츠부르크 중앙역 → <strong>버스 150X/150번</strong> Hauptbahnhof B 정류장 탑승 (€12.10/인, 약 75~90분)</div></div>
+    <div class="tl-row"><div class="tl-time">11:40</div><div class="tl-body">Bad Ischl Seifensiedergasse 하차 → 도보 5분 → The Gallery (Berggasse 8) 짐 보관</div></div>
+    <div class="tl-row"><div class="tl-time">12:00</div><div class="tl-body">도보 5분 → 카페 자우너 케이크</div></div>
+    <div class="tl-row"><div class="tl-time">13:30</div><div class="tl-body">도보 15분 → 카이저빌라 정원 (€6.70)</div></div>
+    <div class="tl-row"><div class="tl-time">15:30</div><div class="tl-body">도보 5분 → SPAR 장보기 → 도보 15분 → The Gallery 체크인
+      <div style="margin-top:5px;font-size:.68rem;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:4px;padding:4px 8px;line-height:1.5;">
+        ⚠️ 체스키크룸로프 마트는 구시가지에서 2km 거리 — 여기서 미리 사가기<br>
+        체스키 2박 간식·음료·아침거리 함께 구매 권장 (Day 11~12 마트 접근 어려움)
+      </div>
+    </div></div>
+    <div class="tl-row"><div class="tl-time">19:45</div><div class="tl-body"><strong>도보 15분</strong> → 유로데르멘 온천 — 4시간권 <strong>€31.50/인</strong> (금요일 평일) · 살츠카머구트 카드 할인 시 €28.35
+      <span class="warn-block">⚠️ 필수 챙길 것: 수영복(필수, 없으면 입장 불가) · 수건(직접 챙기면 절약, 대여 비쌈) · 쪼리/샌들(위생상 필수) · 귀중품 최소화(로커+디지털 손목밴드 지급) · 음식 반입 불가 · 피어싱·시계는 염소·소금물에 손상 가능</span>
+      <span style="display:block;margin-top:5px;font-size:.67rem;color:#94a3b8;line-height:1.5;">💡 온천 대안 (피곤할 때): 트라운강 산책 + 강변 카페 · 카이저빌라 야경 산책 · 숙소 휴식 (내일 케이블카·고사우 체력 비축 우선)</span></div></div>
+  </div>
+  <div class="card-note">⚡ 살츠카머구트 카드 체크인 시 수령 확인 (미제공 시 €4.90/인 구매 추천) · ÖBB 고사우 버스 티켓 구매 (7/31 23:59 전 취소 가능, PDF 생성 즉시 환불 불가)</div>
+</div>
+
+<!-- DAY 10 -->
+<div class="card c-bi">
+  <div class="card-head">
+    <div class="day-num">Day 10</div>
+    <div class="head-info">
+      <div class="head-date">8/1 (토)</div>
+      <div class="head-city">바트이슐</div>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">08:15</div><div class="tl-body">택시 (약 10~15분, €5~8) → 캐트린 케이블카 승강장 (Kaltenbachstraße 62)
+      <span class="warn-block">⚠️ 토요일 551/552번 버스 미운행 — 택시만 가능</span></div></div>
+    <div class="tl-row"><div class="tl-time">08:45</div><div class="tl-body">케이블카 탑승 (약 15분) — €28/인 (살츠카머구트 카드 €26)</div></div>
+    <div class="tl-row"><div class="tl-time">09:00</div><div class="tl-body">정상 하이킹 (~2시간)
+      <span class="warn-block">⚠️ 체력 소모 최대 날 — 충분한 수분·간식 챙길 것</span></div></div>
+    <div class="tl-row"><div class="tl-time">11:00</div><div class="tl-body">케이블카 하산 (약 15분) → 도보 30분 or 택시 5분 → Bad Ischl Busterminal (Bahnhofplatz) + 점심</div></div>
+    <div class="tl-row"><div class="tl-time">13:14</div><div class="tl-body"><span class="tag t-pass">패스</span>541번 버스 출발 Stand C → 고사우 호수 (약 58분) — OÖVV Freizeit-Ticket OÖ <strong>3인 €47.30</strong></div></div>
+    <div class="tl-row"><div class="tl-time">14:12</div><div class="tl-body">Gosausee 도착 — 호수 산책 ~2.5시간</div></div>
+    <div class="tl-row"><div class="tl-time">16:50</div><div class="tl-body">복귀 버스 출발 → Bad Ischl Bahnhof (약 58분)</div></div>
+    <div class="tl-row"><div class="tl-time">17:52</div><div class="tl-body">바트이슐 도착 → 도보 10~15분 → 숙소 복귀 + 자유시간</div></div>
+    <div class="tl-row"><div class="tl-time">19:00</div><div class="tl-body">저녁식사</div></div>
+    <div class="tl-row"><div class="tl-time">20:00</div><div class="tl-body">저녁 산책 or 장보기 (선택, 체력 보고 결정)<br>
+      <span style="font-size:.7rem;color:#94a3b8;">
+        🛒 <strong style="color:#e8edf5;">SPAR 추가 장보기</strong> — 체스키크룸로프 마트 구시가지에서 2km, 숙소에서 도보 25~30분으로 이동이 불편. Day 9에 미리 못 샀거나 추가 필요한 것은 여기서 해결 (SPAR 도보 5분, 22:00까지)<br>
+        🌊 <strong style="color:#e8edf5;">에스플라나데 산책로</strong> — 트라운강 강변 평탄한 산책로, 카페·테라스 (도보 5분)<br>
+        🌿 <strong style="color:#e8edf5;">쿠르파크 (Kurpark)</strong> — 온천 휴양지 분위기 공원, 야간 조명 (도보 10분)<br>
+        🏞️ <strong style="color:#e8edf5;">트라운·이슐강 합류 지점</strong> — 조용한 자연 스팟 (도보 15분)
+      </span>
+    </div></div>
+    <div class="tl-row"><div class="tl-time">21:30</div><div class="tl-body">숙소 복귀 + 짐 싸기 (내일 09:15 CK셔틀)
+      <span class="warn-block">⚠️ 내일 09:00 The Gallery 출발, 09:15 CK셔틀 픽업 — 오늘 밤 짐 완전히 싸두기 / The Gallery 조기 체크아웃 절차 사전 확인 / 체스키 마트 구시가지에서 2km — 필요한 것 오늘 SPAR에서 해결</span></div></div>
+  </div>
+  <div class="card-note">⚡ 내일 09:15 CK셔틀 — 오늘 밤 짐 완전히 싸두기 · The Gallery 조기 체크아웃 절차 확인 · 체스키 마트 불편 → SPAR 미리 구매</div>
+</div>
+
+<!-- DAY 11 -->
+<div class="card c-ck">
+  <div class="card-head">
+    <div class="day-num">Day 11</div>
+    <div class="head-info">
+      <div class="head-date">8/2 (일)</div>
+      <div class="head-city">바트이슐 → 체스키크룸로프</div>
+    </div>
+    <div class="badge-move">이동일</div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">09:00</div><div class="tl-body">숙소(The Gallery) 출발</div></div>
+    <div class="tl-row"><div class="tl-time">09:15</div><div class="tl-body"><span class="tag t-done">☑</span> CK셔틀 픽업 (Berggasse 8, The Gallery 앞) — 이동 약 3h 30m</div></div>
+    <div class="tl-row"><div class="tl-time">12:45</div><div class="tl-body">가르니 호텔 캐슬 브리지 (Hradební 174) 도착 — 짐 보관 (체크인 14:00)</div></div>
+    <div class="tl-row"><div class="tl-time">13:00</div><div class="tl-body"><strong>도보 2분</strong> → 에곤 쉴레 미술관 — <strong>200 CZK/인</strong> (화~일 10:00~18:00, 약 2시간) · 구스타프 클림트 연결 테마</div></div>
+    <div class="tl-row"><div class="tl-time">15:00</div><div class="tl-body">가르니 호텔 체크인
+      <span class="warn-block">⚠️ 에어컨 없음 (요청 시 선풍기) · 주방 없음</span></div></div>
+    <div class="tl-row"><div class="tl-time">15:30</div><div class="tl-body"><strong>도보 5분</strong> → 구시가지 광장 → 라제브니츠키 다리(이발사 다리) → 망토다리 조망</div></div>
+    <div class="tl-row"><div class="tl-time">18:00</div><div class="tl-body">저녁식사 (Švejk Restaurant 권장 — 체코 전통, 구시가지 내) · 맥주 Kozel 현금 선호</div></div>
+    <div class="tl-row"><div class="tl-time">20:00</div><div class="tl-body"><strong>도보</strong> → 세미나르니 정원 → 망토다리 야경 (24시간 개방, 조명 반사 최적)</div></div>
+    <div class="tl-row"><div class="tl-time">21:00</div><div class="tl-body">숙소(가르니 호텔) 복귀</div></div>
+  </div>
+  <div class="card-note">⚡ The Gallery 조기 체크아웃(09:15 전) 절차 사전 확인 / 체스키 마트(Tesco) 숙소에서 도보 25~30분으로 불편 → Day 9·10에 SPAR 미리 구매 / 소매치기·사기 적은 편이나 성 주변 관광지 단가 높음 — 마을 안쪽 식당 추천</div>
+</div>
+
+<!-- DAY 12 -->
+<div class="card c-ck">
+  <div class="card-head">
+    <div class="day-num">Day 12</div>
+    <div class="head-info">
+      <div class="head-date">8/3 (월)</div>
+      <div class="head-city">체스키크룸로프</div>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">09:00</div><div class="tl-body">숙소(가르니 호텔) 출발 → <strong>도보 10분</strong> → 체스키크룸로프 성
+      <span class="warn-block">⚠️ 월요일 가이드 투어(Route 1) 불가 — 셀프 관람 · 오디오가이드 대여 가능</span></div></div>
+    <div class="tl-row"><div class="tl-time">09:00~11:30</div><div class="tl-body">성탑 (162계단 · 별도 티켓 약 200 CZK · 2코트야드 매표소) · 망토다리 · 성 정원 · 해자 곰 관람
+      <span class="warn-block">⚠️ 성 내부 일부 구역 사진 촬영 제한 / 성 마당·정원·망토다리는 무료, 성탑·내부는 유료</span></div></div>
+    <div class="tl-row"><div class="tl-time">11:30</div><div class="tl-body"><strong>도보</strong> → 구시가지 광장 + 점심</div></div>
+    <div class="tl-row"><div class="tl-time">14:00</div><div class="tl-body"><strong>도보 5분</strong> → <span class="tag t-free">무료</span> 자메츠카 정원 (07:00~19:00)</div></div>
+    <div class="tl-row"><div class="tl-time">16:00</div><div class="tl-body">자유 시간 · 래프팅 관람 (블타바강 · 무료 구경) · 기념품 쇼핑 · 카페</div></div>
+    <div class="tl-row"><div class="tl-time">18:00</div><div class="tl-body">저녁식사</div></div>
+    <div class="tl-row"><div class="tl-time">20:30</div><div class="tl-body"><strong>도보</strong> → 망토다리 야경 (24시간 개방)</div></div>
+    <div class="tl-row"><div class="tl-time">21:30</div><div class="tl-body">숙소(가르니 호텔) 복귀 + 짐 싸기
+      <span class="warn-block">⚠️ 내일 08:20 숙소 출발, 08:35 CK셔틀 픽업 — 오늘 밤 짐 완전히 싸두기 / 가르니 호텔 조기 체크아웃 절차 확인</span></div></div>
+  </div>
+  <div class="card-note">⚡ 내일 08:35 CK셔틀 — 오늘 밤 짐 완전히 싸두기 · 조기 체크아웃 절차 확인 · 성탑·내부 유료, 마당·정원·망토다리는 무료</div>
+</div>
+
+<!-- DAY 13 -->
+<div class="card c-pr">
+  <div class="card-head">
+    <div class="day-num">Day 13</div>
+    <div class="head-info">
+      <div class="head-date">8/4 (화)</div>
+      <div class="head-city">체스키 → 프라하</div>
+    </div>
+    <div class="badge-move">이동일</div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">08:20</div><div class="tl-body">숙소(가르니 호텔) 출발</div></div>
+    <div class="tl-row"><div class="tl-time">08:35</div><div class="tl-body"><span class="tag t-done">☑</span> CK셔틀 픽업 (Hradební 174, 숙소 앞) — 이동 약 3h 30m</div></div>
+    <div class="tl-row"><div class="tl-time">12:00</div><div class="tl-body">Grand Hotel International (Koulova 15) 도착 — 짐 무료 보관</div></div>
+    <div class="tl-row"><div class="tl-time">12:30</div><div class="tl-body">호텔 근처 점심</div></div>
+    <div class="tl-row"><div class="tl-time">13:20</div><div class="tl-body"><span class="tag t-pass">패스</span> PID 24h권 ① 활성화 후 출발 — PID Lítačka 앱 140 CZK / 자판기 150 CZK
+      <span class="info-block">🎫 Day 13 예상 탑승 4~6회 → 24시간권 적합 · 탑승 즉시 각인 필수 (미각인 벌금 1,500 CZK)</span></div></div>
+    <div class="tl-row"><div class="tl-time">13:20</div><div class="tl-body">숙소(Koulova 15) → 도보 10분 → Dejvická 역 → 지하철 A선 → Muzeum 환승 → C선 → Vyšehrad역 하차 → 도보 9분 (총 약 25~30분)</div></div>
+    <div class="tl-row"><div class="tl-time">14:00</div><div class="tl-body">비셰흐라드 성 바오로 성당 — 130 CZK (약 2시간) · 카세메이트 150 CZK 현장 결정
+      <span class="warn-block">⚠️ 성당 내부 복장: 어깨·무릎 단정히 가리기 권장 · 미사 중 관람 불가(시간 확인 요) · 외부 공원·성벽은 무료, 조용한 주거지역이므로 소음 주의</span></div></div>
+    <div class="tl-row"><div class="tl-time">16:10</div><div class="tl-body">지하철 C선 Vyšehrad 탑승 → Muzeum 환승 → A선 Staroměstská 하차 → 도보 3분 → 구시가지 광장 + 천문시계탑 (약 18~22분) — 현장 <strong>350 CZK</strong></div></div>
+    <div class="tl-row"><div class="tl-time">18:30</div><div class="tl-body">저녁식사 (구시가지 주변)</div></div>
+    <div class="tl-row"><div class="tl-time">20:30</div><div class="tl-body">트램 8·25·26번 Čechův most 탑승 → Letenské náměstí 하차 → 도보 5분 → <span class="tag t-free">무료</span> 레트나 공원 야경</div></div>
+    <div class="tl-row"><div class="tl-time">22:00</div><div class="tl-body">트램 8·25·26번 Letenské náměstí 탑승 → 숙소 인근 하차 (약 25~30분) → 체크인</div></div>
+  </div>
+  <div class="card-note">⚡ 이동일 + 빽빽한 일정 — 13:20 출발 필수 (숙소→Dejvická 도보 포함) · PID 앱 140 CZK / 자판기 150 CZK</div>
+</div>
+
+<!-- DAY 14 -->
+<div class="card c-pr">
+  <div class="card-head">
+    <div class="day-num">Day 14</div>
+    <div class="head-info">
+      <div class="head-date">8/5 (수)</div>
+      <div class="head-city">프라하</div>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">09:15</div><div class="tl-body">숙소(그랜드 호텔 인터내셔널) 출발</div></div>
+    <div class="tl-row"><div class="tl-time">09:30</div><div class="tl-body"><strong>트램 5·12·17번</strong> 숙소 앞 Podbaba 정류장 탑승 (약 20~25분) → Veletržní palác 하차</div></div>
+    <div class="tl-row"><div class="tl-time">10:00</div><div class="tl-body">벨레트르주니 궁전 — 250 CZK/인 (약 2.5시간)</div></div>
+    <div class="tl-row"><div class="tl-time">12:30</div><div class="tl-body">내부 Café Jedna 점심 (입장권 없이 이용 가능, 약 1시간)</div></div>
+    <div class="tl-row"><div class="tl-time">13:30</div><div class="tl-body"><span class="tag t-pass">패스</span> PID 24h권 ② 활성화 — 앱 140 CZK / 자판기 150 CZK
+      <span class="info-block">🎫 13:30 활성화 → 내일 13:30까지 유효 (Day 15 공항 버스 119번 커버 가능) · Day 14 예상 탑승 4~6회 → 24시간권 적합</span></div></div>
+    <div class="tl-row"><div class="tl-time">13:40</div><div class="tl-body"><strong>트램 22번</strong> Veletržní palác 인근 탑승 → Pohořelec 하차 → 도보 10분 (프라하 성 서쪽 입구 방향) (약 30~35분)</div></div>
+    <div class="tl-row"><div class="tl-time">14:00</div><div class="tl-body"><span class="tag t-done">☑</span> 프라하성 Main Circuit — GYG GYG996ZXHK8G · 각 건물 입구 개별 스캔 (약 3시간)
+      <span class="warn-block">⚠️ 역사 건물 16:00 마감 — 마지막 입장 15:40 · 공항형 보안검색 실시(입장 전 15~20분 여유) · 성 비투스 대성당: 어깨·무릎 가리기 권장(여름 성수기 종종 단속) · 대형 가방 불가(보안검색 후 이동 불편), 배낭은 소형만 · 삼각대·드론 금지 · 코블스톤 지형으로 발편한 신발 필수</span></div></div>
+    <div class="tl-row"><div class="tl-time">17:00</div><div class="tl-body"><strong>도보 15분</strong> → 스트라호프 양조장 (Strahovské nádvoří 301)</div></div>
+    <div class="tl-row"><div class="tl-time">18:00</div><div class="tl-body">스트라호프 양조장 저녁 18:00 · kancelar@klasterni-pivovar.cz 예약 확인 (약 2시간)</div></div>
+    <div class="tl-row"><div class="tl-time">20:00</div><div class="tl-body">트램 22번 (약 25~30분) → 카를교 (Karlův most) 야경</div></div>
+    <div class="tl-row"><div class="tl-time">21:30</div><div class="tl-body">트램 17번 Staroměstská 탑승 → 숙소 인근 하차 (약 20~25분) → 숙소 복귀 + 짐 정리
+      <span class="warn-block">⚠️ 내일 10:00 체크아웃 — 오늘 밤 짐 싸두기 / Day 15 버스 119번은 오늘 활성화한 PID 24h권으로 커버됨</span></div></div>
+  </div>
+  <div class="card-note">⚡ 역사 건물 16:00 마감 엄수 · 트램 22번으로 카를교 이동 25~30분 · 오늘 밤 짐 싸두기</div>
+</div>
+
+<!-- DAY 15 -->
+<div class="card c-pr">
+  <div class="card-head">
+    <div class="day-num">Day 15</div>
+    <div class="head-info">
+      <div class="head-date">8/6 (목)</div>
+      <div class="head-city">프라하 출발</div>
+    </div>
+    <div class="badge-move">귀국</div>
+  </div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-time">10:00</div><div class="tl-body">체크아웃 + 짐 맡기기</div></div>
+    <div class="tl-row"><div class="tl-time">10:10</div><div class="tl-body">도보 10분 → Dejvická 광장 주변 카페 브런치</div></div>
+    <div class="tl-row"><div class="tl-time">11:30</div><div class="tl-body">짐 찾기</div></div>
+    <div class="tl-row"><div class="tl-time">12:00</div><div class="tl-body">버스 119번 터미널 앞 탑승 → Nádraží Veleslavín 하차 → 지하철 A선 Ruzyně 방향 탑승 → Letiště Terminál 2 하차 (총 약 35~45분)</div></div>
+    <div class="tl-row"><div class="tl-time">13:00</div><div class="tl-body">바클라프 하벨 공항 도착 · 체크인 + 보안검색</div></div>
+    <div class="tl-row"><div class="tl-time">16:10</div><div class="tl-body">두바이 경유 출발 → 인천</div></div>
+  </div>
+  <div class="card-note">⚡ 택시 이용 시 13:10 출발 / CZK 잔액 공항 또는 카페에서 소진</div>
+</div>
+
+</div>
+<div class="footer">동유럽 여행 타임라인 v7 · 2026.07.13 · v6 모든 변경 포함 + 관광지별 가방정책·복장규정·필수준비물 공식사이트 기반 검증 반영 · 호프부르크 보관함 없음 확인 · 마차시성당 복장단속 · 쇤브룬·알베르티나·레오폴트·벨베데레 로커 안내 · 프라하성 보안검색·복장 · 유로데르멘 준비물 · 비셰흐라드 성당 복장</div>
+</body>
+</html>

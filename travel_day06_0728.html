@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>동유럽 여행 — DAY 6 빈→잘츠부르크 이동</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p-blue:#7B9BB8;--p-green:#82A88F;--p-purple:#9B8DB8;
+  --p-orange:#C4956A;--p-navy:#6B7FA8;
+  --bg:#F6F4F1;--surface:#FFFFFF;--border:#E8E4DE;
+  --text:#1E1C1A;--muted:#5A5550;--soft:#888078;
+  --radius-card:12px;--radius-badge:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;color:var(--text);background:var(--bg);}
+.header{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-shrink:0;z-index:1000;}
+.brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;}
+.day-pill{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.day-select{font-family:inherit;font-size:11px;border:1px solid var(--border);border-radius:var(--radius-badge);padding:4px 10px;background:var(--surface);color:var(--text);cursor:pointer;outline:none;}
+.layout{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+#map{flex-shrink:0;height:calc(45vh - 52px);min-height:180px;position:relative;z-index:1;}
+#map .leaflet-tile-pane{filter:saturate(0.45) brightness(0.97) contrast(1.15);}
+.panel{flex:1;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 4px;}
+.tab{flex:1;padding:11px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--soft);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;}
+.tab.active{color:var(--text);border-bottom-color:var(--p-blue);}
+.tab-content{display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;}
+.tab-content.active{display:block;}
+.ttc-card{margin:14px 16px 0;background:#EEF4FA;border:1px solid #C8DAE8;border-radius:var(--radius-card);overflow:hidden;}
+.ttc-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;}
+.ttc-title{font-size:13px;font-weight:700;color:#2A4A6A;display:flex;align-items:center;gap:7px;}
+.ttc-chevron{font-size:12px;color:#5A7A9A;transition:transform .2s;}
+.ttc-body{padding:0 14px 12px;border-top:1px solid #C8DAE8;display:none;}
+.ttc-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #D8E8F0;font-size:12px;color:#2A3A4A;line-height:1.6;}
+.ttc-row:last-child{border-bottom:none;}
+.ttc-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.ttc-badge.pass{background:#E8EEF8;color:#3060A0;}
+.ttc-badge.warn{background:#FFF0E8;color:#9A4010;}
+.ttc-badge.good{background:#E8F5E8;color:#2A6A2A;}
+.ttc-warn{background:#FFF8E8;border:1px solid #E8D890;border-radius:8px;padding:7px 10px;margin-top:8px;font-size:11px;color:#7A6010;line-height:1.6;}
+.ttc-compare{margin-top:10px;border:1px solid #D8E8F0;border-radius:8px;overflow:hidden;}
+.ttc-compare-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-bottom:1px solid #E8F0F8;font-size:11.5px;color:#2A3A4A;}
+.ttc-compare-row:last-child{border-bottom:none;}
+.ttc-compare-row.winner{background:#EEF8F0;font-weight:700;color:#2A6A3A;}
+.ttc-compare-label{flex:1;}
+.ttc-compare-price{font-variant-numeric:tabular-nums;font-weight:600;color:#3A5A7A;}
+.weather-card{margin:14px 16px 0;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.wc-item{display:flex;align-items:center;gap:7px;}
+.wc-label{font-size:10px;color:#706860;display:block;margin-bottom:1px;}
+.wc-val{font-size:13px;font-weight:500;color:var(--text);}
+.timeline{padding:14px 16px 20px;}
+.tl-item{display:flex;position:relative;cursor:pointer;}
+.tl-axis{display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0;}
+.tl-pin{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;z-index:1;box-shadow:0 2px 8px rgba(0,0,0,.14);}
+.tl-pin.sight{background:var(--p-blue);}
+.tl-pin.food{background:var(--p-green);}
+.tl-pin.stay{background:var(--p-purple);}
+.tl-pin.transit{background:var(--p-navy);}
+.tl-vline{width:1.5px;background:var(--border);flex:1;min-height:12px;}
+.tl-item:last-child .tl-vline{display:none;}
+.tl-body{flex:1;padding:2px 0 20px 12px;}
+.tl-time{font-size:10px;color:var(--soft);letter-spacing:.4px;margin-bottom:3px;}
+.tl-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.35;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tl-map-icon{font-size:13px;opacity:.6;text-decoration:none;flex-shrink:0;}
+.tl-desc{font-size:12px;color:#4A4540;line-height:1.7;margin-bottom:6px;}
+.tl-map-hint{font-size:10px;color:var(--soft);margin-top:2px;margin-bottom:4px;}
+.move-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:10px 13px;display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+.move-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text);line-height:1.6;}
+.mbadge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-badge);white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.mbadge.walk{background:#FEF3E2;color:#A06830;}
+.mbadge.transit{background:#E8EEF8;color:#506090;}
+.mbadge.train{background:#EAE8F8;color:#5040A0;}
+.info-inline{background:#F4FAF6;border-left:3px solid #82A88F;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#3A6A4A;line-height:1.6;}
+.warn-inline{background:#FFF8E8;border-left:3px solid #C4956A;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#7A5020;line-height:1.6;}
+.move-divider{margin:4px 16px;border:none;border-top:2px dashed var(--border);}
+.subtabs{display:flex;gap:6px;padding:10px 16px 0;}
+.subtab{font-size:12px;font-weight:500;padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-badge);cursor:pointer;color:var(--muted);background:var(--surface);}
+.subtab.active{background:var(--p-blue);color:#fff;border-color:var(--p-blue);}
+.subtab.korean.active{background:var(--p-green);border-color:var(--p-green);}
+.subcontent{display:none;padding:10px 16px 80px;}
+.subcontent.active{display:block;}
+.sec-lbl{font-size:10px;font-weight:600;letter-spacing:.8px;color:var(--soft);text-transform:uppercase;margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.sec-lbl:first-child{margin-top:4px;}
+.place-card{border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:10px;}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;}
+.card-name{font-size:13px;font-weight:600;line-height:1.4;color:var(--text);}
+.badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.badge.saved{background:#FEF5E8;color:#906030;font-weight:700;}
+.badge.ai{background:#F0EAF8;color:#7050A0;font-weight:700;}
+.badge.fixed{background:#FFF0E8;color:#9A4010;font-weight:700;}
+.card-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.card-meta-item{font-size:11px;color:var(--muted);}
+.card-desc{font-size:12px;color:#4A4540;line-height:1.65;margin-bottom:6px;}
+.card-tip{font-size:11px;color:#906030;background:#FEF5E8;border:1px solid #F0D8B0;border-radius:8px;padding:6px 10px;margin-top:4px;}
+.gmap-btn{display:inline-block;font-size:11px;color:var(--p-blue);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-badge);margin-top:6px;}
+.mart-wrap{padding:14px 16px 80px;}
+.mart-card{border:1px solid var(--border);border-radius:var(--radius-card);padding:13px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .18s;}
+.mart-card.on-map{border-color:var(--p-blue);background:#F0F4FA;}
+.mart-name{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.mart-tag{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.4px;}
+.mart-tag.local{background:#E8F5E8;color:#2A6A2A;}
+.mart-hours{font-size:11px;color:#3A7A3A;font-weight:600;margin-bottom:4px;}
+.mart-addr{font-size:11px;color:var(--muted);margin-bottom:5px;}
+.mart-desc{font-size:12px;color:#4A4540;line-height:1.65;}
+.legend{position:fixed;bottom:12px;left:12px;background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:11px;display:flex;flex-direction:column;gap:5px;z-index:500;box-shadow:0 2px 10px rgba(0,0,0,.08);pointer-events:none;}
+.leg-row{display:flex;align-items:center;gap:8px;color:#4A4540;}
+.leg-line{width:22px;height:3px;border-radius:2px;flex-shrink:0;}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.leg-sep{height:1px;background:var(--border);margin:1px 0;}
+@media(min-width:768px){
+  .layout{flex-direction:row;height:100vh;}
+  #map{flex:1;height:100%!important;min-height:unset;}
+  .panel{width:440px;flex:none;border-top:none;border-left:1px solid var(--border);}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="brand">2026 동유럽</span>
+    <span class="day-pill">Day 6 · 빈→잘츠부르크 이동</span>
+  </div>
+  <select class="day-select" onchange="if(this.value)location.href=this.value">
+    <option value="travel_day01_0723.html">7/23 부다페스트 도착</option>
+    <option value="travel_day02_0724.html">7/24 부다페스트 전일</option>
+    <option value="travel_day03_0725.html">7/25 부다→빈 이동</option>
+    <option value="travel_day04_0726.html">7/26 빈 쇤브룬+레오폴트</option>
+    <option value="travel_day05_0727.html">7/27 빈 알베르티나+호프부르크</option>
+    <option value="" selected>7/28 빈→잘츠 이동</option>
+    <option value="travel_day07_0729.html">7/29 잘츠부르크</option>
+    <option value="travel_day08_0730.html">7/30 할슈타트</option>
+    <option value="travel_day09_0731.html">7/31 잘츠→바트이슐</option>
+    <option value="travel_day10_0801.html">8/1 바트이슐</option>
+    <option value="travel_day11_0802.html">8/2 바트이슐→CK</option>
+    <option value="travel_day12_0803.html">8/3 체스키크룸로프</option>
+    <option value="travel_day13_0804.html">8/4 CK→프라하</option>
+    <option value="travel_day14_0805.html">8/5 프라하 전일</option>
+    <option value="travel_day15_0806.html">8/6 프라하 출발</option>
+  </select>
+</div>
+
+<div class="layout">
+  <div id="map">
+    <div class="legend">
+      <div class="leg-row"><div class="leg-line" style="border-top:2px dashed var(--p-navy);background:none;"></div>기차/트램</div>
+      <div class="leg-row"><div class="leg-line" style="background:var(--p-orange);"></div>도보</div>
+      <div class="leg-sep"></div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-blue)"></div>관광/카페</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-purple)"></div>숙소</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-navy)"></div>역</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('timeline',this)">📋 일정</div>
+      <div class="tab" onclick="switchTab('lunch',this)">🍽 점심</div>
+      <div class="tab" onclick="switchTab('dinner',this)">🌙 저녁</div>
+      <div class="tab" onclick="switchTab('mart',this)">🛒 마트</div>
+    </div>
+
+    <!-- 일정 탭 -->
+    <div id="tab-timeline" class="tab-content active">
+
+      <div class="weather-card">
+        <div class="wc-item"><span style="font-size:16px;" id="wc-icon">🌤</span><div><span class="wc-label">날씨 (잘츠)</span><span class="wc-val" id="wc-wx">로딩 중</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌡</span><div><span class="wc-label">기온</span><span class="wc-val" id="wc-temp">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌅</span><div><span class="wc-label">일출</span><span class="wc-val" id="wc-rise">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌇</span><div><span class="wc-label">일몰</span><span class="wc-val" id="wc-set">—</span></div></div>
+      </div>
+
+      <!-- 잘츠부르크 카드 드로어 -->
+      <div class="ttc-card">
+        <div class="ttc-header" onclick="toggleTTC()">
+          <div class="ttc-title">🎫 잘츠부르크 교통·카드 안내</div>
+          <div class="ttc-chevron" id="ttc-chevron">▾</div>
+        </div>
+        <div class="ttc-body" id="ttc-body">
+          <div class="ttc-row">
+            <span class="ttc-badge good">✅ 결론</span>
+            <div>
+              <strong>빌라 엘리사 Guest Mobility Ticket 이용</strong><br>
+              체크인 시 3인 등록하면 발급 · 잘츠부르크 대중교통 무제한 (버스 25번 포함)<br>
+              → 잘츠부르크 카드 불필요
+            </div>
+          </div>
+          <div class="ttc-row">
+            <span class="ttc-badge pass">참고</span>
+            <div>
+              <strong>잘츠부르크 카드 48h €40.50</strong> (ÖBB 앱 10% 할인가)<br>
+              교통 + 주요 명소 입장 포함 · Mobility Ticket 없는 경우 대안<br>
+              개별 구매 합계 €36.80/인 vs 카드 €40.50 → 카드가 소폭 비쌈
+            </div>
+          </div>
+          <div class="ttc-compare">
+            <div class="ttc-compare-row"><span class="ttc-compare-label">Guest Mobility Ticket (무료) + 명소 개별</span><span class="ttc-compare-price">€36.80/인</span></div>
+            <div class="ttc-compare-row"><span class="ttc-compare-label">잘츠부르크 카드 48h (교통+명소 포함)</span><span class="ttc-compare-price">€40.50/인</span></div>
+            <div class="ttc-compare-row winner"><span class="ttc-compare-label">✅ Mobility Ticket + 개별이 €3.70 저렴</span><span class="ttc-compare-price">차액 €3.70</span></div>
+          </div>
+          <div class="ttc-warn">
+            ⚠️ 체크인 시 Guest Mobility Ticket 3인 발급 여부 반드시 확인<br>
+            ⚠️ Mobility Ticket 미발급 시 → 잘츠부르크 카드 48h ÖBB 앱 구매 (€40.50) 검토<br>
+            💡 잘츠부르크 카드 제공 명소: 헬브룬 €16.50 + 호엔잘츠부르크 €15.50 + 묀히스베르크 엘리베이터 €4.80 = €36.80
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline">
+
+        <!-- ① 아디나 출발 -->
+        <div class="tl-item" data-map-key="adina" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">①</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">09:00 출발</div>
+            <div class="tl-name">아디나 아파트먼트 출발 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Adina+Apartment+Hotel+Vienna+Belvedere+Am+Belvedere+10" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">Rechte Wienzeile 3A · 빈 마지막 아침</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚋 트램D</span>Schwarzenbergplatz 탑승 → Opering 하차 · 약 10~12분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ② 카페 자허 -->
+        <div class="tl-item" data-map-key="sacher" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">②</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">09:00~10:00</div>
+            <div class="tl-name">카페 자허 ☑ <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJP13zjkoHbUcR5sDsHqv_3Pk" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Philharmoniker Str. 4 · 예약 완료 ☑<br>
+              <strong>자허토르테 + 커피</strong> · 약 1시간 · 빈 3대 커피하우스<br>
+              빈 마지막 아침 — 여기서 브런치 겸 식사
+            </div>
+            <div class="warn-inline">⚠️ 노쇼 €15/인 · 3인 €45 자동 청구 — 취소 데드라인 예약 확인 이메일로 확인</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">🚶 도보</span>카페 자허 → 아디나 · 약 10~12분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ 아디나 체크아웃 -->
+        <div class="tl-item" data-map-key="adina" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">③</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">11:00 체크아웃</div>
+            <div class="tl-name">아디나 체크아웃 + 짐 픽업 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Adina+Apartment+Hotel+Vienna+Belvedere+Am+Belvedere+10" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              체크아웃 11:00 · 짐 픽업 후 빈 중앙역으로<br>
+              빈 아디나 3박 종료
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">🚶 도보</span>아디나 → 빈 중앙역 · 짐 있으면 약 12~15분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 빈 중앙역 -->
+        <div class="tl-item" data-map-key="wien_hbf" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin transit">④</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">11:30 도착 / 12:28 출발</div>
+            <div class="tl-name">빈 중앙역 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJlU2SCR0HbUcRWoifYt6WBQM" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Wien Hauptbahnhof · <strong>ÖBB 12:28 출발 (예약완료)</strong><br>
+              잘츠부르크까지 약 2시간 25분 · 좌석 지정석<br>
+              역 내 식당에서 기차 탑승 전 간단히 먹을 수 있음
+            </div>
+            <div class="info-inline">💡 역 내 INTERSPAR · Billa · 카페 여러 곳 있음 · 기차 내 식당칸 없음 (간식 미리 구입 권장)</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge train">🚆 ÖBB</span>빈 중앙역 12:28 → 잘츠부르크 중앙역 14:53 · 약 2h 25m</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 잘츠부르크 중앙역 -->
+        <div class="tl-item" data-map-key="salzburg_hbf" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin transit">⑤</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">14:53 도착</div>
+            <div class="tl-name">잘츠부르크 중앙역 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJ5aeJzT1XcUcRHBe2FBdMBTA" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">Salzburg Hauptbahnhof · 잘츠부르크 도착</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">🚶 도보</span>잘츠부르크 중앙역 → 빌라 엘리사 (Jahnstraße 14) · 약 7~10분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ 빌라 엘리사 체크인 -->
+        <div class="tl-item" data-map-key="villa_elisa" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">⑥</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">15:00~16:00</div>
+            <div class="tl-name">빌라 엘리사 체크인 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Villa+Elisa+Salzburg+Elisabethkai+36" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Jahnstraße 14 · 체크인 14:00 · 짐 내려놓기<br>
+              <strong>Guest Mobility Ticket 3인 발급 여부 즉시 확인</strong>
+            </div>
+            <div class="info-inline">🚌 Guest Mobility Ticket — 체크인 시 3인 등록 · 잘츠부르크 대중교통 무제한 (버스 25번 포함) · 관광지 입장권 불포함 · 발급 확인 후 이동 시작</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">🚶 도보</span>빌라 엘리사 → EUROSPAR · 약 5분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑦ EUROSPAR 장보기 -->
+        <div class="tl-item" data-map-key="eurospar" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin food">⑦</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">16:00~17:00</div>
+            <div class="tl-name">EUROSPAR 장보기 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=EUROSPAR+Salzburg+Jahnstrasse" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              빌라 엘리사 도보 5분 · 저녁 식재료 + 아침거리 구입<br>
+              내일 헬브룬 10:00 예약 → 아침 간단히 해결 후 출발
+            </div>
+            <div class="info-inline">💡 내일(Day 7) 일정 빽빽 — 아침거리·생수·간식 오늘 미리 구입 권장</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">🚶 도보</span>EUROSPAR → 빌라 엘리사 · 5분 · 저녁 식사 후 산책 출발</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑧ 미라벨 정원 -->
+        <div class="tl-item" data-map-key="mirabell" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">⑧</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">18:45~19:45</div>
+            <div class="tl-name">미라벨 정원 + 마카르트 다리 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJhT8Mc_pXcUcRLKSHAJtA9xI" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Mirabellplatz · 도보 10~12분<br>
+              잘차흐강 건너 호엔잘츠부르크 성 뷰 · 마카르트 다리 자물쇠<br>
+              무료 개방 · 저녁 빛이 예쁜 시간대
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">🚶 도보</span>미라벨 정원 → 카피텔 광장 · 약 10분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑨ 카피텔 광장 야외 스크린 -->
+        <div class="tl-item" data-map-key="kapitelplatz" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">⑨</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">20:00~22:00</div>
+            <div class="tl-name">카피텔 광장 야외 살로메 스크린 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJcWKP0eJXcUcRv4mIzWcKLyM" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Kapitelplatz · <strong>무료</strong> · 서서 관람 · 캐주얼 복장<br>
+              리하르트 슈트라우스 오페라 살로메 · 112분<br>
+              2018년 잘츠부르크 공연 녹화 / 아스믹 그리고리안 주연 / 빈 필하모닉
+            </div>
+            <div class="info-inline">💡 잘츠부르크 음악제 기간 야외 무료 상영 · 체력 여유 있으면 강력 추천 · 내일 09:20 출발로 체력 안배도 고려</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge walk">🚶 도보</span>카피텔 광장 → 빌라 엘리사 · 약 10~12분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑩ 빌라 엘리사 복귀 -->
+        <div class="tl-item" data-map-key="villa_elisa" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">⑩</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">22:00~</div>
+            <div class="tl-name">빌라 엘리사 복귀 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Villa+Elisa+Salzburg+Elisabethkai+36" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Jahnstraße 14 · 체크아웃 내일 아님 (7/29~31 3박)<br>
+              내일 09:20 출발 · 헬브룬 10:00 슬롯 · 버스 25번 이용
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 점심 탭 -->
+    <div id="tab-lunch" class="tab-content">
+      <div style="margin:14px 16px 0;background:#EEF4FA;border:1px solid #C8DAE8;border-radius:var(--radius-card);padding:11px 14px;font-size:12px;color:#2A4A6A;line-height:1.7;">
+        📍 오늘 점심은 <strong>빈 중앙역 or 기차 내</strong> 상황<br>
+        카페 자허에서 09:00~10:00 브런치 → 12:28 출발 전 역 구내에서 간단히 해결
+      </div>
+
+      <div class="subtabs">
+        <div class="subtab active" onclick="switchSub('sub-lunch-local',this,'lunch')">🍴 현지식</div>
+        <div class="subtab korean" onclick="switchSub('sub-lunch-korean',this,'lunch')">🥢 아시안</div>
+      </div>
+
+      <div id="sub-lunch-local" class="subcontent active">
+        <div class="sec-lbl">🚉 빈 중앙역 구내 (12:28 출발 전)</div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">역 내 INTERSPAR / Billa</div>
+            <div class="badges"><span class="badge ai">💡 추천</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 빈 중앙역 지하 쇼핑몰</span>
+            <span class="card-meta-item">⏰ 06:00~22:00</span>
+          </div>
+          <div class="card-desc">샌드위치·과일·음료·간식 구입 · 기차 내 먹을 것까지 미리 구입 · 2시간 25분 이동 대비</div>
+          <div class="card-tip">💡 카페 자허 브런치로 배부를 수 있음 · 간식·생수 위주 구입 권장</div>
+        </div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">역 내 카페·레스토랑</div>
+            <div class="badges"><span class="badge ai">💡 추천</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 빈 중앙역 1층</span>
+            <span class="card-meta-item">⏰ 다수 상시 운영</span>
+          </div>
+          <div class="card-desc">Vapiano · Nordsee · 각종 카페 · 11:30 도착 후 12:00까지 여유 있게 식사 가능</div>
+          <div class="card-tip">💡 카페 자허 브런치 시간에 따라 점심 skip도 선택지 · 역 내 식사 후 기차 탑승 권장</div>
+        </div>
+
+        <div class="sec-lbl">🏠 잘츠부르크 도착 후 (빌라 엘리사 · 저녁 대신 점심 늦게)</div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">Café Konditorei Fürst</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Brodgasse 13 · 구시가지</span>
+            <span class="card-meta-item">⏰ 08:00~20:00</span>
+          </div>
+          <div class="card-desc">오리지널 모차르트 초콜릿(모차르트쿠겔) 원조 가게 · 잘츠부르크 도착 후 케이크+커피</div>
+          <div class="card-memo">💬 "모차르트 초콜릿" (저장 메모)</div>
+          <div class="card-tip">💡 도착 직후 가볍게 · 구시가지 산책 겸</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Cafe+Konditorei+Furst+Salzburg+Brodgasse+13" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">Zwettler's Wirtshaus</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 잘츠부르크 구시가지</span>
+            <span class="card-meta-item">⏰ 11:00~24:00</span>
+          </div>
+          <div class="card-desc">잘츠부르크 전통 식당 · 슈니첼·굴라쉬 · 현지인 추천</div>
+          <div class="card-memo">💬 "트위터 추천" (저장 메모)</div>
+          <div class="card-tip">💡 도착 직후 늦은 점심 or 이른 저녁으로도 활용 가능</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Zwettlers+Wirtshaus+Salzburg+Kaigasse+3" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">Pauli Stubm</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 잘츠부르크 구시가지</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+          </div>
+          <div class="card-desc">잘츠부르크 전통 오스트리아 요리 · 아늑한 분위기 · 도착 후 첫 잘츠 식사</div>
+          <div class="card-tip">💡 17:00 저녁 전 이른 식사로도 괜찮음</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Pauli+Stub'n+Salzburg+Gstättengasse+2" target="_blank">📍 구글지도</a>
+        </div>
+
+      </div>
+
+      <div id="sub-lunch-korean" class="subcontent">
+        <div class="sec-lbl">🥢 잘츠부르크 아시안</div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">Mister Le (베트남)</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 잘츠부르크 시내</span>
+            <span class="card-meta-item">⏰ 11:00~21:00</span>
+          </div>
+          <div class="card-desc">잘츠부르크 베트남 식당 · 쌀국수·반미 · 오스트리아 식사에 지쳤을 때</div>
+          <div class="card-tip">💡 도착 후 가볍게 · 한식 그리울 때 대안</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Mister+Le+Vietnamese+Salzburg" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">ICHI GO ICHI (일본라멘)</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 잘츠부르크 시내</span>
+            <span class="card-meta-item">⏰ 11:30~21:30</span>
+          </div>
+          <div class="card-desc">잘츠부르크 일본 라멘 전문점 · 돈코츠·쇼유 라멘</div>
+          <div class="card-tip">💡 유럽에서 드문 제대로 된 라멘 · 이동 피로 후 따뜻한 국물</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Ichi+Go+Ichi+Ramen+Salzburg" target="_blank">📍 구글지도</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 저녁 탭 -->
+    <div id="tab-dinner" class="tab-content">
+      <div style="margin:14px 16px 0;background:#F0F8F2;border:1px solid #BFD9C8;border-radius:var(--radius-card);padding:11px 14px;font-size:12px;color:#3D7A55;line-height:1.7;">
+        🏠 오늘 저녁은 <strong>빌라 엘리사 숙소 취사</strong> (기본 계획)<br>
+        이동 피로 + EUROSPAR 장보기 후 숙소에서 해결 · 여력 있으면 아래 식당 대안 참고
+      </div>
+
+      <div class="subtabs">
+        <div class="subtab active" onclick="switchSub('sub-dinner-local',this,'dinner')">🍴 현지식</div>
+        <div class="subtab korean" onclick="switchSub('sub-dinner-korean',this,'dinner')">🥢 아시안</div>
+      </div>
+
+      <div id="sub-dinner-local" class="subcontent active">
+        <div class="sec-lbl">🍽 잘츠부르크 구시가지 · 빌라 엘리사 도보권</div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">MOJO</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 잘츠부르크 시내</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+          </div>
+          <div class="card-desc">잘츠부르크 버거·스낵 · 가볍게 먹기 좋음 · 이동일 피로 후 부담 없는 식사</div>
+          <div class="card-tip">💡 취사 대신 가볍게 나가고 싶을 때 · 미라벨 정원 산책 전후 동선</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=MOJO+Salzburg+Gstättengasse" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">Zwettler's Wirtshaus</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 잘츠부르크 구시가지</span>
+            <span class="card-meta-item">⏰ 11:00~24:00</span>
+          </div>
+          <div class="card-desc">잘츠부르크 전통 오스트리아 요리 · 현지인 추천</div>
+          <div class="card-memo">💬 "트위터 추천" (저장 메모)</div>
+          <div class="card-tip">💡 17:00~18:30 저녁 식사 후 미라벨→카피텔 산책 가능</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Zwettlers+Wirtshaus+Salzburg+Kaigasse+3" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">Pauli Stubm</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 잘츠부르크 구시가지</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+          </div>
+          <div class="card-desc">잘츠부르크 전통 오스트리아 가정식 · 아늑한 분위기</div>
+          <div class="card-tip">💡 도착 첫날 잘츠부르크 분위기 느끼기 좋음</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Pauli+Stub'n+Salzburg+Gstättengasse+2" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">Fabi's Frozen Yogurt</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 잘츠부르크 구시가지</span>
+            <span class="card-meta-item">⏰ 12:00~21:00</span>
+          </div>
+          <div class="card-desc">요아정 스타일 프로즌 요거트 · 저녁 후 산책 중 디저트</div>
+          <div class="card-memo">💬 "요아정" (저장 메모)</div>
+          <div class="card-tip">💡 미라벨 정원 산책 후 들르기 좋음</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Fabis+Frozen+Yogurt+Salzburg" target="_blank">📍 구글지도</a>
+        </div>
+
+      </div>
+
+      <div id="sub-dinner-korean" class="subcontent">
+        <div class="sec-lbl">🥢 아시안 · 한식</div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">Mister Le (베트남)</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 잘츠부르크 시내</span>
+            <span class="card-meta-item">⏰ 11:00~21:00</span>
+          </div>
+          <div class="card-desc">쌀국수·반미 · 이동일 저녁 가볍게 · 오스트리아 음식 피로 해소</div>
+          <div class="card-tip">💡 이동일 저녁 부담 없이 먹기 좋음</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Mister+Le+Vietnamese+Salzburg" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="place-card">
+          <div class="card-header">
+            <div class="card-name">ICHI GO ICHI (일본라멘)</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 잘츠부르크 시내</span>
+            <span class="card-meta-item">⏰ 11:30~21:30</span>
+          </div>
+          <div class="card-desc">일본 라멘 전문점 · 이동 피로 후 따뜻한 국물</div>
+          <div class="card-tip">💡 21:30 마감 — 17:00~18:00 방문 권장</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Ichi+Go+Ichi+Ramen+Salzburg" target="_blank">📍 구글지도</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 마트 탭 -->
+    <div id="tab-mart" class="tab-content">
+      <div class="mart-wrap">
+        <div style="background:#FFF8E8;border:1px solid #E8D890;border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:#7A6010;line-height:1.7;">
+          💡 오늘 16:00 EUROSPAR 장보기 일정 포함 · 저녁 식재료 + 내일 아침·간식 미리 구입
+        </div>
+
+        <div class="sec-lbl">🏪 잘츠부르크 마트</div>
+        <div class="mart-card" onclick="toggleMart(this,'mart_eurospar')">
+          <div class="mart-name">EUROSPAR <span class="mart-tag local">현지마트</span></div>
+          <div class="mart-hours">🕐 월~토 07:30~20:00</div>
+          <div class="mart-addr">📍 빌라 엘리사 도보 5분</div>
+          <div class="mart-desc">체크인 후 바로 도보 5분 · 오스트리아 대형 마트 · 신선식품·음료·간식 풍부 · 오늘 저녁 식재료 + 내일 아침거리 구입</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=EUROSPAR+Salzburg+Jahnstrasse" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="mart-card" onclick="toggleMart(this,'mart_spar')">
+          <div class="mart-name">SPAR <span class="mart-tag local">현지마트</span></div>
+          <div class="mart-hours">🕐 매일 07:00~21:00</div>
+          <div class="mart-addr">📍 잘츠부르크 시내 여러 곳</div>
+          <div class="mart-desc">EUROSPAR 방문 후 추가 필요 시 · 생수·과자·요거트</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=SPAR+Salzburg+Griesgasse" target="_blank">📍 구글지도</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// 이동일: 빈(아디나·카페자허·빈중앙역) → 잘츠부르크(잘츠중앙역·빌라엘리사·미라벨·카피텔)
+// 지도 중심은 잘츠부르크 기준, 빈은 멀어서 도시간 이동선만 점선으로
+const map = L.map('map', {zoomControl:false, tap:true}).setView([47.820, 13.046], 14);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:19
+}).addTo(map);
+L.control.zoom({position:'topright'}).addTo(map);
+
+const BLUE='#7B9BB8', GREEN='#82A88F', PURPLE='#9B8DB8', ORANGE='#C4956A', NAVY='#6B7FA8';
+
+// 잘츠부르크 중심 포인트만 (빈 포인트는 너무 멀어 지도에서 생략)
+const LL = {
+  salzburg_hbf: [47.8126, 13.0451],
+  villa_elisa:  [47.8158, 13.0474],
+  eurospar:     [47.8130, 13.0420],
+  mirabell:     [47.8047, 13.0436],
+  kapitelplatz: [47.7992, 13.0478],
+};
+
+// 빈 포인트 (지도 범위 밖 — flyToPin용으로만 사용, fitBounds 제외)
+const LL_WIEN = {
+  adina:      [48.1879, 16.3707],
+  sacher:     [48.2032, 16.3694],
+  wien_hbf:   [48.1851, 16.3759],
+};
+
+const MK = {};
+
+function calcArrowAngle(from, to) {
+  const p1 = map.latLngToContainerPoint(L.latLng(from));
+  const p2 = map.latLngToContainerPoint(L.latLng(to));
+  return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + 90;
+}
+
+function makeArrowIcon(color, angle) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:22px;height:22px;transform:rotate(${angle}deg);transform-origin:11px 11px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));">
+      <svg width="22" height="22" viewBox="0 0 10 10">
+        <polygon points="5,0 9.5,10 5,7 0.5,10" fill="${color}" opacity="1"/>
+      </svg></div>`,
+    iconSize: [22, 22], iconAnchor: [11, 11]
+  });
+}
+
+function addLine(from, to, color, dash) {
+  if (!LL[from] || !LL[to]) return null;
+  const line = L.polyline([LL[from], LL[to]], {
+    color, weight:3.5, opacity:.78, dashArray:dash?'6,5':null, lineCap:'round'
+  }).addTo(map);
+  const angle = calcArrowAngle(LL[from], LL[to]);
+  const arrow = L.marker(LL[to], {
+    icon: makeArrowIcon(color, angle),
+    interactive: false, zIndexOffset: -10
+  }).addTo(map);
+  line._arrow = arrow;
+  return line;
+}
+
+const _baseLines = [];
+
+function refreshArrows() {
+  _baseLines.forEach(l => {
+    if (!l || !l._from || !l._to || !l._arrow) return;
+    const angle = calcArrowAngle(l._from, l._to);
+    l._arrow.setIcon(makeArrowIcon(l._color, angle));
+  });
+}
+map.on('zoomend moveend', refreshArrows);
+
+function addTrackedLine(from, to, color, dash) {
+  const l = addLine(from, to, color, dash);
+  if (l && LL[from] && LL[to]) {
+    l._from = LL[from]; l._to = LL[to]; l._color = color;
+  }
+  return l;
+}
+
+function mkDropPin(num, color, label) {
+  const hasLabel = label && label.length > 0;
+  const totalW = hasLabel ? Math.min(220, label.length * 9 + 56) : 30;
+  return L.divIcon({
+    className: '',
+    html: `<div style="position:relative;display:flex;align-items:flex-start;gap:6px;width:${totalW}px;">
+      <div style="position:relative;width:30px;height:38px;flex-shrink:0;">
+        <div style="width:30px;height:30px;background:${color};border:2.5px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(0,0,0,.22);position:absolute;top:0;left:0;"></div>
+        <div style="position:absolute;top:4px;left:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white;font-family:'Noto Sans KR',sans-serif;z-index:2;">${num}</div>
+      </div>
+      ${hasLabel ? `<div style="margin-top:3px;background:white;border:1.5px solid #D8D2CA;border-radius:6px;padding:4px 9px;font-size:11.5px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:#1E1C1A;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.1);line-height:1.3;">${label}</div>` : ''}
+    </div>`,
+    iconSize: [totalW, 38], iconAnchor: [15, 38], popupAnchor: [0, -40]
+  });
+}
+
+// 잘츠부르크 포인트만 핀 표시
+const FIXED = [
+  {k:'salzburg_hbf', num:'⑤', c:NAVY,   tip:'잘츠부르크 중앙역'},
+  {k:'villa_elisa',  num:'⑥', c:PURPLE, tip:'빌라 엘리사'},
+  {k:'eurospar',     num:'⑦', c:GREEN,  tip:'EUROSPAR'},
+  {k:'mirabell',     num:'⑧', c:BLUE,   tip:'미라벨 정원'},
+  {k:'kapitelplatz', num:'⑨', c:BLUE,   tip:'카피텔 광장'},
+];
+FIXED.forEach(p => { MK[p.k] = L.marker(LL[p.k], {icon: mkDropPin(p.num, p.c, p.tip)}).addTo(map); });
+
+const _boundsLL = Object.values(LL);
+map.fitBounds(_boundsLL, {padding:[48,48]});
+
+map.whenReady(() => {
+  setTimeout(() => {
+    map.invalidateSize();
+    map.fitBounds(_boundsLL, {padding:[48,48]});
+    // 잘츠부르크 내 이동선
+    const l1 = addTrackedLine('salzburg_hbf', 'villa_elisa', ORANGE, false);
+    const l2 = addTrackedLine('villa_elisa', 'eurospar', ORANGE, false);
+    const l3 = addTrackedLine('villa_elisa', 'mirabell', ORANGE, false);
+    const l4 = addTrackedLine('mirabell', 'kapitelplatz', ORANGE, false);
+    const l5 = addTrackedLine('kapitelplatz', 'villa_elisa', NAVY, true);
+    [l1,l2,l3,l4,l5].forEach(l => { if(l) _baseLines.push(l); });
+  }, 120);
+});
+
+setTimeout(() => {
+  map.invalidateSize();
+  map.fitBounds(_boundsLL, {padding:[48,48]});
+}, 100);
+window.addEventListener('load', () => {
+  setTimeout(() => map.invalidateSize(), 200);
+});
+
+function flyToPin(el) {
+  const key = el.dataset.mapKey;
+  if (!key) return;
+  const body = el.querySelector('.tl-body');
+  if (body) { body.style.background = '#E8F0FA'; setTimeout(() => { body.style.background = ''; }, 600); }
+  // 빈 포인트는 map.setView로 이동
+  if (LL_WIEN[key]) {
+    map.setView(LL_WIEN[key], 14);
+  } else if (LL[key]) {
+    map.panTo(LL[key]);
+  }
+}
+
+const martPins = {};
+function toggleMart(el, key) {
+  const coords = {
+    mart_eurospar: [47.8130, 13.0420],
+    mart_spar:     [47.8100, 13.0450],
+  };
+  const labels = { mart_eurospar:'EUROSPAR', mart_spar:'SPAR' };
+  if (martPins[key]) {
+    try { map.removeLayer(martPins[key]); } catch(e) {}
+    delete martPins[key];
+    el.classList.remove('on-map');
+  } else {
+    martPins[key] = L.marker(coords[key] || LL.villa_elisa, {icon: mkDropPin('🛒', ORANGE, labels[key])}).addTo(map);
+    el.classList.add('on-map');
+    map.panTo(coords[key] || LL.villa_elisa);
+  }
+}
+
+function toggleTTC() {
+  const body = document.getElementById('ttc-body');
+  const chev = document.getElementById('ttc-chevron');
+  const isOpen = body.style.display === 'block';
+  if (isOpen) { body.style.display = 'none'; chev.style.transform = 'rotate(-90deg)'; }
+  else { body.style.display = 'block'; chev.style.transform = ''; }
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const target = document.getElementById('tab-' + name);
+  target.classList.add('active');
+  target.scrollTop = 0;
+  void target.offsetHeight;
+  setTimeout(() => map.invalidateSize(), 50);
+}
+function switchSub(id, el, group) {
+  document.getElementById('tab-' + group).querySelectorAll('.subtab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + group).querySelectorAll('.subcontent').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// 날씨 (7/28 잘츠부르크)
+(async () => {
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.811&longitude=13.033&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FVienna&forecast_days=16');
+    const d = await r.json();
+    const idx = d.daily.time.indexOf('2026-07-28');
+    if (idx < 0) throw new Error();
+    const wc = d.daily.weather_code[idx];
+    const mx = Math.round(d.daily.temperature_2m_max[idx]);
+    const mn = Math.round(d.daily.temperature_2m_min[idx]);
+    const rise = d.daily.sunrise[idx].slice(11, 16);
+    const set = d.daily.sunset[idx].slice(11, 16);
+    const icons = {0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',61:'🌧',80:'🌦',95:'⛈'};
+    const wx = {0:'맑음',1:'대체로 맑음',2:'구름 조금',3:'흐림',45:'안개',51:'이슬비',61:'비',80:'소나기',95:'뇌우'};
+    document.getElementById('wc-icon').textContent = icons[wc] || '🌤';
+    document.getElementById('wc-wx').textContent = wx[wc] || '맑음';
+    document.getElementById('wc-temp').textContent = `${mn}°~${mx}°C`;
+    document.getElementById('wc-rise').textContent = rise;
+    document.getElementById('wc-set').textContent = set;
+  } catch(e) { document.getElementById('wc-wx').textContent = '날씨 정보 없음'; }
+})();
+
+document.querySelectorAll('.tl-map-icon').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+document.querySelectorAll('.move-card').forEach(el => el.addEventListener('click', e => e.stopPropagation()));
+document.querySelectorAll('.gmap-btn').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+window.addEventListener('resize', () => map.invalidateSize());
+</script>
+</body>
+</html>

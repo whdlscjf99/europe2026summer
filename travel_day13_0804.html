@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>동유럽 여행 — DAY 13 체스키크룸로프→프라하</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p-blue:#7B9BB8;--p-green:#82A88F;--p-purple:#9B8DB8;
+  --p-orange:#C4956A;--p-navy:#6B7FA8;
+  --bg:#F6F4F1;--surface:#FFFFFF;--border:#E8E4DE;
+  --text:#1E1C1A;--muted:#5A5550;--soft:#888078;
+  --radius-card:12px;--radius-badge:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;color:var(--text);background:var(--bg);}
+.header{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-shrink:0;z-index:1000;}
+.brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;}
+.day-pill{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.day-select{font-family:inherit;font-size:11px;border:1px solid var(--border);border-radius:var(--radius-badge);padding:4px 10px;background:var(--surface);color:var(--text);cursor:pointer;outline:none;}
+.layout{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+#map{flex-shrink:0;height:calc(45vh - 52px);min-height:180px;position:relative;z-index:1;}
+#map .leaflet-tile-pane{filter:saturate(0.45) brightness(0.97) contrast(1.15);}
+.panel{flex:1;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 4px;}
+.tab{flex:1;padding:11px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--soft);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;}
+.tab.active{color:var(--text);border-bottom-color:var(--p-blue);}
+.tab-content{display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;}
+.tab-content.active{display:block;}
+.weather-card{margin:14px 16px 0;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.wc-item{display:flex;align-items:center;gap:7px;}
+.wc-label{font-size:10px;color:#706860;display:block;margin-bottom:1px;}
+.wc-val{font-size:13px;font-weight:500;color:var(--text);}
+/* CK셔틀 교통 카드 */
+.ttc-card{margin:12px 16px 0;background:var(--bg);border:1px solid #C8DAE8;border-radius:var(--radius-card);overflow:hidden;}
+.ttc-header{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#EEF4FA;}
+.ttc-title{font-size:13px;font-weight:700;color:#2A4A6A;display:flex;align-items:center;gap:7px;}
+.ttc-chevron{font-size:12px;color:#2A4A6A;transition:transform .2s;display:inline-block;transform:rotate(-90deg);}
+.ttc-body{display:none;padding:11px 14px 13px;}
+.ttc-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text);line-height:1.6;margin-bottom:6px;}
+.ttc-row:last-child{margin-bottom:0;}
+.tbadge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-badge);white-space:nowrap;flex-shrink:0;margin-top:1px;background:#FFF0E8;color:#9A4010;}
+.ttc-note{font-size:11px;color:#3A6A9A;background:#E8F0FA;border-radius:6px;padding:5px 9px;margin-top:8px;line-height:1.6;}
+/* PID 드로어 */
+.pid-card{margin:10px 16px 0;background:var(--bg);border:1px solid #D8C8E8;border-radius:var(--radius-card);overflow:hidden;}
+.pid-header{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#F4EEF8;}
+.pid-title{font-size:13px;font-weight:700;color:#4A2A7A;display:flex;align-items:center;gap:7px;}
+.pid-chevron{font-size:12px;color:#4A2A7A;transition:transform .2s;display:inline-block;transform:rotate(-90deg);}
+.pid-body{display:none;padding:11px 14px 13px;font-size:12px;color:var(--text);line-height:1.8;}
+.pid-body table{width:100%;border-collapse:collapse;margin-top:6px;font-size:11px;}
+.pid-body td{padding:4px 6px;border:1px solid var(--border);}
+.pid-body td:first-child{font-weight:600;color:var(--muted);white-space:nowrap;}
+.timeline{padding:14px 16px 20px;}
+.tl-item{display:flex;position:relative;cursor:pointer;}
+.tl-axis{display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0;}
+.tl-pin{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;z-index:1;box-shadow:0 2px 8px rgba(0,0,0,.14);}
+.tl-pin.sight{background:var(--p-blue);}
+.tl-pin.food{background:var(--p-green);}
+.tl-pin.stay{background:var(--p-purple);}
+.tl-pin.transit{background:var(--p-navy);}
+.tl-vline{width:1.5px;background:var(--border);flex:1;min-height:12px;}
+.tl-item:last-child .tl-vline{display:none;}
+.tl-body{flex:1;padding:2px 0 20px 12px;}
+.tl-time{font-size:10px;color:var(--soft);letter-spacing:.4px;margin-bottom:3px;}
+.tl-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.35;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tl-map-icon{font-size:13px;opacity:.6;text-decoration:none;flex-shrink:0;}
+.tl-desc{font-size:12px;color:#4A4540;line-height:1.7;margin-bottom:6px;}
+.tl-map-hint{font-size:10px;color:var(--soft);margin-top:2px;margin-bottom:4px;}
+.move-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-card);padding:10px 13px;display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+.move-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text);line-height:1.6;}
+.mbadge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-badge);white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.mbadge.walk{background:#FEF3E2;color:#A06830;}
+.mbadge.transit{background:#E8EEF8;color:#506090;}
+.mbadge.shuttle{background:#E0EAF5;color:#2A4A7A;}
+.tl-meal-filled{background:#F0F8F2;border:1px solid #BFD9C8;border-radius:var(--radius-card);padding:10px 13px;margin-top:6px;display:none;}
+.tl-meal-filled-name{font-size:13px;font-weight:600;color:#3D7A55;margin-bottom:2px;}
+.tl-meal-filled-desc{font-size:11px;color:var(--muted);}
+.info-inline{background:#F4FAF6;border-left:3px solid #82A88F;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#3A6A4A;line-height:1.6;}
+.warn-inline{background:#FFF8E8;border-left:3px solid #C4956A;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;font-size:11px;color:#7A5020;line-height:1.6;}
+.subtabs{display:flex;gap:6px;padding:10px 16px 0;}
+.subtab{font-size:12px;font-weight:500;padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-badge);cursor:pointer;color:var(--muted);background:var(--surface);}
+.subtab.active{background:var(--p-blue);color:#fff;border-color:var(--p-blue);}
+.subcontent{display:none;padding:10px 16px 80px;}
+.subcontent.active{display:block;}
+.sec-lbl{font-size:10px;font-weight:600;letter-spacing:.8px;color:var(--soft);text-transform:uppercase;margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.sec-lbl:first-child{margin-top:4px;}
+.place-card{border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .18s;}
+.place-card.selected{border-color:var(--p-blue);background:#F0F4FA;}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;}
+.card-name{font-size:13px;font-weight:600;line-height:1.4;color:var(--text);}
+.badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.badge.saved{background:#FEF5E8;color:#906030;font-weight:700;}
+.badge.ai{background:#F0EAF8;color:#7050A0;font-weight:700;}
+.badge.verified{background:#E8F5E8;color:#2A6A2A;font-weight:700;}
+.card-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.card-meta-item{font-size:11px;color:var(--muted);}
+.card-desc{font-size:12px;color:#4A4540;line-height:1.65;margin-bottom:6px;}
+.card-memo{font-size:11px;color:#5A7A5A;background:#F4FAF4;border:1px solid #C8DCC8;border-radius:8px;padding:5px 9px;margin-bottom:5px;}
+.card-tip{font-size:11px;color:#906030;background:#FEF5E8;border:1px solid #F0D8B0;border-radius:8px;padding:6px 10px;margin-top:4px;}
+.selected-notice{display:none;font-size:11px;color:#3D7A55;font-weight:600;margin-top:6px;}
+.place-card.selected .selected-notice{display:block;}
+.gmap-btn{display:inline-block;font-size:11px;color:var(--p-blue);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-badge);margin-top:6px;}
+.mart-wrap{padding:14px 16px 80px;}
+.mart-card{border:1px solid var(--border);border-radius:var(--radius-card);padding:13px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .18s;}
+.mart-card.on-map{border-color:var(--p-blue);background:#F0F4FA;}
+.mart-name{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.mart-tag{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.4px;}
+.mart-tag.local{background:#E8F5E8;color:#2A6A2A;}
+.mart-tag.korean{background:#FEF5E8;color:#906030;}
+.mart-hours{font-size:11px;color:#3A7A3A;font-weight:600;margin-bottom:4px;}
+.mart-addr{font-size:11px;color:var(--muted);margin-bottom:5px;}
+.mart-desc{font-size:12px;color:#4A4540;line-height:1.65;}
+.legend{position:fixed;bottom:12px;left:12px;background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:11px;display:flex;flex-direction:column;gap:5px;z-index:500;box-shadow:0 2px 10px rgba(0,0,0,.08);pointer-events:none;}
+.leg-row{display:flex;align-items:center;gap:8px;color:#4A4540;}
+.leg-line{width:22px;height:3px;border-radius:2px;flex-shrink:0;}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.leg-sep{height:1px;background:var(--border);margin:1px 0;}
+@media(min-width:768px){
+  .layout{flex-direction:row;height:100vh;}
+  #map{flex:1;height:100%!important;min-height:unset;}
+  .panel{width:440px;flex:none;border-top:none;border-left:1px solid var(--border);}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="brand">2026 동유럽</span>
+    <span class="day-pill">Day 13 · 체스키크룸로프→프라하</span>
+  </div>
+  <select class="day-select" onchange="if(this.value)location.href=this.value">
+    <option value="travel_day01_0723.html">7/23 부다페스트 도착</option>
+    <option value="travel_day02_0724.html">7/24 부다페스트 전일</option>
+    <option value="travel_day03_0725.html">7/25 부다→빈 이동</option>
+    <option value="travel_day04_0726.html">7/26 빈 쇤브룬+레오폴트</option>
+    <option value="travel_day05_0727.html">7/27 빈 알베르티나+호프부르크</option>
+    <option value="travel_day06_0728.html">7/28 빈→잘츠 이동</option>
+    <option value="travel_day07_0729.html">7/29 잘츠부르크</option>
+    <option value="travel_day08_0730.html">7/30 할슈타트+다흐슈타인</option>
+    <option value="travel_day09_0731.html">7/31 잘츠→바트이슐</option>
+    <option value="travel_day10_0801.html">8/1 바트이슐 전일</option>
+    <option value="travel_day11_0802.html">8/2 바트이슐→CK</option>
+    <option value="travel_day12_0803.html">8/3 체스키크룸로프</option>
+    <option value="" selected>8/4 CK→프라하</option>
+    <option value="travel_day14_0805.html">8/5 프라하 전일</option>
+    <option value="travel_day15_0806.html">8/6 프라하 출발</option>
+  </select>
+</div>
+
+<div class="layout">
+  <div id="map">
+    <div class="legend">
+      <div class="leg-row"><div class="leg-line" style="border-top:2px dashed #7A9ABE;background:none;"></div>셔틀</div>
+      <div class="leg-row"><div class="leg-line" style="background:var(--p-orange);"></div>도보</div>
+      <div class="leg-row"><div class="leg-line" style="background:var(--p-navy);"></div>지하철</div>
+      <div class="leg-sep"></div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-blue)"></div>관광</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-green)"></div>식당</div>
+      <div class="leg-row"><div class="leg-dot" style="background:var(--p-purple)"></div>숙소</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('timeline',this)">📋 일정</div>
+      <div class="tab" onclick="switchTab('lunch',this)">🍽 점심</div>
+      <div class="tab" onclick="switchTab('dinner',this)">🌙 저녁</div>
+      <div class="tab" onclick="switchTab('mart',this)">🛒 마트</div>
+    </div>
+
+    <!-- 일정 탭 -->
+    <div id="tab-timeline" class="tab-content active">
+
+      <div class="weather-card">
+        <div class="wc-item"><span style="font-size:16px;" id="wc-icon">🌤</span><div><span class="wc-label">날씨 (프라하)</span><span class="wc-val" id="wc-wx">로딩 중</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌡</span><div><span class="wc-label">기온</span><span class="wc-val" id="wc-temp">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌅</span><div><span class="wc-label">일출</span><span class="wc-val" id="wc-rise">—</span></div></div>
+        <div class="wc-item"><span style="font-size:16px;">🌇</span><div><span class="wc-label">일몰</span><span class="wc-val" id="wc-set">—</span></div></div>
+      </div>
+
+      <!-- CK셔틀 교통 카드 -->
+      <div class="ttc-card">
+        <div class="ttc-header" onclick="toggleTTC()">
+          <div class="ttc-title">🚐 CK셔틀 — 예약 완료</div>
+          <span class="ttc-chevron" id="ttc-chevron">▾</span>
+        </div>
+        <div class="ttc-body" id="ttc-body">
+          <div class="ttc-row"><span class="tbadge">🚐 셔틀</span>Garnihotel Castle Bridge (Hradební 174, Český Krumlov) → Grand Hotel International (Koulova 1501/15, Praha)</div>
+          <div class="ttc-row" style="font-size:12px;color:var(--muted);">📅 08:35 픽업 · 12:00~12:45 도착 (약 3시간 30분) · 3인 3,600 CZK · 결제 완료</div>
+          <div class="ttc-note">
+            ⚠️ 08:20까지 호텔 로비 대기 · 가르니 호텔 조기 체크아웃 절차 확인 필수<br>
+            🏨 Grand Hotel International 24시간 리셉션 ✅ · 짐 보관 무료 ✅<br>
+            📌 체크인 시간 14:00 vs 15:00 혼재 — 현장 확인 (짐 먼저 맡기고 출발)
+          </div>
+        </div>
+      </div>
+
+      <!-- PID 24h권 드로어 -->
+      <div class="pid-card">
+        <div class="pid-header" onclick="togglePID()">
+          <div class="pid-title">🚇 프라하 PID 교통권</div>
+          <span class="pid-chevron" id="pid-chevron">▾</span>
+        </div>
+        <div class="pid-body" id="pid-body">
+          <div><strong>24시간권 2장</strong> 구매 권장 (오늘 + 내일)</div>
+          <table>
+            <tr><td>현장 가격</td><td>150 CZK/장</td></tr>
+            <tr><td>앱 가격</td><td>140 CZK/장 (PID Lítačka 앱)</td></tr>
+            <tr><td>3인 2장 합계</td><td>현장 900 CZK / 앱 840 CZK</td></tr>
+            <tr><td>유효범위</td><td>지하철·트램·버스 전 노선</td></tr>
+            <tr><td>구매처</td><td>지하철역 자판기 or PID Lítačka 앱</td></tr>
+          </table>
+          <div style="margin-top:8px;font-size:11px;color:#4A2A7A;background:#F4EEF8;border-radius:6px;padding:5px 9px;line-height:1.6;">
+            💡 오늘 도착 후 14:00 활성화 기준 → 내일 14:00까지 유효<br>
+            14:00 이후 이동(레트나 야경~귀숙)에 두 번째 24h권 필요<br>
+            → 오늘 첫 탑승 시 활성화 시간 기억해두기
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline">
+
+        <!-- ① 체스키크룸로프 출발 -->
+        <div class="tl-item" data-map-key="ck_depart" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">①</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">08:35 출발</div>
+            <div class="tl-name">CK셔틀 출발 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Garni+Hotel+Castle+Bridge+Cesky+Krumlov" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">Hradební 174, Český Krumlov · 08:20 로비 대기</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge shuttle">🚐 CK셔틀</span>Hradební 174 → Grand Hotel International · 약 3시간 30분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ② 프라하 도착 + 짐 보관 -->
+        <div class="tl-item" data-map-key="grandhotel" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">②</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">12:00~12:45</div>
+            <div class="tl-name">Grand Hotel International 도착 · 짐 보관 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Grand+Hotel+International+Praha+Dejvice+Dejvická+15" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Koulova 1501/15, Praha 6 · <strong>24시간 리셉션 ✅ · 짐 보관 무료 ✅</strong><br>
+              체크인 14:00~15:00 (혼재, 현장 확인) → 짐 맡기고 바로 출발
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 지하철 C선</span>숙소 근처 Dejvická역 → Vyšehrad역 · 약 20~25분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ 점심 슬롯 -->
+        <div class="tl-item" id="tl-item-lunch" onclick="flyToLunch(this)">
+          <div class="tl-axis"><div class="tl-pin food">③</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">13:00~13:30</div>
+            <div class="tl-name">점심식사 <span style="font-size:11px;font-weight:400;color:var(--soft);">— 점심 탭에서 선택</span></div>
+            <div class="tl-map-hint">🗺 점심 탭에서 선택 후 지도에 반영</div>
+            <div class="tl-desc">숙소 근처 (Dejvice) · 이동 전 간단히 해결 · 비셰흐라드 전 완료 목표</div>
+            <div id="tl-lunch-filled" class="tl-meal-filled">
+              <div class="tl-meal-filled-name" id="tl-lunch-filled-name"></div>
+              <div class="tl-meal-filled-desc" id="tl-lunch-filled-desc"></div>
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 지하철 A→C 환승</span>Dejvická → Vyšehrad · 약 25분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 비셰흐라드 -->
+        <div class="tl-item" data-map-key="vysehrad" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">④</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">14:00~16:00</div>
+            <div class="tl-name">비셰흐라드 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJoUyFZ3mUC0cRsNmEJjNRiMc" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              C선 Vyšehrad역 하차 도보 9분 · 공원 24시간 무료<br>
+              <strong>성 베드로·바울 성당:</strong> 10:00~18:00 · 130 CZK/인<br>
+              <strong>카세메이트+고를리체:</strong> 150 CZK/인 · 가이드 투어 매시 정각(약 1시간) — <span style="color:#C04040;">현장 결정</span><br>
+              묘지: 드보르작·스메타나 등 체코 위인 안장
+            </div>
+            <div class="warn-inline">⚠️ 카세메이트 투어 참가 시 14:00 정각 투어 맞춰야 함 — 지하철 지연 고려, 14:00 이후 도착 시 15:00 투어로 조정</div>
+            <div class="info-inline">💡 이동일 피로 고려 → 성당+묘지+성벽 뷰로 충분 · 카세메이트는 체력 여유 있을 때</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 트램</span>Vyšehrad → 구시가지 (트램 환승) · 약 20~25분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 구시가지 광장 + 천문시계탑 -->
+        <div class="tl-item" data-map-key="oldtown" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">⑤</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">16:30~18:30</div>
+            <div class="tl-name">구시가지 광장 + 천문시계탑 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJ19UTj3OUC0cRQ3VdEPCGWGQ" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Staroměstské náměstí · <strong>천문시계탑(Orloj):</strong> 화~일 09:00~20:00 (월 11:00~20:00)<br>
+              <strong>입장료 현장 350 CZK</strong> (엑셀 220 CZK는 구가격 — 수정 완료)<br>
+              얼리버드 50% 할인(175 CZK): 오전 첫 1시간 현장만 → 오늘은 해당 없음<br>
+              엘리베이터 +100 CZK 현장 결정 · 사도 행렬 쇼 매시 정각 (약 45초)
+            </div>
+            <div class="info-inline">💡 매시 정각 사도 행렬 쇼 꼭 보기 · 탑 올라가면 구시가지 전경 · 틴 성당(외관) 광장에서 감상</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 트램</span>구시가지 → 저녁 식당 · 이동 탭 참조</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ 저녁 슬롯 -->
+        <div class="tl-item" id="tl-item-dinner" onclick="flyToDinner(this)">
+          <div class="tl-axis"><div class="tl-pin food">⑥</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">19:00~20:30</div>
+            <div class="tl-name">저녁식사 <span style="font-size:11px;font-weight:400;color:var(--soft);">— 저녁 탭에서 선택</span></div>
+            <div class="tl-map-hint">🗺 저녁 탭에서 선택 후 지도에 반영</div>
+            <div class="tl-desc">구시가지 또는 레트나 방향 · 레트나 공원 전 식사 완료</div>
+            <div id="tl-dinner-filled" class="tl-meal-filled">
+              <div class="tl-meal-filled-name" id="tl-dinner-filled-name"></div>
+              <div class="tl-meal-filled-desc" id="tl-dinner-filled-desc"></div>
+            </div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 트램 1·8·25·26번</span>→ Letenské náměstí · 레트나 공원 도보 5분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑦ 레트나 공원 야경 -->
+        <div class="tl-item" data-map-key="letna" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin sight">⑦</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">21:00~22:00</div>
+            <div class="tl-name">레트나 공원 야경 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJTw6e6GiUC0cRa1-pHjYlmqQ" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">
+              Letenské sady · 무료 · 24시간 개방<br>
+              <strong>8/4 일몰 약 20:30</strong> — 21:00 이후 블타바강 + 다리 5개 겹쳐 보이는 야경 최적<br>
+              트램 1·8·25·26번 → Letenské náměstí 하차 → 도보 5분
+            </div>
+            <div class="info-inline">💡 야경 후 숙소 복귀: 트램 직행 15~20분 · 야간 운행 ✅</div>
+            <div class="move-card">
+              <div class="move-row"><span class="mbadge transit">🚇 트램</span>Letenské náměstí → Podbaba (숙소 앞) · 15~20분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑧ 숙소 복귀 체크인 -->
+        <div class="tl-item" data-map-key="grandhotel" onclick="flyToPin(this)">
+          <div class="tl-axis"><div class="tl-pin stay">⑧</div><div class="tl-vline"></div></div>
+          <div class="tl-body">
+            <div class="tl-time">22:20</div>
+            <div class="tl-name">Grand Hotel International 복귀 + 체크인 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Grand+Hotel+International+Praha+Dejvice+Dejvická+15" target="_blank">📍</a></div>
+            <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
+            <div class="tl-desc">Koulova 1501/15 · Podbaba 트램 정류장 바로 앞 · 24시간 리셉션 ✅</div>
+            <div class="info-inline">💡 내일 벨레트르주니 궁전 10:00 오픈 — 여유있게 출발 가능 · 충분한 수면 권장</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 점심 탭 -->
+    <div id="tab-lunch" class="tab-content">
+      <div style="margin:14px 16px 0;background:#EEF4FA;border:1px solid #C8DAE8;border-radius:var(--radius-card);padding:11px 14px;font-size:12px;color:#2A4A6A;line-height:1.7;">
+        📍 Grand Hotel 근처 (Dejvice) · 이동 전 간단히 · 13:30 비셰흐라드 출발 목표
+      </div>
+
+      <div class="subtabs">
+        <div class="subtab active" onclick="switchSub('sub-lunch-local',this,'lunch')">🍴 현지식</div>
+        <div class="subtab" onclick="switchSub('sub-lunch-korean',this,'lunch')">🥢 아시안</div>
+      </div>
+
+      <div id="sub-lunch-local" class="subcontent active">
+        <div class="sec-lbl">💡 숙소 근처 (Dejvice)</div>
+
+        <div class="place-card" id="lc-lt" onclick="selectLunch(this,'lt')">
+          <div class="card-header">
+            <div class="card-name">LT Café</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.4</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 숙소 근처 · Dejvice</span>
+            <span class="card-meta-item">⏰ 08:00~21:00</span>
+          </div>
+          <div class="card-desc">카페·식사 · 숙소 근처 1순위 · 빠르게 해결하기 좋음</div>
+          <div class="card-memo">💬 "숙소 근처1" (저장 메모)</div>
+          <div class="card-tip">💡 이동일 오전 셔틀 후 빠른 점심 · 13:30 출발 맞추기 좋음</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=LT+Cafe+Praha+Dejvice" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-pizzamat" onclick="selectLunch(this,'pizzamat')">
+          <div class="card-header">
+            <div class="card-name">Pizzamat Dejvice</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.1</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Dejvice · 숙소 도보권</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+          </div>
+          <div class="card-desc">피자 · 든든하게 · 이동 피로 후 탄수화물 보충</div>
+          <div class="card-memo">💬 "먹을만한곳" (저장 메모)</div>
+          <div class="card-tip">💡 빠르고 든든한 점심 · 비셰흐라드 도보 전 에너지 충전</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Pizzamat+Praha+Dejvice" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-dejvice" onclick="selectLunch(this,'dejvice')">
+          <div class="card-header">
+            <div class="card-name">Dejvické Theater Cafe</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Dejvická 광장 · 숙소 도보 10분</span>
+            <span class="card-meta-item">⏰ 09:00~22:00</span>
+          </div>
+          <div class="card-desc">카페·브런치 스타일 · Dejvická 광장 · 여유있게 앉아서 먹을 수 있음</div>
+          <div class="card-memo">💬 "갈만한곳2" (저장 메모)</div>
+          <div class="card-tip">💡 체코 현지 카페 분위기 · 브런치+커피로 이동 피로 회복</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Dejvicke+Theater+Cafe+Praha" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div>
+
+      <div id="sub-lunch-korean" class="subcontent">
+        <div class="sec-lbl">🥢 아시안 (숙소 근처)</div>
+
+        <div class="place-card" id="lc-chicken" onclick="selectLunch(this,'chicken')">
+          <div class="card-header">
+            <div class="card-name">CHICKEN KRUSH</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.5</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 프라하 중심부 (구시가지 방향)</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+          </div>
+          <div class="card-desc">한국식 치킨 · 프라하 한국 음식 대표 · 한식 그리울 때 최선</div>
+          <div class="card-tip">💡 숙소에서 다소 거리 있음 · 구시가지 이동 후 점심으로 맞추면 동선 효율 · 저녁에 더 추천</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Chicken+Krush+Praha+Korunní" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 저녁 탭 -->
+    <div id="tab-dinner" class="tab-content">
+      <div style="margin:14px 16px 0;background:#EEF4FA;border:1px solid #C8DAE8;border-radius:var(--radius-card);padding:11px 14px;font-size:12px;color:#2A4A6A;line-height:1.7;">
+        📍 구시가지 또는 레트나 방향 · 레트나 야경(21:00) 전 완료
+      </div>
+
+      <div class="subtabs">
+        <div class="subtab active" onclick="switchSub('sub-dinner-local',this,'dinner')">🍴 현지식</div>
+        <div class="subtab" onclick="switchSub('sub-dinner-korean',this,'dinner')">🥢 한식</div>
+      </div>
+
+      <div id="sub-dinner-local" class="subcontent active">
+        <div class="sec-lbl">💡 AI 추천 (구시가지)</div>
+
+        <div class="place-card" id="dc-nasemaso" onclick="selectDinner(this,'nasemaso')">
+          <div class="card-header">
+            <div class="card-name">Naše Maso</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.6</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Dlouhá 727/39 · 구시가지 도보 5분</span>
+            <span class="card-meta-item">⏰ 10:00~21:00</span>
+          </div>
+          <div class="card-desc">비프 타르타르·수제 버거 · 프라하 최고 정육 레스토랑 · 현지인 단골</div>
+          <div class="card-memo">💬 "비프타르타르/버거" (저장 메모)</div>
+          <div class="card-tip">💡 프라하 첫 저녁으로 강력 추천 · 줄 서는 경우 있음 — 19:00 이전 도착 권장 · 카드 결제 가능</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Nase+Maso+Praha+Dlouhá+39" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-restart" onclick="selectDinner(this,'restart')">
+          <div class="card-header">
+            <div class="card-name">Restart Pub</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 구시가지 · 바 겸 레스토랑</span>
+            <span class="card-meta-item">⏰ 15:00~02:00</span>
+          </div>
+          <div class="card-desc">체코 맥주 + 식사 · 한국인 많이 찾는 바 · 가볍게 저녁+맥주 한잔</div>
+          <div class="card-memo">💬 "한지인 많이 가는 바" (저장 메모)</div>
+          <div class="card-tip">💡 저녁식사+레트나 야경 전 맥주 한잔 · 늦게 열어서 18:00 이후 방문 · 야경 후 2차도 가능</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Restart+Pub+Praha" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-lokál" onclick="selectDinner(this,'lokal')">
+          <div class="card-header">
+            <div class="card-name">Lokál Dlouhááá</div>
+            <div class="badges"><span class="badge ai">💡 추천</span><span class="badge verified">⭐ 4.5</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Dlouhá 33 · 구시가지 도보 5분</span>
+            <span class="card-meta-item">⏰ 11:00~01:00</span>
+          </div>
+          <div class="card-desc">체코 전통 요리 + 필스너 우르켈 · 탱크 직송 생맥주 · 프라하 현지 분위기 대표</div>
+          <div class="card-tip">💡 체코 마지막 전통 저녁으로 적합 · 성수기 예약 권장 · Naše Maso와 같은 거리 — 동선 묶기 가능</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Lokal+Dlouhaaa+Praha+Dlouhá+33" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div>
+
+      <div id="sub-dinner-korean" class="subcontent">
+        <div class="sec-lbl">💾 저장된 곳 (한식)</div>
+
+        <div class="place-card" id="dc-chicken" onclick="selectDinner(this,'chicken_d')">
+          <div class="card-header">
+            <div class="card-name">CHICKEN KRUSH</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.5</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 프라하 중심부</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+          </div>
+          <div class="card-desc">한국식 치킨 · 프라하 한국 음식 중 가장 접근하기 쉬운 선택</div>
+          <div class="card-tip">💡 레트나 가기 전 구시가지 방향에서 저녁 해결 · 한식 그리울 때</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Chicken+Krush+Praha+Korunní" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="dc-pocha" onclick="selectDinner(this,'pocha')">
+          <div class="card-header">
+            <div class="card-name">POCHA</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.4</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 프라하 중심부</span>
+            <span class="card-meta-item">⏰ 17:00~23:00</span>
+          </div>
+          <div class="card-desc">한국 포차 스타일 · 삼겹살·치킨·소주 · 프라하 한인 핫플</div>
+          <div class="card-tip">💡 17:00 오픈 · 레트나 야경 전 저녁으로 동선 고려 필요 · 구시가지보다 레트나 방향에 가까운지 확인 후 선택</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Pocha+Korean+Bar+Praha" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 마트 탭 -->
+    <div id="tab-mart" class="tab-content">
+      <div class="mart-wrap">
+        <div style="background:#EEF4FA;border:1px solid #C8DAE8;border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:#2A4A6A;line-height:1.7;">
+          🛒 <strong>Kaufland 숙소 근처</strong> — 프라하 2박 식재료·간식 여기서 해결
+        </div>
+
+        <div class="sec-lbl">🏪 프라하 마트</div>
+
+        <div class="mart-card" onclick="toggleMart(this,'kaufland')">
+          <div class="mart-name">Kaufland <span class="mart-tag local">현지마트</span></div>
+          <div class="mart-hours">🕐 월~일 07:00~22:00</div>
+          <div class="mart-addr">📍 숙소 근처 · Grand Hotel International 도보권</div>
+          <div class="mart-desc">대형 마트 · 식재료·음료·간식·세면용품 · 프라하 입성 첫날 필요 물품 구입</div>
+          <div class="card-memo">💬 "숙소 근처 마켓" (저장 메모)</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Kaufland+Praha+Dejvice+Evropská" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="sec-lbl">🌏 한인마트 / 한식당</div>
+
+        <div class="mart-card">
+          <div class="mart-name">CHICKEN KRUSH <span class="mart-tag korean">한식</span></div>
+          <div class="mart-hours">🕐 11:00~22:00</div>
+          <div class="mart-addr">📍 프라하 중심부</div>
+          <div class="mart-desc">한국식 치킨 · 저녁 탭에도 있음 · 한식 첫 번째 선택</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Chicken+Krush+Praha+Korunní" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="mart-card">
+          <div class="mart-name">POCHA <span class="mart-tag korean">한식</span></div>
+          <div class="mart-hours">🕐 17:00~23:00</div>
+          <div class="mart-addr">📍 프라하 중심부</div>
+          <div class="mart-desc">포차 스타일 · 삼겹살·소주 · 저녁 탭에도 있음</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Pocha+Korean+Bar+Praha" target="_blank">📍 구글지도</a>
+        </div>
+
+        <div class="sec-lbl">📋 내일 체크리스트 (14일차)</div>
+        <div style="border:1px solid var(--border);border-radius:var(--radius-card);padding:12px 14px;font-size:12px;color:#4A4540;line-height:2.0;">
+          내일 8/5(수) — 벨레트르주니 궁전 10:00 오픈<br>
+          ☐ 스트라호프 양조장 예약 확인 (klasterni-pivovar.cz, 성수기 만석)<br>
+          ☐ 프라하 성 티켓 확인 (Main Circuit 450 CZK/인, 온라인 구매 권장)<br>
+          ☐ PID 교통권 첫 탑승 시간 기억 → 14:00 이후 두 번째 24h권 필요<br>
+          ☐ 귀국 비행 16:10 → 공항 13:40 도착 필요 (14일차 체크아웃 후 공항 이동)
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// 이동일 — 두 도시 포함 fitBounds
+const map = L.map('map', {zoomControl:false, tap:true}).setView([49.5, 14.35], 8);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:19
+}).addTo(map);
+L.control.zoom({position:'topright'}).addTo(map);
+
+const BLUE='#7B9BB8', GREEN='#82A88F', PURPLE='#9B8DB8', ORANGE='#C4956A', NAVY='#6B7FA8', SHUTTLE='#7A9ABE';
+
+const LL = {
+  ck_depart:  [48.8125, 14.3198],  // 가르니 호텔 (체스키)
+  grandhotel: [50.1031, 14.3876],  // Grand Hotel International
+  vysehrad:   [50.0648, 14.4195],  // 비셰흐라드
+  oldtown:    [50.0870, 14.4213],  // 구시가지/천문시계
+  letna:      [50.0980, 14.4106],  // 레트나 공원
+  // 점심
+  lt:         [50.1025, 14.3880],
+  pizzamat:   [50.1020, 14.3890],
+  dejvice:    [50.1010, 14.3900],
+  chicken:    [50.0870, 14.4200],
+  // 저녁
+  nasemaso:   [50.0906, 14.4247],
+  restart:    [50.0880, 14.4230],
+  lokal:      [50.0907, 14.4250],
+  chicken_d:  [50.0870, 14.4200],
+  pocha:      [50.0880, 14.4210],
+};
+
+const MK = {};
+
+function calcArrowAngle(from, to) {
+  const p1 = map.latLngToContainerPoint(L.latLng(from));
+  const p2 = map.latLngToContainerPoint(L.latLng(to));
+  return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + 90;
+}
+function makeArrowIcon(color, angle) {
+  return L.divIcon({className:'',html:`<div style="width:22px;height:22px;transform:rotate(${angle}deg);transform-origin:11px 11px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));"><svg width="22" height="22" viewBox="0 0 10 10"><polygon points="5,0 9.5,10 5,7 0.5,10" fill="${color}" opacity="1"/></svg></div>`,iconSize:[22,22],iconAnchor:[11,11]});
+}
+function addLine(from, to, color, dash) {
+  if(!LL[from]||!LL[to])return null;
+  const line=L.polyline([LL[from],LL[to]],{color,weight:3.5,opacity:.78,dashArray:dash?'6,5':null,lineCap:'round'}).addTo(map);
+  const arrow=L.marker(LL[to],{icon:makeArrowIcon(color,calcArrowAngle(LL[from],LL[to])),interactive:false,zIndexOffset:-10}).addTo(map);
+  line._arrow=arrow;
+  return line;
+}
+const _baseLines=[], lunchLines=[], dinnerLines=[];
+function _allLines(){return _baseLines.concat(lunchLines,dinnerLines);}
+function refreshArrows(){_allLines().forEach(l=>{if(!l||!l._from||!l._to||!l._arrow)return;l._arrow.setIcon(makeArrowIcon(l._color,calcArrowAngle(l._from,l._to)));});}
+map.on('zoomend moveend',refreshArrows);
+function addTrackedLine(from,to,color,dash){const l=addLine(from,to,color,dash);if(l&&LL[from]&&LL[to]){l._from=LL[from];l._to=LL[to];l._color=color;}return l;}
+
+function mkDropPin(num,color,label){
+  const hasLabel=label&&label.length>0;
+  const totalW=hasLabel?Math.min(220,label.length*9+56):30;
+  return L.divIcon({className:'',html:`<div style="position:relative;display:flex;align-items:flex-start;gap:6px;width:${totalW}px;"><div style="position:relative;width:30px;height:38px;flex-shrink:0;"><div style="width:30px;height:30px;background:${color};border:2.5px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(0,0,0,.22);position:absolute;top:0;left:0;"></div><div style="position:absolute;top:4px;left:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white;font-family:'Noto Sans KR',sans-serif;z-index:2;">${num}</div></div>${hasLabel?`<div style="margin-top:3px;background:white;border:1.5px solid #D8D2CA;border-radius:6px;padding:4px 9px;font-size:11.5px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:#1E1C1A;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.1);line-height:1.3;">${label}</div>`:''}</div>`,iconSize:[totalW,38],iconAnchor:[15,38]});
+}
+function mkTransitPin(emoji, label) {
+  return L.divIcon({className:'',html:`<div style="display:flex;align-items:flex-start;gap:6px;"><div style="width:30px;height:30px;background:${SHUTTLE};border:2px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">${emoji}</div><div style="margin-top:3px;background:white;border:1.5px solid #C8DAE8;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:#1E1C1A;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.1);">${label}</div></div>`,iconSize:[200,32],iconAnchor:[15,15]});
+}
+
+// 비셰흐라드 교통 거점 핀
+MK['metro_vysehrad'] = L.marker([50.0648,14.4195],{icon:mkTransitPin('🚇','Vyšehrad역 (C선)')}).addTo(map);
+
+const FIXED=[
+  {k:'ck_depart',  num:'①',c:PURPLE, tip:'가르니 호텔 (CK)'},
+  {k:'grandhotel', num:'②',c:PURPLE, tip:'Grand Hotel'},
+  {k:'vysehrad',   num:'④',c:BLUE,   tip:'비셰흐라드'},
+  {k:'oldtown',    num:'⑤',c:BLUE,   tip:'구시가지/천문시계'},
+  {k:'letna',      num:'⑦',c:BLUE,   tip:'레트나 공원'},
+];
+FIXED.forEach(p=>{MK[p.k]=L.marker(LL[p.k],{icon:mkDropPin(p.num,p.c,p.tip)}).addTo(map);});
+
+const _boundsLL=[LL.ck_depart, LL.grandhotel, LL.vysehrad, LL.oldtown, LL.letna];
+map.fitBounds(_boundsLL,{padding:[48,48]});
+
+let _lineGrandToVysehrad, _lineOldtownToDinner;
+
+map.whenReady(()=>{
+  setTimeout(()=>{
+    map.invalidateSize();
+    map.fitBounds(_boundsLL,{padding:[48,48]});
+    // 셔틀 점선 (두 도시 간)
+    _baseLines.push(addTrackedLine('ck_depart','grandhotel',SHUTTLE,true));
+    // 프라하 내 동선 (점심 슬롯 통과: grandhotel→vysehrad)
+    _lineGrandToVysehrad = addTrackedLine('grandhotel','vysehrad',NAVY,false);
+    if(_lineGrandToVysehrad) _baseLines.push(_lineGrandToVysehrad);
+    _baseLines.push(addTrackedLine('vysehrad','oldtown',NAVY,false));
+    // 저녁 슬롯 통과: oldtown→letna
+    _lineOldtownToDinner = addTrackedLine('oldtown','letna',NAVY,false);
+    if(_lineOldtownToDinner) _baseLines.push(_lineOldtownToDinner);
+    _baseLines.push(addTrackedLine('letna','grandhotel',NAVY,false));
+  },120);
+});
+setTimeout(()=>{map.invalidateSize();map.fitBounds(_boundsLL,{padding:[48,48]});},100);
+window.addEventListener('load',()=>{setTimeout(()=>map.invalidateSize(),200);});
+
+const LUNCH_DATA={
+  lt:       {name:'LT Café',              desc:'카페·식사 · 숙소 근처 · 빠르게 해결'},
+  pizzamat: {name:'Pizzamat Dejvice',     desc:'피자 · 든든하게 · Dejvice'},
+  dejvice:  {name:'Dejvické Theater Cafe',desc:'카페·브런치 · Dejvická 광장'},
+  chicken:  {name:'CHICKEN KRUSH',        desc:'한국식 치킨 · 구시가지 방향'},
+};
+let selLunch=null;
+
+const DINNER_DATA={
+  nasemaso:  {name:'Naše Maso',       desc:'비프 타르타르·버거 · 구시가지 · Dlouhá 39'},
+  restart:   {name:'Restart Pub',     desc:'체코 맥주+식사 · 구시가지'},
+  lokal:     {name:'Lokál Dlouhááá',  desc:'체코 전통+필스너 · 구시가지 · Dlouhá 33'},
+  chicken_d: {name:'CHICKEN KRUSH',   desc:'한국식 치킨 · 구시가지 방향'},
+  pocha:     {name:'POCHA',           desc:'포차 · 삼겹살·소주 · 17:00~'},
+};
+let selDinner=null;
+
+function _clearLines(arr){arr.forEach(l=>{if(!l)return;try{map.removeLayer(l);}catch(e){}if(l._arrow){try{map.removeLayer(l._arrow);}catch(e){}}});arr.length=0;}
+function _removePin(key){if(MK[key]){try{map.removeLayer(MK[key]);}catch(e){}delete MK[key];}}
+
+function selectLunch(el,key){
+  document.querySelectorAll('#tab-lunch .place-card').forEach(c=>c.classList.remove('selected'));
+  _clearLines(lunchLines);_removePin('r_lunch');
+  if(_lineGrandToVysehrad){_lineGrandToVysehrad.setStyle({opacity:.78});if(_lineGrandToVysehrad._arrow)_lineGrandToVysehrad._arrow.setOpacity(.78);}
+  if(selLunch===key){selLunch=null;document.getElementById('tl-lunch-filled').style.display='none';return;}
+  el.classList.add('selected');selLunch=key;
+  const d=LUNCH_DATA[key];
+  if(_lineGrandToVysehrad){_lineGrandToVysehrad.setStyle({opacity:0});if(_lineGrandToVysehrad._arrow)_lineGrandToVysehrad._arrow.setOpacity(0);}
+  MK['r_lunch']=L.marker(LL[key]||LL.grandhotel,{icon:mkDropPin('③',GREEN,d.name)}).addTo(map);
+  lunchLines.push(addTrackedLine('grandhotel',key,ORANGE,false));
+  lunchLines.push(addTrackedLine(key,'vysehrad',NAVY,false));
+  document.getElementById('tl-lunch-filled').style.display='block';
+  document.getElementById('tl-lunch-filled-name').textContent='🍽 점심 식사';
+  document.getElementById('tl-lunch-filled-desc').textContent=d.name+' · '+d.desc;
+  map.panTo(LL[key]||LL.grandhotel);
+}
+
+function selectDinner(el,key){
+  document.querySelectorAll('#tab-dinner .place-card').forEach(c=>c.classList.remove('selected'));
+  _clearLines(dinnerLines);_removePin('r_dinner');
+  if(_lineOldtownToDinner){_lineOldtownToDinner.setStyle({opacity:.78});if(_lineOldtownToDinner._arrow)_lineOldtownToDinner._arrow.setOpacity(.78);}
+  if(selDinner===key){selDinner=null;document.getElementById('tl-dinner-filled').style.display='none';return;}
+  el.classList.add('selected');selDinner=key;
+  const d=DINNER_DATA[key];
+  if(_lineOldtownToDinner){_lineOldtownToDinner.setStyle({opacity:0});if(_lineOldtownToDinner._arrow)_lineOldtownToDinner._arrow.setOpacity(0);}
+  MK['r_dinner']=L.marker(LL[key]||LL.oldtown,{icon:mkDropPin('⑥',GREEN,d.name)}).addTo(map);
+  dinnerLines.push(addTrackedLine('oldtown',key,ORANGE,false));
+  dinnerLines.push(addTrackedLine(key,'letna',NAVY,false));
+  document.getElementById('tl-dinner-filled').style.display='block';
+  document.getElementById('tl-dinner-filled-name').textContent='🌙 저녁 식사';
+  document.getElementById('tl-dinner-filled-desc').textContent=d.name+' · '+d.desc;
+  map.panTo(LL[key]||LL.oldtown);
+}
+
+const martPins={};
+function toggleMart(el,key){
+  const coords={kaufland:[50.1035,14.3870]};
+  const labels={kaufland:'Kaufland'};
+  if(martPins[key]){try{map.removeLayer(martPins[key]);}catch(e){}delete martPins[key];el.classList.remove('on-map');}
+  else{martPins[key]=L.marker(coords[key]||LL.grandhotel,{icon:mkDropPin('🛒',ORANGE,labels[key]||'마트')}).addTo(map);el.classList.add('on-map');map.panTo(coords[key]||LL.grandhotel);}
+}
+
+function flyToPin(el){
+  const key=el.dataset.mapKey;if(!key||!LL[key])return;
+  const body=el.querySelector('.tl-body');
+  if(body){body.style.background='#E8F0FA';setTimeout(()=>{body.style.background='';},600);}
+  map.panTo(LL[key]);
+}
+function flyToLunch(el){
+  const body=el.querySelector('.tl-body');
+  if(body){body.style.background='#E8F0FA';setTimeout(()=>{body.style.background='';},600);}
+  if(selLunch&&LL[selLunch]){map.panTo(LL[selLunch]);}else{map.panTo(LL['grandhotel']);}
+}
+function flyToDinner(el){
+  const body=el.querySelector('.tl-body');
+  if(body){body.style.background='#E8F0FA';setTimeout(()=>{body.style.background='';},600);}
+  if(selDinner&&LL[selDinner]){map.panTo(LL[selDinner]);}else{map.panTo(LL['oldtown']);}
+}
+
+function toggleTTC(){
+  const body=document.getElementById('ttc-body');
+  const chev=document.getElementById('ttc-chevron');
+  const isOpen=body.style.display==='block';
+  if(isOpen){body.style.display='none';chev.style.transform='rotate(-90deg)';}
+  else{body.style.display='block';chev.style.transform='';}
+}
+function togglePID(){
+  const body=document.getElementById('pid-body');
+  const chev=document.getElementById('pid-chevron');
+  const isOpen=body.style.display==='block';
+  if(isOpen){body.style.display='none';chev.style.transform='rotate(-90deg)';}
+  else{body.style.display='block';chev.style.transform='';}
+}
+
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const target=document.getElementById('tab-'+name);
+  target.classList.add('active');target.scrollTop=0;
+  void target.offsetHeight;
+  setTimeout(()=>map.invalidateSize(),50);
+}
+function switchSub(id,el,group){
+  document.getElementById('tab-'+group).querySelectorAll('.subtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+group).querySelectorAll('.subcontent').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');document.getElementById(id).classList.add('active');
+}
+
+(async()=>{
+  try{
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=50.075&longitude=14.437&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FPrague&forecast_days=16');
+    const d=await r.json();
+    const idx=d.daily.time.indexOf('2026-08-04');
+    if(idx<0)throw new Error();
+    const wc=d.daily.weather_code[idx];
+    const mx=Math.round(d.daily.temperature_2m_max[idx]);
+    const mn=Math.round(d.daily.temperature_2m_min[idx]);
+    const rise=d.daily.sunrise[idx].slice(11,16);
+    const set=d.daily.sunset[idx].slice(11,16);
+    const icons={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',61:'🌧',80:'🌦',95:'⛈'};
+    const wx={0:'맑음',1:'대체로 맑음',2:'구름 조금',3:'흐림',45:'안개',51:'이슬비',61:'비',80:'소나기',95:'뇌우'};
+    document.getElementById('wc-icon').textContent=icons[wc]||'🌤';
+    document.getElementById('wc-wx').textContent=wx[wc]||'맑음';
+    document.getElementById('wc-temp').textContent=`${mn}°~${mx}°C`;
+    document.getElementById('wc-rise').textContent=rise;
+    document.getElementById('wc-set').textContent=set;
+  }catch(e){document.getElementById('wc-wx').textContent='날씨 정보 없음';}
+})();
+
+document.querySelectorAll('.tl-map-icon').forEach(a=>a.addEventListener('click',e=>e.stopPropagation()));
+document.querySelectorAll('.move-card').forEach(el=>el.addEventListener('click',e=>e.stopPropagation()));
+document.querySelectorAll('.gmap-btn').forEach(a=>a.addEventListener('click',e=>e.stopPropagation()));
+window.addEventListener('resize',()=>map.invalidateSize());
+</script>
+</body>
+</html>
