@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>동유럽 여름 여행 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e8eaf0;
+    --muted: #6b7080;
+    --accent-bu: #4f8ef7;   /* 부다페스트 — 파란 도나우 */
+    --accent-vi: #9b6dff;   /* 빈 — 보라 왕실 */
+    --accent-sa: #f5a623;   /* 잘츠부르크 — 금빛 모차르트 */
+    --accent-ha: #3ecf8e;   /* 잘캄머굿 — 에메랄드 호수 */
+    --accent-ck: #e05c5c;   /* 체스키크룸로프 — 붉은 기와 */
+    --accent-pr: #f7c94f;   /* 프라하 — 황금 첨탑 */
+  }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    padding: 48px 24px 32px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .header-title {
+    font-size: clamp(26px, 6vw, 42px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .header-title span {
+    background: linear-gradient(90deg, #4f8ef7, #9b6dff, #f5a623, #3ecf8e, #e05c5c, #f7c94f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-meta {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ── 도시 섹션 ── */
+  .sections {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .city-block {
+    margin-top: 36px;
+  }
+
+  .city-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 4px;
+    margin-bottom: 10px;
+  }
+  .city-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .city-name {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .city-dates {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ── 카드 그리드 ── */
+  .day-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .day-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .day-card:hover {
+    border-color: var(--accent-color);
+    background: #1f2230;
+  }
+  .day-card:active {
+    background: #252839;
+  }
+
+  .day-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--accent-color);
+    min-width: 36px;
+  }
+  .day-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+  .day-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .day-date {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .day-desc {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .day-arrow {
+    color: var(--muted);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* ── 기타 파일 ── */
+  .extra-block {
+    margin-top: 36px;
+    border-top: 1px solid var(--border);
+    padding-top: 28px;
+  }
+  .extra-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 4px;
+    margin-bottom: 10px;
+  }
+  .extra-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: var(--text);
+    margin-bottom: 6px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .extra-card:hover {
+    border-color: #555;
+    background: #1f2230;
+  }
+  .extra-icon { font-size: 18px; flex-shrink: 0; }
+  .extra-info { flex: 1; }
+  .extra-title { font-size: 13px; font-weight: 600; }
+  .extra-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  @media (max-width: 400px) {
+    .header { padding: 36px 16px 24px; }
+    .day-desc { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">2026 · 15일 동유럽</div>
+  <h1 class="header-title"><span>부다페스트 · 빈 · 잘츠부르크<br>잘캄머굿 · 체스키크룸로프 · 프라하</span></h1>
+  <p class="header-meta">7월 23일 — 8월 6일</p>
+</div>
+
+<div class="sections">
+
+  <!-- 부다페스트 -->
+  <div class="city-block">
+    <div class="city-label">
+      <div class="city-dot" style="background:var(--accent-bu)"></div>
+      <span class="city-name">부다페스트</span>
+      <span class="city-dates">7/23 – 7/25</span>
+    </div>
+    <div class="day-grid">
+      <a class="day-card" style="--accent-color:var(--accent-bu)" href="travel_day01_0723.html">
+        <span class="day-num">DAY 1</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">7월 23일 (목) · 인천 출발 → 부다페스트 도착</div>
+          <div class="day-desc">공항 이동 · 숙소 체크인 · 성 이슈트반 대성당 · 야경 산책</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+      <a class="day-card" style="--accent-color:var(--accent-bu)" href="travel_day02_0724.html">
+        <span class="day-num">DAY 2</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">7월 24일 (금) · 부다페스트 전일</div>
+          <div class="day-desc">어부의 요새 · 마차시 성당 · 겔레르트 언덕 · 루인 바</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 빈 -->
+  <div class="city-block">
+    <div class="city-label">
+      <div class="city-dot" style="background:var(--accent-vi)"></div>
+      <span class="city-name">빈 (Wien)</span>
+      <span class="city-dates">7/25 – 7/28</span>
+    </div>
+    <div class="day-grid">
+      <a class="day-card" style="--accent-color:var(--accent-vi)" href="travel_day03_0725.html">
+        <span class="day-num">DAY 3</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">7월 25일 (토) · 부다페스트 → 빈 이동</div>
+          <div class="day-desc">켈레티역 출발 · 벨베데레 · 슈테판 대성당 · 시청사 야경</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+      <a class="day-card" style="--accent-color:var(--accent-vi)" href="travel_day04_0726.html">
+        <span class="day-num">DAY 4</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">7월 26일 (일) · 빈 전일</div>
+          <div class="day-desc">쇤브룬 궁전 · 레오폴트 미술관 · MQ · 나슈마르크트</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+      <a class="day-card" style="--accent-color:var(--accent-vi)" href="travel_day05_0727.html">
+        <span class="day-num">DAY 5</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">7월 27일 (월) · 빈 전일</div>
+          <div class="day-desc">알베르티나 · 호프부르크 · 카를 성당 · 카페 산책</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 잘츠부르크 -->
+  <div class="city-block">
+    <div class="city-label">
+      <div class="city-dot" style="background:var(--accent-sa)"></div>
+      <span class="city-name">잘츠부르크</span>
+      <span class="city-dates">7/28 – 7/30</span>
+    </div>
+    <div class="day-grid">
+      <a class="day-card" style="--accent-color:var(--accent-sa)" href="travel_day06_0728.html">
+        <span class="day-num">DAY 6</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">7월 28일 (화) · 빈 → 잘츠부르크 이동</div>
+          <div class="day-desc">카페 자허 · 빈 중앙역 출발 · 미라벨 정원 · 카피텔 광장</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+      <a class="day-card" style="--accent-color:var(--accent-sa)" href="travel_day07_0729.html">
+        <span class="day-num">DAY 7</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">7월 29일 (수) · 잘츠부르크 전일</div>
+          <div class="day-desc">헬브룬 트릭분수 · 호엔잘츠부르크 성 · 게트라이데 거리 · 아우구스티너</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 잘캄머굿 -->
+  <div class="city-block">
+    <div class="city-label">
+      <div class="city-dot" style="background:var(--accent-ha)"></div>
+      <span class="city-name">잘캄머굿 (할슈타트·바트이슐)</span>
+      <span class="city-dates">7/30 – 8/1</span>
+    </div>
+    <div class="day-grid">
+      <a class="day-card" style="--accent-color:var(--accent-ha)" href="travel_day08_0730.html">
+        <span class="day-num">DAY 8</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">7월 30일 (목) · 할슈타트 당일치기</div>
+          <div class="day-desc">할슈타트 마을 · 다흐슈타인 5핑거스 케이블카 · 호수 산책</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+      <a class="day-card" style="--accent-color:var(--accent-ha)" href="travel_day09_0731.html">
+        <span class="day-num">DAY 9</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">7월 31일 (금) · 잘츠부르크 → 바트이슐 이동</div>
+          <div class="day-desc">카이저빌라 · 유로데르멘 온천 · The Gallery 체크인</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+      <a class="day-card" style="--accent-color:var(--accent-ha)" href="travel_day10_0801.html">
+        <span class="day-num">DAY 10</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">8월 1일 (토) · 바트이슐 전일</div>
+          <div class="day-desc">캐트린 케이블카 하이킹 · 고사우 호수 산책</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 체스키크룸로프 -->
+  <div class="city-block">
+    <div class="city-label">
+      <div class="city-dot" style="background:var(--accent-ck)"></div>
+      <span class="city-name">체스키크룸로프</span>
+      <span class="city-dates">8/2 – 8/3</span>
+    </div>
+    <div class="day-grid">
+      <a class="day-card" style="--accent-color:var(--accent-ck)" href="travel_day11_0802.html">
+        <span class="day-num">DAY 11</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">8월 2일 (일) · 바트이슐 → 체스키크룸로프 이동</div>
+          <div class="day-desc">에곤 쉴레 아트 센트룸 · 구시가지 · 망토 다리 야경</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+      <a class="day-card" style="--accent-color:var(--accent-ck)" href="travel_day12_0803.html">
+        <span class="day-num">DAY 12</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">8월 3일 (월) · 체스키크룸로프 전일</div>
+          <div class="day-desc">체스키크룸로프 성 · 자메츠카 정원 · 블타바 강변 산책</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 프라하 -->
+  <div class="city-block">
+    <div class="city-label">
+      <div class="city-dot" style="background:var(--accent-pr)"></div>
+      <span class="city-name">프라하 (Praha)</span>
+      <span class="city-dates">8/4 – 8/6</span>
+    </div>
+    <div class="day-grid">
+      <a class="day-card" style="--accent-color:var(--accent-pr)" href="travel_day13_0804.html">
+        <span class="day-num">DAY 13</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">8월 4일 (화) · 체스키크룸로프 → 프라하 이동</div>
+          <div class="day-desc">비셰흐라드 · 구시가지 광장 · 천문시계 · 레트나 공원 야경</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+      <a class="day-card" style="--accent-color:var(--accent-pr)" href="travel_day14_0805.html">
+        <span class="day-num">DAY 14</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">8월 5일 (수) · 프라하 전일</div>
+          <div class="day-desc">벨레트르주니 궁전 · 프라하 성 · 스트라호프 수도원 · 카를교 야경</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+      <a class="day-card" style="--accent-color:var(--accent-pr)" href="travel_day15_0806.html">
+        <span class="day-num">DAY 15</span>
+        <div class="day-divider"></div>
+        <div class="day-info">
+          <div class="day-date">8월 6일 (목) · 프라하 출발 → 인천</div>
+          <div class="day-desc">Dejvice 브런치 · 공항 이동 · 귀국</div>
+        </div>
+        <span class="day-arrow">›</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 기타 파일 -->
+  <div class="extra-block">
+    <div class="extra-label">기타</div>
+    <a class="extra-card" href="동유럽_타임라인_v7.html">
+      <span class="extra-icon">🗺️</span>
+      <div class="extra-info">
+        <div class="extra-title">전체 여행 타임라인</div>
+        <div class="extra-sub">동유럽_타임라인_v7</div>
+      </div>
+    </a>
+    <a class="extra-card" href="동유럽_출발전_최종체크리스트_v3.html">
+      <span class="extra-icon">✅</span>
+      <div class="extra-info">
+        <div class="extra-title">출발 전 최종 체크리스트</div>
+        <div class="extra-sub">동유럽_출발전_최종체크리스트_v3</div>
+      </div>
+    </a>
+  </div>
+
+</div>
+</body>
+</html>
