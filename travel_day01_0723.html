@@ -110,11 +110,6 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
 .mart-hours{font-size:11px;color:#3A7A3A;font-weight:600;margin-bottom:4px;}
 .mart-addr{font-size:11px;color:var(--muted);margin-bottom:5px;}
 .mart-desc{font-size:12px;color:#4A4540;line-height:1.65;}
-.legend{position:fixed;bottom:12px;left:12px;background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:11px;display:flex;flex-direction:column;gap:5px;z-index:500;box-shadow:0 2px 10px rgba(0,0,0,.08);pointer-events:none;}
-.leg-row{display:flex;align-items:center;gap:8px;color:#4A4540;}
-.leg-line{width:22px;height:3px;border-radius:2px;flex-shrink:0;}
-.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.leg-sep{height:1px;background:var(--border);margin:1px 0;}
 @media(min-width:768px){
   .layout{flex-direction:row;height:100vh;}
   #map{flex:1;height:100%!important;min-height:unset;}
@@ -149,16 +144,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
 
 <div class="layout">
   <div id="map">
-    <div class="legend">
-      <div class="leg-row"><div class="leg-line" style="background:var(--p-navy);opacity:.7;border-top:2px dashed var(--p-navy);background:none;"></div>버스·지하철</div>
-      <div class="leg-row"><div class="leg-line" style="background:var(--p-orange);"></div>도보</div>
-      <div class="leg-sep"></div>
-      <div class="leg-row"><div class="leg-dot" style="background:var(--p-transit)"></div>교통거점</div>
-      <div class="leg-row"><div class="leg-dot" style="background:var(--p-blue)"></div>관광</div>
-      <div class="leg-row"><div class="leg-dot" style="background:var(--p-green)"></div>식당</div>
-      <div class="leg-row"><div class="leg-dot" style="background:var(--p-purple)"></div>숙소</div>
-      <div class="leg-row"><div class="leg-dot" style="background:var(--p-night)"></div>야경</div>
-    </div>
+    
   </div>
 
   <div class="panel">
@@ -195,7 +181,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
               요금 <strong>2,500 HUF/인</strong> (3인 7,500 HUF) · 100E 전용 티켓만 유효<br>
               BudapestGO 앱 사전 구매 권장 (공항 부스: 2A 08:00~22:00 / 2B 09:00~21:00)<br>
               종점: <strong>Deák Ferenc tér</strong> — 숙소까지 도보 약 15분
-              <br><a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Budapest+Airport+100E+Bus+Stop+Terminal+2&query_place_id=ChIJyc6F8pPtQUcRDu3FMpvkP4Q" target="_blank">📍 100E 버스 정류장</a>
+              <br><a class="gmap-btn" href="https://maps.google.com/?q=47.4338,19.2617" target="_blank">📍 100E 버스 정류장</a>
             </div>
           </div>
           <div class="ttc-row">
@@ -210,7 +196,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
             <div>
               <strong>Deák Ferenc tér</strong> 하차 → 도보 약 15분<br>
               숙소: B40 Green ApartRooms (Baross utca 40, 8구역)
-              <br><a class="gmap-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJMc-i0X7BQUcR_M_VGvhT2RM" target="_blank">📍 Deák Ferenc tér</a>
+              <br><a class="gmap-btn" href="https://maps.google.com/?q=47.4980,19.0516" target="_blank">📍 Deák Ferenc tér</a>
             </div>
           </div>
           <div class="ttc-warn">
@@ -224,10 +210,10 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
       <div class="timeline">
 
         <div class="tl-item" data-map-key="airport_bus" onclick="flyToPin(this)">
-          <div class="tl-axis"><div class="tl-pin transit">🚌</div><div class="tl-vline"></div></div>
+          <div class="tl-axis"><div class="tl-pin transit">①</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">13:55 도착 (입국심사 약 1시간)</div>
-            <div class="tl-name">공항 100E 버스 탑승 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Budapest+Airport+100E+Bus+Stop+Terminal+2&query_place_id=ChIJyc6F8pPtQUcRDu3FMpvkP4Q" target="_blank">📍</a></div>
+            <div class="tl-name">공항 100E 버스 탑승 <a class="tl-map-icon" href="https://maps.google.com/?q=47.4338,19.2617" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               터미널 2A·2B 중간 <strong>BKK 스테이션</strong>에서 탑승<br>
@@ -241,10 +227,10 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
         </div>
 
         <div class="tl-item" data-map-key="deak" onclick="flyToPin(this)">
-          <div class="tl-axis"><div class="tl-pin transit">🚇</div><div class="tl-vline"></div></div>
+          <div class="tl-axis"><div class="tl-pin transit">②</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">15:40~16:00 예상</div>
-            <div class="tl-name">Deák Ferenc tér 하차 → 숙소 이동 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJMc-i0X7BQUcR_M_VGvhT2RM" target="_blank">📍</a></div>
+            <div class="tl-name">Deák Ferenc tér 하차 → 숙소 이동 <a class="tl-map-icon" href="https://maps.google.com/?q=47.4980,19.0516" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               M1·M2·M3 환승 허브 · 부다페스트 교통 중심지<br>
@@ -260,7 +246,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin stay">③</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">16:00~17:00</div>
-            <div class="tl-name">B40 Green ApartRooms 체크인 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=B40+Green+ApartRooms+Baross+utca+40+Budapest" target="_blank">📍</a></div>
+            <div class="tl-name">B40 Green ApartRooms 체크인 <a class="tl-map-icon" href="https://maps.google.com/?q=47.4938,19.0618" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               Baross utca 40, 8구역 · 에어컨·주방 완비<br>
@@ -278,7 +264,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin sight">④</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">17:00~18:00</div>
-            <div class="tl-name">성 이슈트반 대성당 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJ982jOl7BQUcRy7x_rqz8Qt0" target="_blank">📍</a></div>
+            <div class="tl-name">성 이슈트반 대성당 <a class="tl-map-icon" href="https://maps.google.com/?q=47.5006,19.0537" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               월~토 09:00~17:15 / 일·공휴일 12:30~17:15 · <strong>7/23 목 정상 운영 ✅</strong><br>
@@ -295,7 +281,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin food">⑤</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">18:00~18:20</div>
-            <div class="tl-name">젤라또 로사 그란데 (Gelarto Rosa) <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Gelarto+Rosa+Budapest+Szent+Istvan+ter+3" target="_blank">📍</a></div>
+            <div class="tl-name">젤라또 로사 그란데 (Gelarto Rosa) <a class="tl-map-icon" href="https://maps.google.com/?q=47.5006,19.0530" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               성당 바로 앞 광장 · 와이프 저장 ✅<br>
@@ -313,7 +299,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin food">⑥</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">18:30~19:30</div>
-            <div class="tl-name">저녁식사 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJMc-i0X7BQUcR_M_VGvhT2RM" target="_blank">📍</a></div>
+            <div class="tl-name">저녁식사 <a class="tl-map-icon" href="https://maps.google.com/?q=47.4980,19.0516" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 저녁 탭에서 식당 선택 후 지도에 반영</div>
             <div class="tl-desc">저녁 탭에서 식당을 선택하면 여기에 자동 표시됩니다</div>
             <div id="tl-dinner-filled" class="tl-meal-filled">
@@ -330,7 +316,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin night">⑦</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">19:00 탑승 / 19:30~20:30 크루즈</div>
-            <div class="tl-name">다뉴브 유람선 선셋 크루즈 (Dock 10) <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Dock+10+Jane+Haining+rkp+10+Budapest+danube+cruise" target="_blank">📍</a></div>
+            <div class="tl-name">다뉴브 유람선 선셋 크루즈 (Dock 10) <a class="tl-map-icon" href="https://maps.google.com/?q=47.4960,19.0511" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               출발 도크: <strong>Dock 10 · Jane Haining rkp. 10</strong> (엘리자베스 다리 페스트쪽)<br>
@@ -348,7 +334,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin night">⑧</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">21:00~21:30 (체력 보고 결정)</div>
-            <div class="tl-name">바차니 광장 야경 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJD_guHFTBQUcRe1Eo9Qooh7Y" target="_blank">📍</a></div>
+            <div class="tl-name">바차니 광장 야경 <a class="tl-map-icon" href="https://maps.google.com/?q=47.5016,19.0402" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               국회의사당 정면 뷰 최적 포인트 (다뉴브 강 건너 부다 쪽)<br>
@@ -388,7 +374,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           </div>
           <div class="card-desc">헝가리 전통 가정식 · 굴라쉬·치킨 파프리카시 · TripAdvisor 483리뷰 4.7점 · 한국어 리뷰 다수</div>
           <div class="card-tip">💡 도착 첫날 헝가리 정통 요리 시작으로 최적 · 예약 권장 (성수기 대기 30분+)</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/place/Parasztkonyha+Restaurant/@47.4995428,19.0513501,17z/data=!4m6!3m5!1s0x4741dd441a0670b3:0x8df4d20a3d6c6386" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://maps.google.com/?q=47.5002,19.0545" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
@@ -404,7 +390,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           </div>
           <div class="card-desc">헝가리 전통 요리 현대적 재해석 · 구글 20,000건 리뷰 · 망갈레차 돼지고기·오리 스테이크·굴라쉬 추천 · 1970년대 복고 인테리어</div>
           <div class="card-tip">💡 한국인 부다페스트 맛집 1순위 · 예약 권장</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/place/Menza/@47.5003,19.0645,17z/data=!4m2!3m1!1s0x4741dc6e9b62d4d5:0x361daa1bec9740fe" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://maps.google.com/?q=47.5000,19.0645" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
@@ -419,7 +405,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           </div>
           <div class="card-desc">현대 유럽 그릴·헝가리 요리 · 오픈키친 · 굴라쉬·포크립 한국어 리뷰 극찬 · 성당 관람 후 바로 연결되는 위치</div>
           <div class="card-tip">💡 성당 앞 최고의 위치 · 분위기·친절도 모두 긍정 리뷰</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Bestia+Restaurant+Budapest+Szent+Istvan+ter+9" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://maps.google.com/?q=47.5003,19.0540" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
@@ -434,7 +420,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           </div>
           <div class="card-desc">헝가리 전통 가정식 · 피아노 라이브 연주 · TripAdvisor 1,596리뷰 · 오리 푸아그라·굴라쉬 추천 · 빵 덮개 굴라쉬 유명</div>
           <div class="card-tip">💡 한국인 방문 빈도 높음 · 짜지 않은 굴라쉬로 유명 · 예약 권장</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=VakVarju+Etterem+Budapest+Paulay+Ede+utca+7" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://maps.google.com/?q=47.4996,19.0563" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
@@ -449,7 +435,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           </div>
           <div class="card-desc">중동·이스라엘 퓨전 · 흄무스·팔라펠·샤와르마·머겟 소시지 · 구글 2,200건+ 리뷰 4.5점 · 실내 정원 루인바 분위기 · 라이브 재즈</div>
           <div class="card-tip">💡 헝가리 음식이 아닌 색다른 선택 · 분위기 최고 · 예약 필수 (성수기 매일 만석)</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Mazel+Tov+Budapest+Akacfa+utca+47" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://maps.google.com/?q=47.4993,19.0664" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
@@ -470,7 +456,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           </div>
           <div class="card-desc">베트남 가족 비스트로 · 정통 베트남 쌀국수 · Restaurant Guru 4.8점 · 작은 규모로 조용한 식사 가능</div>
           <div class="card-tip">💡 헝가리 음식이 부담스럽다면 첫날 가볍게</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Pho+Astoria+Bistro+Budapest+Kossuth+Lajos+utca+6" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://maps.google.com/?q=47.4975,19.0530" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
@@ -493,7 +479,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="mart-hours">🕐 월~토 07:00~21:00 / 일 08:00~20:00</div>
           <div class="mart-addr">📍 Kerepesi út 9 · 숙소(Baross utca 40) 도보 5분</div>
           <div class="mart-desc">숙소에서 가장 가까운 마트 · 생수·간식·기본 식재료 구매 가능</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=SPAR+Budapest+Kerepesi+ut+9" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://maps.google.com/?q=SPAR+Budapest+Kerepesi+ut" target="_blank">📍 구글지도</a>
         </div>
 
         <div class="mart-card" onclick="toggleMart(this,'mart_tesco')">
@@ -501,7 +487,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="mart-hours">🕐 매일 06:00~22:00</div>
           <div class="mart-addr">📍 숙소 반경 500m 내 다수 분포</div>
           <div class="mart-desc">편의점 형태 소형 마트 · 생수·스낵·음료 빠르게 구매 가능</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=CBA+Prima+Budapest+VIII+kerulet+Baross+utca" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://maps.google.com/?q=CBA+Budapest+8+kerulet" target="_blank">📍 구글지도</a>
         </div>
 
         <div class="sec-lbl">🌏 한인·아시안 마트</div>
@@ -510,7 +496,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="mart-hours">🕐 매일 09:00~20:00</div>
           <div class="mart-addr">📍 Kőbányai út 21 · 숙소에서 트램 또는 도보 20분</div>
           <div class="mart-desc">라면·햇반·김치·고추장 등 한국 식재료 구비 · 아시안 식품 전반 취급</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Asia+Center+Budapest+Kobanyai+ut+21" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://maps.google.com/?q=Asia+Center+Budapest+Kobanyai" target="_blank">📍 구글지도</a>
         </div>
       </div>
     </div>
@@ -618,8 +604,8 @@ function mkDropPin(num, color, label) {
 
 // 고정 핀
 const FIXED = [
-  {k:'airport_bus', num:'🚌', c:TRANSIT, tip:'100E 버스 탑승장'},
-  {k:'deak',        num:'🚇', c:TRANSIT, tip:'Deák Ferenc tér'},
+  {k:'airport_bus', num:'①',  c:TRANSIT, tip:'100E 버스 탑승장'},
+  {k:'deak',        num:'②',  c:TRANSIT, tip:'Deák Ferenc tér'},
   {k:'hotel',       num:'③',  c:PURPLE,  tip:'B40 숙소'},
   {k:'basilica',    num:'④',  c:BLUE,    tip:'성 이슈트반 대성당'},
   {k:'gelarto',     num:'⑤',  c:GREEN,   tip:'젤라또 로사'},
@@ -629,7 +615,7 @@ const FIXED = [
 FIXED.forEach(p => { MK[p.k] = L.marker(LL[p.k], {icon: mkDropPin(p.num, p.c, p.tip)}).addTo(map); });
 
 // fitBounds 먼저 실행 후 선을 그려야 화살표 각도가 정확함
-const _bounds = [LL.deak, LL.hotel, LL.basilica, LL.dock10, LL.batthyany];
+const _bounds = [LL.airport_bus, LL.deak, LL.hotel, LL.basilica, LL.dock10, LL.batthyany];
 map.fitBounds(_bounds, {padding:[48,48]});
 
 // 지도 준비 완료 후 선 그리기
@@ -639,7 +625,8 @@ map.whenReady(() => {
     map.invalidateSize();
     map.fitBounds(_bounds, {padding:[48,48]});
     // 기본 동선 선 (fitBounds 이후 그려서 각도 정확)
-    _baseLines.push(addTrackedLine('deak', 'hotel', ORANGE, true));
+    _baseLines.push(addTrackedLine('airport_bus', 'deak', NAVY, false));  // ①공항→②Deák (버스)
+    _baseLines.push(addTrackedLine('deak', 'hotel', ORANGE, true));       // ②Deák→③숙소 (도보)
     _baseLines.push(addTrackedLine('hotel', 'basilica', NAVY, false));
     _baseLines.push(addTrackedLine('basilica', 'gelarto', ORANGE, true));
     _lineGelartoToDinner = addTrackedLine('gelarto', 'dock10', ORANGE, true);
