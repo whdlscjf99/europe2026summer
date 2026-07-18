@@ -229,7 +229,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin sight">②</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">09:30~12:30</div>
-            <div class="tl-name">쇤브룬 궁전 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJu-P7rfoHbUcR0Sz9ZhWHV60" target="_blank">📍</a></div>
+            <div class="tl-name">쇤브룬 궁전 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Schönbrunn+Palace+Vienna+Schönbrunner+Schloßstraße+47" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               예약 완료 ☑ · <strong>클래식 패스 €49/인</strong> (order 260712000247)<br>
@@ -267,7 +267,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin sight">④</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">14:30~17:00</div>
-            <div class="tl-name">레오폴트 미술관 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJSy38hEoHbUcRhDAyLfyOKaI" target="_blank">📍</a></div>
+            <div class="tl-name">레오폴트 미술관 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Leopold+Museum+Vienna+MuseumsQuartier" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               Museumsplatz 1 · MuseumsQuartier 내<br>
@@ -287,7 +287,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin sight">⑤</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">17:00~18:00</div>
-            <div class="tl-name">MQ 야외 광장 산책 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJEUvf_koHbUcR_Aq1e8o1uIs" target="_blank">📍</a></div>
+            <div class="tl-name">MQ 야외 광장 산책 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=MuseumsQuartier+Vienna+Museumsplatz+1" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               MuseumsQuartier 무료 야외 공간 · 선베드 형태 대형 조형물 '엔치'(Enzis)<br>
@@ -339,43 +339,11 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
     <div id="tab-lunch" class="tab-content">
       <div class="subtabs">
         <div class="subtab active" onclick="switchSub('sub-lunch-local',this,'lunch')">🍴 현지식</div>
-        <div class="subtab korean" onclick="switchSub('sub-lunch-korean',this,'lunch')">🥢 아시안</div>
+        <div class="subtab korean" onclick="switchSub('sub-lunch-asian',this,'lunch')">🥢 아시안</div>
+        <div class="subtab korean" onclick="switchSub('sub-lunch-cafe',this,'lunch')">☕ 카페·브런치</div>
       </div>
 
       <div id="sub-lunch-local" class="subcontent active">
-        <div class="sec-lbl">☕ MQ 내부 — 레오폴트 카페·광장</div>
-
-        <div class="place-card" id="lc-cafe_leopold" onclick="selectLunch(this,'cafe_leopold')">
-          <div class="card-header">
-            <div class="card-name">Café Leopold (레오폴트 미술관 내)</div>
-            <div class="badges"><span class="badge ai">💡 추천</span></div>
-          </div>
-          <div class="card-meta">
-            <span class="card-meta-item">📍 MQ 레오폴트 미술관 지하 1층</span>
-            <span class="card-meta-item">⏰ 10:00~24:00</span>
-          </div>
-          <div class="card-desc">MQ 내 분위기 좋은 카페·레스토랑 · 오스트리아 가정식·파스타·수프 · 입장 전 식사 후 바로 관람 가능한 최적 동선</div>
-          <div class="card-tip">💡 14:30 입장 전 여기서 점심 → 동선 제로. 붐빌 수 있으니 12:45~13:00 도착 권장</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJSy38hEoHbUcRhDAyLfyOKaI" target="_blank">📍 구글지도</a>
-          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
-        </div>
-
-        <div class="place-card" id="lc-mq_yard" onclick="selectLunch(this,'mq_yard')">
-          <div class="card-header">
-            <div class="card-name">MQ 야외 푸드 노점·카페</div>
-            <div class="badges"><span class="badge ai">💡 추천</span></div>
-          </div>
-          <div class="card-meta">
-            <span class="card-meta-item">📍 MuseumsQuartier 야외 광장</span>
-            <span class="card-meta-item">⏰ 여름 시즌 상시 운영</span>
-          </div>
-          <div class="card-desc">야외 선베드(엔치) 옆 노점 · 소시지·케밥·커피 등 간단한 점심 · 현지인처럼 야외에서 여유롭게</div>
-          <div class="card-tip">💡 날씨 좋으면 최고 선택 · 가격도 저렴 · 관람 전 부담 없이 먹기 좋음</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJEUvf_koHbUcR_Aq1e8o1uIs" target="_blank">📍 구글지도</a>
-          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
-        </div>
-
-        <div class="sec-lbl">🍽 MQ 주변 — 나슈마르크트·마리힐퍼</div>
 
         <div class="place-card" id="lc-reinthaler" onclick="selectLunch(this,'reinthaler')">
           <div class="card-header">
@@ -388,7 +356,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           </div>
           <div class="card-desc">빈 전통 바이슬(로컬 선술집) · 슈니첼·굴라쉬·타펠슈피츠 · 현지인 단골 · 관광지 가격 아님</div>
           <div class="card-tip">💡 빈 로컬 분위기 그대로 · MQ에서 도보 10분이라 이동 감수해야 함</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Reinithalers+Beisl+Wien+Dorotheergasse+4" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Reinthalers+Beisl+Wien+Dorotheergasse+4" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
@@ -426,8 +394,8 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
 
       </div>
 
-      <div id="sub-lunch-korean" class="subcontent">
-        <div class="sec-lbl">🥢 아시안 · 한식</div>
+      <div id="sub-lunch-asian" class="subcontent">
+        <div class="sec-lbl">🥢 아시안</div>
 
         <div class="place-card korean-card" id="lc-tofu" onclick="selectLunch(this,'tofu')">
           <div class="card-header">
@@ -438,7 +406,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
             <span class="card-meta-item">📍 MQ 주변 · 도보 10분</span>
             <span class="card-meta-item">⏰ 11:30~21:30</span>
           </div>
-          <div class="card-desc">빈 한식·아시안 퓨전 · 두부·찌개류 · 한국 반찬 스타일</div>
+          <div class="card-desc">아시안 퓨전 · 두부 요리 중심 · 가볍고 담백한 점심에 적합</div>
           <div class="card-tip">💡 빈 한식 중 접근성 좋은 편 · 오리지널 한국 맛보다는 현지화</div>
           <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Tofu+und+Chili+Wien+Gumpendorfer+Str" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
@@ -454,11 +422,44 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
             <span class="card-meta-item">⏰ 11:30~21:00</span>
           </div>
           <div class="card-desc">만두 전문점 · 한국식 군만두·물만두 · 빈 한인 커뮤니티 추천</div>
-          <div class="card-tip">💡 MQ에서 도보 15분 거리 · 한국 음식 그리울 때</div>
+          <div class="card-tip">💡 MQ에서 도보 15분 거리 · 아시안 가볍게 해결할 때</div>
           <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Mandu+Co+Wien+Mariahilfer+Str" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
+      </div>
 
+      <div id="sub-lunch-cafe" class="subcontent">
+        <div class="sec-lbl">☕ 카페·브런치 — MQ 내부</div>
+
+        <div class="place-card" id="lc-cafe_leopold" onclick="selectLunch(this,'cafe_leopold')">
+          <div class="card-header">
+            <div class="card-name">Café Leopold (레오폴트 미술관 내)</div>
+            <div class="badges"><span class="badge ai">💡 추천</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 MQ 레오폴트 미술관 지하 1층</span>
+            <span class="card-meta-item">⏰ 10:00~24:00</span>
+          </div>
+          <div class="card-desc">MQ 내 분위기 좋은 카페·레스토랑 · 오스트리아 가정식·파스타·수프 · 입장 전 식사 후 바로 관람 가능한 최적 동선</div>
+          <div class="card-tip">💡 14:30 입장 전 여기서 점심 → 동선 제로. 붐빌 수 있으니 12:45~13:00 도착 권장</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Leopold+Museum+Vienna+MuseumsQuartier" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card" id="lc-mq_yard" onclick="selectLunch(this,'mq_yard')">
+          <div class="card-header">
+            <div class="card-name">MQ 야외 푸드 노점·카페</div>
+            <div class="badges"><span class="badge ai">💡 추천</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 MuseumsQuartier 야외 광장</span>
+            <span class="card-meta-item">⏰ 여름 시즌 상시 운영</span>
+          </div>
+          <div class="card-desc">야외 선베드(엔치) 옆 노점 · 소시지·케밥·커피 등 간단한 점심 · 현지인처럼 야외에서 여유롭게</div>
+          <div class="card-tip">💡 날씨 좋으면 최고 선택 · 가격도 저렴 · 관람 전 부담 없이 먹기 좋음</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=MuseumsQuartier+Vienna+Museumsplatz+1" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
       </div>
     </div>
 
@@ -466,7 +467,8 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
     <div id="tab-dinner" class="tab-content">
       <div class="subtabs">
         <div class="subtab active" onclick="switchSub('sub-dinner-local',this,'dinner')">🍴 현지식</div>
-        <div class="subtab korean" onclick="switchSub('sub-dinner-korean',this,'dinner')">🥢 아시안</div>
+        <div class="subtab korean" onclick="switchSub('sub-dinner-asian',this,'dinner')">🥢 아시안</div>
+        <div class="subtab korean" onclick="switchSub('sub-dinner-korean',this,'dinner')">🍚 한식</div>
       </div>
 
       <div id="sub-dinner-local" class="subcontent active">
@@ -515,7 +517,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           </div>
           <div class="card-desc">빈 전통 로컬 바이슬 · 굴라쉬·슈니첼·타펠슈피츠 · 관광지 가격 아님</div>
           <div class="card-tip">💡 로컬 가격에 빈 전통 요리 · 예약 없이 입장 가능한 경우 많음</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Reinithalers+Beisl+Wien+Dorotheergasse+4" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Reinthalers+Beisl+Wien+Dorotheergasse+4" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
@@ -546,14 +548,14 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           </div>
           <div class="card-desc">1876년 창업 빈 전통 카페하우스 · 저녁 식사+커피+케이크 · 내부 건축 자체가 볼거리</div>
           <div class="card-tip">💡 저녁 피크는 대기 길 수 있음 · 식사 목적보다 케이크+커피 여유 즐기는 스타일로</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJtXaIbkoHbUcRBH5yyiJIl-Q" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Café+Central+Vienna+Herrengasse+14" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
       </div>
 
-      <div id="sub-dinner-korean" class="subcontent">
-        <div class="sec-lbl">🥢 아시안 · 한식</div>
+      <div id="sub-dinner-asian" class="subcontent">
+        <div class="sec-lbl">🥢 아시안</div>
 
         <div class="place-card korean-card" id="dc-ostmeer" onclick="selectDinner(this,'ostmeer')">
           <div class="card-header">
@@ -569,6 +571,10 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Ostmeer+Restaurant+Wien+Rechte+Wienzeile" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
+      </div>
+
+      <div id="sub-dinner-korean" class="subcontent">
+        <div class="sec-lbl">🍚 한식</div>
 
         <div class="place-card korean-card" id="dc-kocos" onclick="selectDinner(this,'kocos')">
           <div class="card-header">
@@ -584,7 +590,6 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Kocos+Wien+Mariahilfer+Str" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
-
       </div>
     </div>
 

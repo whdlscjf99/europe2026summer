@@ -209,7 +209,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin stay">①</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">10:00 체크아웃</div>
-            <div class="tl-name">빌라 엘리사 체크아웃 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Villa+Elisa+Salzburg+Elisabethkai+36" target="_blank">📍</a></div>
+            <div class="tl-name">빌라 엘리사 체크아웃 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Villa+Elisa+Salzburg+Jahnstrasse+14" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">Jahnstraße 14 · 잘츠부르크 3박 종료 · 짐 챙겨서 출발</div>
             <div class="move-card">
@@ -224,7 +224,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin stay">②</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">11:40 도착</div>
-            <div class="tl-name">The Gallery 짐 보관 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=The+Gallery+Bad+Ischl+Pfarrgasse" target="_blank">📍</a></div>
+            <div class="tl-name">The Gallery 짐 보관 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=The+Gallery+Bad+Ischl+Berggasse+8" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               Berggasse 8 · Seifensiedergasse 하차 → 도보 5분<br>
@@ -261,7 +261,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin sight">④</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">13:30~15:30</div>
-            <div class="tl-name">카이저빌라 정원 <a class="tl-map-icon" href="https://www.google.com/maps/place/?q=place_id:ChIJycj_rUEbbUcR1pBl_3OPwCA" target="_blank">📍</a></div>
+            <div class="tl-name">카이저빌라 정원 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=Kaiservilla+Bad+Ischl+Jainzen+38" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               Jainzen 38 · <strong>정원 입장 €6.70/인</strong><br>
@@ -314,7 +314,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="tl-axis"><div class="tl-pin stay">⑦</div><div class="tl-vline"></div></div>
           <div class="tl-body">
             <div class="tl-time">22:00~</div>
-            <div class="tl-name">The Gallery 복귀 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=The+Gallery+Bad+Ischl+Pfarrgasse" target="_blank">📍</a></div>
+            <div class="tl-name">The Gallery 복귀 <a class="tl-map-icon" href="https://www.google.com/maps/search/?api=1&query=The+Gallery+Bad+Ischl+Berggasse+8" target="_blank">📍</a></div>
             <div class="tl-map-hint">🗺 탭하면 지도에서 위치 확인</div>
             <div class="tl-desc">
               Berggasse 8 · 체크아웃 내일 11:00<br>
@@ -331,17 +331,13 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
     <div id="tab-lunch" class="tab-content">
       <div class="subtabs">
         <div class="subtab active" onclick="switchSub('sub-lunch-local',this,'lunch')">🍴 현지식</div>
-        <div class="subtab korean" onclick="switchSub('sub-lunch-korean',this,'lunch')">🥢 아시안</div>
+        <div class="subtab korean" onclick="switchSub('sub-lunch-cafe',this,'lunch')">☕ 카페·브런치</div>
       </div>
 
       <div id="sub-lunch-local" class="subcontent active">
         <div class="sec-lbl">☕ 바트이슐 카페·식당</div>
 
-        <div class="place-card" id="lc-zauner" onclick="selectLunch(this,'zauner')">
-          <div class="card-header">
-            <div class="card-name">Cafe-Restaurant Zauner</div>
-            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.4</span></div>
-          </div>
+        
           <div class="card-meta">
             <span class="card-meta-item">📍 Pfarrgasse 7 · The Gallery 도보 5분</span>
             <span class="card-meta-item">⏰ 09:00~18:00</span>
@@ -352,11 +348,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
-        <div class="place-card" id="lc-kaiser_melange" onclick="selectLunch(this,'kaiser_melange')">
-          <div class="card-header">
-            <div class="card-name">Café Kaiser Melange</div>
-            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
-          </div>
+        
           <div class="card-meta">
             <span class="card-meta-item">📍 바트이슐 시내</span>
             <span class="card-meta-item">⏰ 08:00~18:00</span>
@@ -367,11 +359,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
-        <div class="place-card" id="lc-cottage" onclick="selectLunch(this,'cottage')">
-          <div class="card-header">
-            <div class="card-name">Cottage Bad Ischl</div>
-            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.5</span></div>
-          </div>
+        
           <div class="card-meta">
             <span class="card-meta-item">📍 바트이슐 시내</span>
             <span class="card-meta-item">⏰ 07:00~18:00</span>
@@ -383,11 +371,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
-        <div class="place-card" id="lc-maislinger" onclick="selectLunch(this,'maislinger')">
-          <div class="card-header">
-            <div class="card-name">BÄCKEREI MAISLINGER</div>
-            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
-          </div>
+        
           <div class="card-meta">
             <span class="card-meta-item">📍 바트이슐 시내</span>
             <span class="card-meta-item">⏰ 06:00~17:00</span>
@@ -416,7 +400,33 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
 
       </div>
 
-      <div id="sub-lunch-korean" class="subcontent">
+      <div id="sub-lunch-cafe" class="subcontent">
+        <div class="sec-lbl">☕ 카페·베이커리</div>
+
+<div class="place-card" id="lc-zauner_c" onclick="selectLunch(this,'zauner')">
+          <div class="card-header">
+            <div class="card-name">Cafe-Restaurant Zauner</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.4</span></div>
+          </div>
+
+<div class="place-card" id="lc-kaiser_melange_c" onclick="selectLunch(this,'kaiser_melange')">
+          <div class="card-header">
+            <div class="card-name">Café Kaiser Melange</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
+          </div>
+
+<div class="place-card" id="lc-cottage_c" onclick="selectLunch(this,'cottage')">
+          <div class="card-header">
+            <div class="card-name">Cottage Bad Ischl</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.5</span></div>
+          </div>
+
+<div class="place-card" id="lc-maislinger_c" onclick="selectLunch(this,'maislinger')">
+          <div class="card-header">
+            <div class="card-name">BÄCKEREI MAISLINGER</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+
         <div style="padding:20px 0;text-align:center;color:var(--muted);font-size:13px;line-height:1.8;">
           바트이슐은 소도시 — 아시안 식당 없음<br>
           빵집·카페 간편식 or 현지식 추천
@@ -433,7 +443,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
 
       <div class="subtabs">
         <div class="subtab active" onclick="switchSub('sub-dinner-local',this,'dinner')">🌊 온천</div>
-        <div class="subtab korean" onclick="switchSub('sub-dinner-alt',this,'dinner')">🍽 식당 대안</div>
+        <div class="subtab korean" onclick="switchSub('sub-dinner-local2',this,'dinner')">🍴 식당 대안</div>
       </div>
 
       <div id="sub-dinner-local" class="subcontent active">
@@ -450,7 +460,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           </div>
           <div class="card-desc">소금·온천수 실내외 풀 · 사우나 · 슬라이드 · 4시간권 €31.50 / 살츠카머구트 카드 €28.35</div>
           <div class="card-tip">💡 19:45 출발 → 20:00 입장 → 자정 전 퇴장 가능 · 수영복·수건·쪼리 필수 · 귀중품 로커 보관</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJPz6v4bEabUcRMQW0wVvfFiI" target="_blank">📍 구글지도</a>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Cafe+Restaurant+Zauner+Bad+Ischl+Pfarrgasse+7" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
@@ -464,7 +474,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
         </div>
       </div>
 
-      <div id="sub-dinner-alt" class="subcontent">
+      <div id="sub-dinner-local2" class="subcontent">
         <div class="sec-lbl">🍽 바트이슐 외부 식당</div>
 
         <div class="place-card" id="dc-zauner_d" onclick="selectDinner(this,'zauner_d')">
