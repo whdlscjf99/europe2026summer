@@ -24,6 +24,9 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
 .layout{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 #map{flex-shrink:0;height:calc(45vh - 52px);min-height:180px;position:relative;z-index:1;}
 #map .leaflet-tile-pane{filter:saturate(0.45) brightness(0.97) contrast(1.15);}
+#resizer{height:10px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);cursor:row-resize;flex-shrink:0;display:flex;align-items:center;justify-content:center;z-index:10;user-select:none;-webkit-user-select:none;}
+#resizer::after{content:'';width:32px;height:3px;border-radius:2px;background:var(--border);}
+
 .panel{flex:1;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
 .tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 4px;}
 .tab{flex:1;padding:11px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--soft);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;}
@@ -133,7 +136,8 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
     
   </div>
 
-  <div class="panel">
+  <div id="resizer"></div>
+<div class="panel">
     <div class="tabs">
       <div class="tab active" onclick="switchTab('timeline',this)">📋 일정</div>
       <div class="tab" onclick="switchTab('lunch',this)">🍽 점심</div>
@@ -296,86 +300,11 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
     <div id="tab-lunch" class="tab-content">
       <div class="subtabs">
         <div class="subtab active" onclick="switchSub('sub-lunch-local',this,'lunch')">🍴 현지식</div>
-        <div class="subtab korean" onclick="switchSub('sub-lunch-asian',this,'lunch')">🥢 아시안</div>
-        <div class="subtab korean" onclick="switchSub('sub-lunch-korean',this,'lunch')">🍚 한식</div>
-        <div class="subtab korean" onclick="switchSub('sub-lunch-cafe',this,'lunch')">☕ 카페·브런치</div>
+        <div class="subtab korean" onclick="switchSub('sub-lunch-korean',this,'lunch')">🥢 아시안</div>
       </div>
 
       <div id="sub-lunch-local" class="subcontent active">
-
-        <div class="place-card" id="lc-reinthaler" onclick="selectLunch(this,'reinthaler')">
-          <div class="card-header">
-            <div class="card-name">Reinthaler's Beisl</div>
-            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
-          </div>
-          <div class="card-meta">
-            <span class="card-meta-item">📍 Gluckgasse 5 · 알베르티나 도보 8분</span>
-            <span class="card-meta-item">⏰ 11:00~22:00</span>
-          </div>
-          <div class="card-desc">빈 전통 바이슬 · 슈니첼·굴라쉬·타펠슈피츠 · 현지인 단골 · 관광지 가격 아님</div>
-          <div class="card-tip">💡 빈 로컬 분위기 가장 진한 선택 · 호프부르크까지 도보 8분</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Reinthalers+Beisl+Wien+Dorotheergasse+4" target="_blank">📍 구글지도</a>
-          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
-        </div>
-
-      </div>
-
-      <div id="sub-lunch-asian" class="subcontent">
-        <div class="sec-lbl">🥢 아시안</div>
-
-        <div class="place-card korean-card" id="lc-tofu" onclick="selectLunch(this,'tofu')">
-          <div class="card-header">
-            <div class="card-name">Tofu und Chili</div>
-            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
-          </div>
-          <div class="card-meta">
-            <span class="card-meta-item">📍 알베르티나에서 도보 12분</span>
-            <span class="card-meta-item">⏰ 11:30~21:30</span>
-          </div>
-          <div class="card-desc">아시안 퓨전 · 두부 요리 중심 · 가볍고 담백</div>
-          <div class="card-tip">💡 13:30 슬롯 감안 시간 빠듯 · 12:00 바로 출발해야 가능</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Tofu+und+Chili+Wien+Gumpendorfer+Str" target="_blank">📍 구글지도</a>
-          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
-        </div>
-
-        <div class="place-card korean-card" id="lc-mandu" onclick="selectLunch(this,'mandu')">
-          <div class="card-header">
-            <div class="card-name">Mandu & Co</div>
-            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
-          </div>
-          <div class="card-meta">
-            <span class="card-meta-item">📍 나슈마르크트 근처</span>
-            <span class="card-meta-item">⏰ 11:30~21:00</span>
-          </div>
-          <div class="card-desc">만두 전문점 · 한국식 군만두·물만두 · 빈 한인 추천</div>
-          <div class="card-tip">💡 알베르티나에서 도보 15분 · 시간 여유 있을 때만</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Mandu+Co+Wien+Mariahilfer+Str" target="_blank">📍 구글지도</a>
-          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
-        </div>
-      </div>
-
-      <div id="sub-lunch-korean" class="subcontent">
-        <div class="sec-lbl">🍚 한식</div>
-
-        <div class="place-card korean-card" id="lc-vienna_bungsik" onclick="selectLunch(this,'vienna_bungsik')">
-          <div class="card-header">
-            <div class="card-name">비엔나 분식</div>
-            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
-          </div>
-          <div class="card-meta">
-            <span class="card-meta-item">📍 빈 시내</span>
-            <span class="card-meta-item">⏰ 운영시간 현장 확인</span>
-          </div>
-          <div class="card-desc">김밥 전문 · 한국식 간단 점심 · 빈에서 드문 김밥 메뉴</div>
-          <div class="card-memo">💬 "김밥" (저장 메모)</div>
-          <div class="card-tip">💡 가볍고 빠르게 · 13:30 예약 앞두고 부담 없이</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Vienna+Bungsik+Wien+Mariahilfer+Str" target="_blank">📍 구글지도</a>
-          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
-        </div>
-      </div>
-
-      <div id="sub-lunch-cafe" class="subcontent">
-        <div class="sec-lbl">☕ 카페·브런치 — 알베르티나·호프부르크 주변</div>
+        <div class="sec-lbl">☕ 알베르티나·호프부르크 바로 주변</div>
 
         <div class="place-card" id="lc-cafe_schwarzenberg" onclick="selectLunch(this,'cafe_schwarzenberg')">
           <div class="card-header">
@@ -386,9 +315,9 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
             <span class="card-meta-item">📍 Kärntner Ring 17 · 알베르티나 도보 5분</span>
             <span class="card-meta-item">⏰ 07:30~22:00</span>
           </div>
-          <div class="card-desc">1861년 창업 빈 전통 카페하우스 · 황실 분위기 · 카이저슈마른 추천</div>
+          <div class="card-desc">1861년 창업 빈 전통 카페하우스 · 황실 분위기 · 카이저슈마른 추천 · 호프부르크 예약 전 동선 최적</div>
           <div class="card-memo">💬 "카이저슈만" (저장 메모)</div>
-          <div class="card-tip">💡 13:30 슬롯 감안 12:00~13:10 완료 가능 · 커피+케이크 중심으로 가볍게</div>
+          <div class="card-tip">💡 13:30 슬롯 감안 12:00~13:10 완료 가능 · 식사보다 커피+케이크 중심으로 가볍게</div>
           <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Cafe+Schwarzenberg+Wien+Karntner+Ring+17" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
@@ -403,8 +332,25 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
             <span class="card-meta-item">⏰ 07:30~22:00</span>
           </div>
           <div class="card-desc">1876년 창업 · 신고딕 건축 내부 자체가 볼거리 · 수프·샌드위치·케이크</div>
-          <div class="card-tip">💡 건물 분위기 인상적 · 12:00 도착 권장 (대기 가능성 있음)</div>
+          <div class="card-tip">💡 건물 분위기 인상적 · 12:00 도착 권장 (대기 가능성 있음) · 호프부르크 방향 도보 이동 가능</div>
           <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Café+Central+Vienna+Herrengasse+14" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="sec-lbl">🍽 케른트너·구시가지 주변</div>
+
+        <div class="place-card" id="lc-reinthaler" onclick="selectLunch(this,'reinthaler')">
+          <div class="card-header">
+            <div class="card-name">Reinthaler's Beisl</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span><span class="badge verified">⭐ 4.3</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 Gluckgasse 5 · 알베르티나 도보 8분</span>
+            <span class="card-meta-item">⏰ 11:00~22:00</span>
+          </div>
+          <div class="card-desc">빈 전통 바이슬 · 슈니첼·굴라쉬·타펠슈피츠 · 현지인 단골 · 관광지 가격 아님</div>
+          <div class="card-tip">💡 빈 로컬 분위기 가장 진한 선택 · 호프부르크까지 도보 8분</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Reinthalers+Beisl+Wien+Dorotheergasse+4" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
@@ -433,11 +379,63 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
             <span class="card-meta-item">📍 알베르티나 근처 · 구시가지</span>
             <span class="card-meta-item">⏰ 11:00~21:00</span>
           </div>
-          <div class="card-desc">현대적 카페·브런치 · 신선한 재료 중심 · 알베르티나 관람 후 바로</div>
+          <div class="card-desc">현대적 오스트리아 퀴진 · 신선한 재료 중심 · 알베르티나 관람 후 바로</div>
           <div class="card-tip">💡 동선상 편리 · 호프부르크까지 도보 5분 이내</div>
           <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=PAREMI+Wien+Naschmarkt" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
+
+      </div>
+
+      <div id="sub-lunch-korean" class="subcontent">
+        <div class="sec-lbl">🥢 아시안 · 한식</div>
+
+        <div class="place-card korean-card" id="lc-vienna_bungsik" onclick="selectLunch(this,'vienna_bungsik')">
+          <div class="card-header">
+            <div class="card-name">비엔나 분식</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 빈 시내</span>
+            <span class="card-meta-item">⏰ 운영시간 현장 확인</span>
+          </div>
+          <div class="card-desc">김밥 전문 · 한국식 간단 점심 · 빈에서 드문 김밥 메뉴</div>
+          <div class="card-memo">💬 "김밥" (저장 메모)</div>
+          <div class="card-tip">💡 가볍고 빠르게 · 13:30 예약 앞두고 부담 없이</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Vienna+Bungsik+Wien+Mariahilfer+Str" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card korean-card" id="lc-tofu" onclick="selectLunch(this,'tofu')">
+          <div class="card-header">
+            <div class="card-name">Tofu und Chili</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 알베르티나에서 도보 12분</span>
+            <span class="card-meta-item">⏰ 11:30~21:30</span>
+          </div>
+          <div class="card-desc">빈 한식·아시안 퓨전 · 두부·찌개류 · 한국 반찬 스타일</div>
+          <div class="card-tip">💡 13:30 슬롯 감안 시간 빠듯 · 12:00 바로 출발해야 가능</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Tofu+und+Chili+Wien+Gumpendorfer+Str" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
+        <div class="place-card korean-card" id="lc-mandu" onclick="selectLunch(this,'mandu')">
+          <div class="card-header">
+            <div class="card-name">Mandu & Co</div>
+            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
+          </div>
+          <div class="card-meta">
+            <span class="card-meta-item">📍 나슈마르크트 근처</span>
+            <span class="card-meta-item">⏰ 11:30~21:00</span>
+          </div>
+          <div class="card-desc">만두 전문점 · 한국식 군만두·물만두 · 빈 한인 추천</div>
+          <div class="card-tip">💡 알베르티나에서 도보 15분 · 시간 여유 있을 때만</div>
+          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Mandu+Co+Wien+Mariahilfer+Str" target="_blank">📍 구글지도</a>
+          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
+        </div>
+
       </div>
     </div>
 
@@ -445,8 +443,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
     <div id="tab-dinner" class="tab-content">
       <div class="subtabs">
         <div class="subtab active" onclick="switchSub('sub-dinner-local',this,'dinner')">🍴 현지식</div>
-        <div class="subtab korean" onclick="switchSub('sub-dinner-asian',this,'dinner')">🥢 아시안</div>
-        <div class="subtab korean" onclick="switchSub('sub-dinner-korean',this,'dinner')">🍚 한식</div>
+        <div class="subtab korean" onclick="switchSub('sub-dinner-korean',this,'dinner')">🥢 아시안</div>
       </div>
 
       <div id="sub-dinner-local" class="subcontent active">
@@ -532,6 +529,8 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
 
+      </div>
+
         <div class="place-card" id="dc-bitzinger" onclick="selectDinner(this,'bitzinger')">
           <div class="card-header">
             <div class="card-name">비트징거 (Bitzinger Würstelstand)</div>
@@ -547,10 +546,9 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Bitzinger+Würstelstand+Albertinaplatz+Wien" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
-      </div>
 
-      <div id="sub-dinner-asian" class="subcontent">
-        <div class="sec-lbl">🥢 아시안</div>
+      <div id="sub-dinner-korean" class="subcontent">
+        <div class="sec-lbl">🥢 아시안 · 한식</div>
 
         <div class="place-card korean-card" id="dc-ostmeer" onclick="selectDinner(this,'ostmeer')">
           <div class="card-header">
@@ -566,10 +564,6 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Ostmeer+Restaurant+Wien+Rechte+Wienzeile" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
-      </div>
-
-      <div id="sub-dinner-korean" class="subcontent">
-        <div class="sec-lbl">🍚 한식</div>
 
         <div class="place-card korean-card" id="dc-kocos" onclick="selectDinner(this,'kocos')">
           <div class="card-header">
@@ -585,6 +579,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
           <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Kocos+Wien+Mariahilfer+Str" target="_blank">📍 구글지도</a>
           <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
+
       </div>
     </div>
 
@@ -983,6 +978,40 @@ function switchSub(id, el, group) {
 document.querySelectorAll('.tl-map-icon').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
 document.querySelectorAll('.move-card').forEach(el => el.addEventListener('click', e => e.stopPropagation()));
 document.querySelectorAll('.gmap-btn').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+
+// ── 드래그 리사이저 ──────────────────────────────────────────
+(function(){
+  const resizer = document.getElementById('resizer');
+  const mapEl   = document.getElementById('map');
+  const panel   = document.querySelector('.panel');
+  if(!resizer || !mapEl || !panel) return;
+  let startY = 0, startH = 0;
+  function onStart(e){
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    startH = mapEl.offsetHeight;
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onEnd);
+    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('touchend',  onEnd);
+    e.preventDefault();
+  }
+  function onMove(e){
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+    const newH = Math.max(120, Math.min(startH + (y - startY), window.innerHeight - 160));
+    mapEl.style.height = newH + 'px';
+    map.invalidateSize();
+    e.preventDefault();
+  }
+  function onEnd(){
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup',   onEnd);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend',  onEnd);
+  }
+  resizer.addEventListener('mousedown',  onStart);
+  resizer.addEventListener('touchstart', onStart, {passive:false});
+})();
+
 window.addEventListener('resize', () => map.invalidateSize());
 </script>
 </body>

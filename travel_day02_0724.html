@@ -25,6 +25,9 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
 .layout{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 #map{flex-shrink:0;height:calc(45vh - 52px);min-height:180px;position:relative;z-index:1;}
 #map .leaflet-tile-pane{filter:saturate(0.45) brightness(0.97) contrast(1.15);}
+#resizer{height:10px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);cursor:row-resize;flex-shrink:0;display:flex;align-items:center;justify-content:center;z-index:10;user-select:none;-webkit-user-select:none;}
+#resizer::after{content:'';width:32px;height:3px;border-radius:2px;background:var(--border);}
+
 .panel{flex:1;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
 .tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 4px;}
 .tab{flex:1;padding:11px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--soft);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;}
@@ -162,7 +165,8 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
     
   </div>
 
-  <div class="panel">
+  <div id="resizer"></div>
+<div class="panel">
     <div class="tabs">
       <div class="tab active" onclick="switchTab('timeline',this)">📋 일정</div>
       <div class="tab" onclick="switchTab('lunch',this)">🍽 점심</div>
@@ -397,7 +401,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
     <div id="tab-lunch" class="tab-content">
       <div class="subtabs">
         <div class="subtab active" onclick="switchSub('sub-lunch-local',this,'lunch')">🍴 현지식</div>
-        <div class="subtab korean" onclick="switchSub('sub-lunch-asian',this,'lunch')">🥢 아시안</div>
+        <div class="subtab korean" onclick="switchSub('sub-lunch-korean',this,'lunch')">🥢 아시안</div>
       </div>
 
       <div id="sub-lunch-local" class="subcontent active">
@@ -498,7 +502,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
 
       </div>
 
-      <div id="sub-lunch-asian" class="subcontent">
+      <div id="sub-lunch-korean" class="subcontent">
         <div class="sec-lbl">🥢 아시안</div>
 
         <div class="place-card korean-card" id="lc-pho" onclick="selectLunch(this,'pho')">
@@ -539,8 +543,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
     <div id="tab-dinner" class="tab-content">
       <div class="subtabs">
         <div class="subtab active" onclick="switchSub('sub-dinner-local',this,'dinner')">🍴 현지식</div>
-        <div class="subtab korean" onclick="switchSub('sub-dinner-asian',this,'dinner')">🥢 아시안</div>
-        <div class="subtab korean" onclick="switchSub('sub-dinner-pub',this,'dinner')">🍺 펍·와인바</div>
+        <div class="subtab korean" onclick="switchSub('sub-dinner-korean',this,'dinner')">🥢 아시안</div>
       </div>
 
       <div id="sub-dinner-local" class="subcontent active">
@@ -625,7 +628,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
 
       </div>
 
-      <div id="sub-dinner-asian" class="subcontent">
+      <div id="sub-dinner-korean" class="subcontent">
         <div class="sec-lbl">🥢 아시안 · 베트남</div>
 
         <div class="place-card korean-card" id="dc-pho" onclick="selectDinner(this,'pho_d')">
@@ -646,44 +649,6 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;colo
 
         <div style="background:#F4F9F4;border:1px dashed #B8D8C0;border-radius:var(--radius-card);padding:12px 14px;margin-bottom:10px;font-size:12px;color:#5A8A6A;line-height:1.7;">
           🏠 숙소 주방 완비 — 내일 기차 이동 전 간단히 해먹기 가능. SPAR (도보 5분, 21:00까지)에서 장보기.
-        </div>
-      </div>
-
-      <div id="sub-dinner-pub" class="subcontent">
-        <div class="sec-lbl">🍺 펍 · 루인바</div>
-
-        <div style="background:#FFF8E8;border:1px solid #E8D890;border-radius:var(--radius-card);padding:10px 13px;margin-bottom:12px;font-size:12px;color:#7A6010;line-height:1.7;">
-          ⚠️ 심플라 케르트는 오늘 저녁 일정에 확정 포함 (타임라인 ⑧번) — 아래는 심플라 전후 들를 수 있는 루인바 대안 또는 함께 방문할 바
-        </div>
-
-        <div class="place-card" id="dc-beerpeople" onclick="selectDinner(this,'beerpeople')">
-          <div class="card-header">
-            <div class="card-name">Beer People Budapest</div>
-            <div class="badges"><span class="badge saved">💾 저장됨</span></div>
-          </div>
-          <div class="card-meta">
-            <span class="card-meta-item">📍 유대인지구 · 심플라 케르트 도보 5분 이내</span>
-            <span class="card-meta-item">⏰ 16:00~24:00</span>
-          </div>
-          <div class="card-desc">루인펍 구역 내 크래프트 맥주 바 · 다양한 헝가리·체코 생맥주 구비 · 심플라보다 한산하고 조용한 분위기</div>
-          <div class="card-tip">💡 심플라와 동선 동일 — 분위기 비교 후 선택 or 심플라 전 예열용으로 활용</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Beer+People+Budapest+Kazinczy+utca" target="_blank">📍 구글지도</a>
-          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
-        </div>
-
-        <div class="place-card" id="dc-mazel_pub" onclick="selectDinner(this,'mazeltov')">
-          <div class="card-header">
-            <div class="card-name">Mazel Tov</div>
-            <div class="badges"><span class="badge verified">⭐ 4.5</span></div>
-          </div>
-          <div class="card-meta">
-            <span class="card-meta-item">📍 Akácfa u. 47 · 심플라 도보 3분</span>
-            <span class="card-meta-item">⏰ 12:00~24:00</span>
-          </div>
-          <div class="card-desc">실내 정원형 루인바 · 라이브 재즈 · 이스라엘 퓨전 식사 겸 가능 · 음료 단독 방문도 OK</div>
-          <div class="card-tip">💡 저녁 식사 + 음료를 한 곳에서 해결하고 싶을 때 · 심플라 전 1차로 최적</div>
-          <a class="gmap-btn" href="https://www.google.com/maps/search/?api=1&query=Mazel+Tov+Budapest+Akacfa+utca+47" target="_blank">📍 구글지도</a>
-          <div class="selected-notice">✅ 선택됨 — 일정에 반영</div>
         </div>
       </div>
     </div>
@@ -758,7 +723,6 @@ const LL = {
   parasztkonyha:[47.5002,19.0545],
   bonnie:     [47.4995, 19.0620],
   pho_d:      [47.4975, 19.0530],
-  beerpeople: [47.4993, 19.0648],
 };
 
 const MK = {};
@@ -947,7 +911,6 @@ const DINNER_DATA = {
   parasztkonyha: {c:GREEN, tip:'Parasztkonyha', name:'Parasztkonyha Restaurant',            desc:'헝가리 가정식 · TripAdvisor 4.7 · 굴라쉬'},
   bonnie:        {c:GREEN, tip:'Bonnie',        name:'Bonnie',                             desc:'유대인지구 분위기 식당 · 간이 짤 수 있음'},
   pho_d:         {c:GREEN, tip:'Pho-Astoria',   name:'Pho-Astoria Bistro',                 desc:'베트남 쌀국수 · 가볍고 담백'},
-  beerpeople:    {c:NIGHT, tip:'Beer People',   name:'Beer People Budapest',               desc:'루인펍 구역 크래프트 맥주 바 · 심플라 도보 5분'},
 };
 
 let selDinner = null;
@@ -1096,6 +1059,40 @@ function switchSub(id, el, group) {
 document.querySelectorAll('.tl-map-icon').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
 document.querySelectorAll('.move-card').forEach(el => el.addEventListener('click', e => e.stopPropagation()));
 document.querySelectorAll('.gmap-btn').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+
+// ── 드래그 리사이저 ──────────────────────────────────────────
+(function(){
+  const resizer = document.getElementById('resizer');
+  const mapEl   = document.getElementById('map');
+  const panel   = document.querySelector('.panel');
+  if(!resizer || !mapEl || !panel) return;
+  let startY = 0, startH = 0;
+  function onStart(e){
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    startH = mapEl.offsetHeight;
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onEnd);
+    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('touchend',  onEnd);
+    e.preventDefault();
+  }
+  function onMove(e){
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+    const newH = Math.max(120, Math.min(startH + (y - startY), window.innerHeight - 160));
+    mapEl.style.height = newH + 'px';
+    map.invalidateSize();
+    e.preventDefault();
+  }
+  function onEnd(){
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup',   onEnd);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend',  onEnd);
+  }
+  resizer.addEventListener('mousedown',  onStart);
+  resizer.addEventListener('touchstart', onStart, {passive:false});
+})();
+
 window.addEventListener('resize', () => map.invalidateSize());
 </script>
 </body>
