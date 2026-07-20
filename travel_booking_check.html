@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>예약 점검 · 동유럽 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e8eaf0;
+    --muted: #6b7080;
+    --green: #3ecf8e;
+    --yellow: #f5a623;
+    --red: #e05c5c;
+    --blue: #4f8ef7;
+    --purple: #9b6dff;
+  }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  .header {
+    padding: 40px 24px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 4px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .back-btn:hover { color: var(--text); border-color: #555; }
+  .header-text { flex: 1; }
+  .header-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .header-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+
+  /* 섹션 헤더 */
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 36px 0 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon { font-size: 16px; }
+  .section-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .section-count {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--muted);
+    background: #1f2230;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  /* 예약 카드 */
+  .booking-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .booking-card.done { border-left: 3px solid var(--green); }
+  .booking-card.warn { border-left: 3px solid var(--yellow); }
+  .booking-card.danger { border-left: 3px solid var(--red); }
+  .booking-card.info { border-left: 3px solid var(--blue); }
+
+  .bc-status {
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .bc-body { flex: 1; min-width: 0; }
+  .bc-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .bc-name {
+    font-size: 13px;
+    font-weight: 600;
+    flex: 1;
+    min-width: 0;
+  }
+  .bc-date {
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-top: 1px;
+  }
+  .bc-detail {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .bc-detail strong { color: #c8cad4; }
+  .bc-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 7px;
+  }
+  .tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .tag-voucher { background: rgba(62,207,142,.15); color: var(--green); }
+  .tag-time    { background: rgba(245,166,35,.15);  color: var(--yellow); }
+  .tag-noshow  { background: rgba(224,92,92,.15);   color: var(--red); }
+  .tag-cash    { background: rgba(79,142,247,.15);  color: var(--blue); }
+  .tag-card    { background: rgba(155,109,255,.15); color: var(--purple); }
+  .tag-free    { background: rgba(62,207,142,.10);  color: #5adaa8; }
+  .tag-pending { background: rgba(224,92,92,.12);   color: #f08080; }
+  .tag-app     { background: rgba(79,142,247,.12);  color: #7bb3fa; }
+  .tag-refund  { background: rgba(245,166,35,.12);  color: #f7c060; }
+
+  /* 주의사항 블록 */
+  .note-block {
+    background: rgba(245,166,35,.07);
+    border: 1px solid rgba(245,166,35,.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #c8b87a;
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+  .note-block.red {
+    background: rgba(224,92,92,.07);
+    border-color: rgba(224,92,92,.2);
+    color: #d4908a;
+  }
+
+  /* 장소별 입장 규정 */
+  .rules-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+  .rules-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .rules-head:hover { background: rgba(255,255,255,.03); }
+  .rules-city-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .rules-place { font-size: 13px; font-weight: 600; flex: 1; }
+  .rules-date  { font-size: 11px; color: var(--muted); }
+  .rules-chev  { color: var(--muted); font-size: 13px; transition: transform 0.2s; }
+  .rules-body  { display: none; padding: 0 16px 14px; }
+  .rules-card.open .rules-body  { display: block; }
+  .rules-card.open .rules-chev  { transform: rotate(90deg); }
+
+  .rule-row {
+    display: flex;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 12px;
+    border-bottom: 1px dashed #1e2535;
+    line-height: 1.5;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-icon { flex-shrink: 0; width: 18px; text-align: center; }
+  .rule-text { color: var(--muted); flex: 1; }
+  .rule-text strong { color: #c8cad4; }
+  .rule-text .warn { color: var(--yellow); }
+  .rule-text .danger { color: var(--red); }
+
+  /* 현장 구매 */
+  .onsite-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .onsite-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .onsite-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .onsite-info { flex: 1; }
+  .onsite-name { font-size: 13px; font-weight: 600; }
+  .onsite-detail { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .onsite-price { font-size: 12px; font-weight: 600; color: #c8cad4; white-space: nowrap; }
+
+  @media (max-width: 400px) {
+    .header { flex-direction: column; gap: 10px; }
+    .bc-top { flex-direction: column; gap: 3px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a class="back-btn" href="index.html">← 홈</a>
+  <div class="header-text">
+    <div class="header-eyebrow">2026 동유럽 여행</div>
+    <div class="header-title">예약 점검</div>
+    <div class="header-sub">바우처 보유 · 현장 구매 · 주의사항 한눈에 보기</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ══════════════════════════════════
+       1. 바우처 보유 (예약 완료)
+  ══════════════════════════════════ -->
+  <div class="section-head">
+    <span class="section-icon">✅</span>
+    <span class="section-title">바우처 보유 — 예약 완료</span>
+    <span class="section-count">13건</span>
+  </div>
+
+  <!-- 7/23 레젠다 크루즈 -->
+  <div class="booking-card done">
+    <span class="bc-status">🚢</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">레젠다 크루즈 (Danube Legend)</span>
+        <span class="bc-date">7/23 (목)</span>
+      </div>
+      <div class="bc-detail">
+        <strong>20:15 출발</strong> · Vigadó tér Dock 7 · 3인 €75 · 예약 ID 5118346
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+        <span class="tag tag-time">시간 엄수</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/24 마차슈 성당 -->
+  <div class="booking-card done">
+    <span class="bc-status">⛪</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">마차슈 성당</span>
+        <span class="bc-date">7/24 (금)</span>
+      </div>
+      <div class="bc-detail">
+        3인 3,400 Ft/인 · 날짜 지정 (연도 내 자유 사용 — 타워 제외)<br>
+        <span class="warn">⚠️ 타워 티켓은 지정 일시만 유효</span>
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/25 벨베데레 상궁 -->
+  <div class="booking-card done">
+    <span class="bc-status">🏛️</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">벨베데레 상궁</span>
+        <span class="bc-date">7/25 (토)</span>
+      </div>
+      <div class="bc-detail">
+        <strong>오후 2:00 (14:00) 입장</strong> · 3인 · GYG GYGRFQL3AW7N<br>
+        15분 전 도착 권장 · 셀카봉·대형 가방·음식음료 반입 불가
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+        <span class="tag tag-time">14:00 타임슬롯</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/26 쇤브룬 -->
+  <div class="booking-card done">
+    <span class="bc-status">👑</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">쇤브룬 Classic Pass</span>
+        <span class="bc-date">7/26 (일)</span>
+      </div>
+      <div class="bc-detail">
+        <strong>09:30~09:45 입장</strong> · 3인 €147 · Order 260712000247<br>
+        지각 시 환불 없이 실효 · 배낭 클로크룸 보관 필수 · 음식음료·플래시 불가
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+        <span class="tag tag-time">09:30 타임슬롯</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/26 레오폴트 -->
+  <div class="booking-card done">
+    <span class="bc-status">🎨</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">레오폴트 미술관 Fast Track</span>
+        <span class="bc-date">7/26 (일)</span>
+      </div>
+      <div class="bc-detail">
+        3인 성인 · Trip.com · Ref 2214875469 · 10:00~18:00<br>
+        패스트레인 카운터 (Tiqets 로고) 에 스마트폰 제시
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/27 시시 뮤지엄 -->
+  <div class="booking-card done">
+    <span class="bc-status">👸</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">시시 뮤지엄 (호프부르크)</span>
+        <span class="bc-date">7/27 (월)</span>
+      </div>
+      <div class="bc-detail">
+        <strong>13:30~13:45 입장</strong> · 3인 €60 · Order 260712000354<br>
+        지각 시 티켓 무효 · 캐리어·대형 가방·셀피스틱·플래시 반입 불가 · 보관함 없음
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+        <span class="tag tag-time">13:30 타임슬롯</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/27 알베르티나 -->
+  <div class="booking-card done">
+    <span class="bc-status">🖼️</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">알베르티나 미술관</span>
+        <span class="bc-date">7/27 (월)</span>
+      </div>
+      <div class="bc-detail">
+        3인 성인 · Trip.com · Ref 244747177 · 10:00~18:00<br>
+        가방·코트 입구에서 맡김 · 액체류 반입 불가 · 이어폰+스마트폰으로 오디오 가이드
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/27 비발디 공연 -->
+  <div class="booking-card done">
+    <span class="bc-status">🎻</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">카를 성당 비발디 사계 공연</span>
+        <span class="bc-date">7/27 (월)</span>
+      </div>
+      <div class="bc-detail">
+        <strong>20:15 시작</strong> · 약 75분 · 에어컨 없음 — 얇게 입기
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+        <span class="tag tag-time">20:00 도착 목표</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/28 카페 자허 -->
+  <div class="booking-card done">
+    <span class="bc-status">☕</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">카페 자허 Wien</span>
+        <span class="bc-date">7/28 (화)</span>
+      </div>
+      <div class="bc-detail">
+        <strong>09:15 예약</strong> · 3인 · 1시간 제한<br>
+        <span class="warn">⚠️ 15분 이상 지각 시 자동 취소 + 노쇼 €15/인(3인 €45)</span>
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-time">09:00 전 도착 필수</span>
+        <span class="tag tag-noshow">노쇼 €15/인</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/29 헬브룬 -->
+  <div class="booking-card done">
+    <span class="bc-status">💦</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">헬브룬 트릭분수 (Wasserspiele)</span>
+        <span class="bc-date">7/29 (수)</span>
+      </div>
+      <div class="bc-detail">
+        <strong>10:00 입장</strong> · 3인 각 €16.50 · 입장 10분 전 도착 권장<br>
+        슐로스 방문은 입장시간 무관하게 영업시간 내 자유
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+        <span class="tag tag-time">10:00 입장</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/29 호엔잘츠부르크 -->
+  <div class="booking-card done">
+    <span class="bc-status">🏰</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">호엔잘츠부르크 FestungsBahn 푸니쿨라</span>
+        <span class="bc-date">7/29 (수)</span>
+      </div>
+      <div class="bc-detail">
+        3인 · 성 입장 포함 · 5/1~9/30 08:30~20:00 운영
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7/30 다흐슈타인 -->
+  <div class="booking-card done">
+    <span class="bc-status">🏔️</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">다흐슈타인 5핑거즈 케이블카</span>
+        <span class="bc-date">7/30 (목)</span>
+      </div>
+      <div class="bc-detail">
+        3인 각 €46.70 · Krippenstein Obertraun · Booking 6XFD-F7SP<br>
+        <span class="warn">⚠️ 정상 기온 12~17°C — 바람막이·후리스 필수</span><br>
+        마지막 상행 17:00 → <strong>15:30 이전 하산 탑승</strong> 필수
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+        <span class="tag tag-time">15:30 하산 마감</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CK셔틀 -->
+  <div class="booking-card done">
+    <span class="bc-status">🚐</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">CK셔틀 (바트이슐→CK / CK→프라하)</span>
+        <span class="bc-date">8/2 · 8/4</span>
+      </div>
+      <div class="bc-detail">
+        8/2 <strong>09:15</strong> Berggasse 8 출발 → Garni Hotel Castle Bridge<br>
+        8/4 <strong>08:35</strong> Garni Hotel 출발 → Hotel International Prague<br>
+        각 3인 3,600 CZK · 출발 5분 전 픽업 장소 대기 필수
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+        <span class="tag tag-time">8/2 09:15 / 8/4 08:35</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 프라하 성 -->
+  <div class="booking-card done">
+    <span class="bc-status">🗝️</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">프라하 성 Main Circuit</span>
+        <span class="bc-date">8/5 (수)</span>
+      </div>
+      <div class="bc-detail">
+        3인 · GYG GYG996ZXHK8G · 09:00~17:00 (역사 건물 16:00 마감)<br>
+        각 건물 입구에서 개별 스캔 · 로브코비츠 궁전 미포함 · 드론·플래시·반려동물 불가<br>
+        <span class="warn">⚠️ 취소: 8/4 오전 9:00 이전</span>
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-voucher">바우처 있음</span>
+        <span class="tag tag-refund">8/4 09:00 전 취소 가능</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       2. 처리 필요
+  ══════════════════════════════════ -->
+  <div class="section-head">
+    <span class="section-icon">⚠️</span>
+    <span class="section-title">처리 필요</span>
+    <span class="section-count">3건</span>
+  </div>
+
+  <div class="booking-card danger">
+    <span class="bc-status">🍺</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">스트라호프 양조장</span>
+        <span class="bc-date">8/5 (수) 18:00</span>
+      </div>
+      <div class="bc-detail">
+        성수기 만석 빈번 · 이메일 발송 후 미답장 상태<br>
+        <strong>전화 즉시 예약: +420 233 353 155</strong><br>
+        이메일: kancelar@klasterni-pivovar.cz
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-pending">예약 미완료</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="booking-card warn">
+    <span class="bc-status">🏡</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">B40 Green ApartRooms — 체크아웃 절차</span>
+        <span class="bc-date">7/25 (토) 아침</span>
+      </div>
+      <div class="bc-detail">
+        09:10 기차 출발 · 정규 체크아웃 10:00 → 조기 체크아웃 필요<br>
+        리셉션 16:00까지만 운영 · 무인 체크인 코드 + 열쇠 처리 방법 미확인<br>
+        이메일 또는 전화로 확인 필요
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-pending">확인 필요</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="booking-card warn">
+    <span class="bc-status">🏊</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">The Gallery — 살츠카머구트 카드 발급 여부</span>
+        <span class="bc-date">7/31~8/2</span>
+      </div>
+      <div class="bc-detail">
+        문의 발송했으나 살츠카머구트 투어리즘에서 회신 (The Gallery 본인 미확인)<br>
+        카드 있으면: 캐트린 케이블카 €26/인, 온천 10% 할인<br>
+        연락처: galleryapartments@gmx.at / +43 664 4642494
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-pending">확인 필요</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       3. 고사우 버스 (앱 확인 필요)
+  ══════════════════════════════════ -->
+  <div class="section-head">
+    <span class="section-icon">🎫</span>
+    <span class="section-title">결제 완료 — 탑승권 별도 확인</span>
+    <span class="section-count">1건</span>
+  </div>
+
+  <div class="booking-card info">
+    <span class="bc-status">🚌</span>
+    <div class="bc-body">
+      <div class="bc-top">
+        <span class="bc-name">고사우 버스 (OÖVV 왕복)</span>
+        <span class="bc-date">8/1 (토)</span>
+      </div>
+      <div class="bc-detail">
+        Bad Ischl → Gosausee <strong>13:14</strong> 출발 / 복귀 <strong>17:45</strong><br>
+        3인 왕복 €62.40 · ÖBB 앱 Buchungscode: 0440 2148 5820 1885<br>
+        현재 보유: 결제 확인서 (Vorsteuerbescheinigung) — <strong>탑승권 아님</strong><br>
+        <span class="warn">⚠️ ÖBB 앱 "meine Tickets"에서 실제 탑승권 확인 필요</span><br>
+        취소: 7/31 23:59까지 무료
+      </div>
+      <div class="bc-tags">
+        <span class="tag tag-app">ÖBB 앱 확인 필요</span>
+        <span class="tag tag-refund">7/31까지 취소 가능</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       4. 현장 구매 항목
+  ══════════════════════════════════ -->
+  <div class="section-head">
+    <span class="section-icon">🏧</span>
+    <span class="section-title">현장 구매</span>
+    <span class="section-count">14건</span>
+  </div>
+
+  <div class="note-block">
+    💳 어부의 요새 상부 타워 — <strong>카드 전용, 현금 불가</strong><br>
+    💵 할슈타트 납골당 — <strong>현금 €2 필수</strong><br>
+    🎫 살츠카머구트 카드 할인 — <strong>카운터 직접 제시 (키오스크 불가)</strong>
+  </div>
+
+  <div class="onsite-grid">
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#4f8ef7"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">어부의 요새 상부 타워</div>
+        <div class="onsite-detail">7/24 (금) · 카드 전용, 현금 불가</div>
+      </div>
+      <div class="onsite-price">1,700 HUF/인</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#4f8ef7"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">할슈타트 납골당</div>
+        <div class="onsite-detail">7/30 (목) · 현금만 · 온라인 구매 불가</div>
+      </div>
+      <div class="onsite-price">€2 현금</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#f5a623"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">묀히스베르크 엘리베이터</div>
+        <div class="onsite-detail">7/29 (수) · 21:00까지 운영</div>
+      </div>
+      <div class="onsite-price">왕복 €4.80</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#f5a623"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">묀히스베르크 현대미술관</div>
+        <div class="onsite-detail">7/29 (수) · 10:00~18:00 (선택)</div>
+      </div>
+      <div class="onsite-price">€15</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#3ecf8e"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">캐트린 케이블카</div>
+        <div class="onsite-detail">8/1 (토) · 살츠카머구트 카드 있으면 €26/인</div>
+      </div>
+      <div class="onsite-price">€28/인 (정가)</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#3ecf8e"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">유로데르멘 온천 (4시간권)</div>
+        <div class="onsite-detail">8/1 (토) · 살츠카머구트 카드 10% 할인 → 카운터 직접 제시 / 수건 미지참 시 €8.50 대여</div>
+      </div>
+      <div class="onsite-price">€32.50/인</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#3ecf8e"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">카이저빌라</div>
+        <div class="onsite-detail">7/31 (금) 또는 8/1 (토) · 현장 결정</div>
+      </div>
+      <div class="onsite-price">€6.70~€21</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#e05c5c"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">에곤 쉴레 미술관</div>
+        <div class="onsite-detail">8/2 (일)</div>
+      </div>
+      <div class="onsite-price">200 CZK/인</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#e05c5c"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">체스키크룸로프 성탑</div>
+        <div class="onsite-detail">8/3 (월) · 가이드 투어 불가 (월요일) · 성탑 셀프 관람만</div>
+      </div>
+      <div class="onsite-price">현장 확인</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#f7c94f"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">비셰흐라드 성당</div>
+        <div class="onsite-detail">8/4 (화)</div>
+      </div>
+      <div class="onsite-price">130 CZK/인</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#f7c94f"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">천문시계탑</div>
+        <div class="onsite-detail">8/4 (화) · 현장 350 CZK / 얼리버드(09:00) 175 CZK</div>
+      </div>
+      <div class="onsite-price">350 CZK/인</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#f7c94f"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">벨레트르주니 궁전</div>
+        <div class="onsite-detail">8/5 (수)</div>
+      </div>
+      <div class="onsite-price">250 CZK/인</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#6b7080"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">심플라 케르트 (루인펍)</div>
+        <div class="onsite-detail">7/24 (금) · 입장 무료</div>
+      </div>
+      <div class="onsite-price tag-free" style="font-size:11px; padding:2px 8px; border-radius:4px; background:rgba(62,207,142,.1); color:#5adaa8;">무료</div>
+    </div>
+    <div class="onsite-card">
+      <div class="onsite-dot" style="background:#6b7080"></div>
+      <div class="onsite-info">
+        <div class="onsite-name">카를교 야경 · 겔레르트 언덕 · 미라벨 정원 등</div>
+        <div class="onsite-detail">무료 개방</div>
+      </div>
+      <div class="onsite-price" style="font-size:11px; padding:2px 8px; border-radius:4px; background:rgba(62,207,142,.1); color:#5adaa8;">무료</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       5. 장소별 입장 규정
+  ══════════════════════════════════ -->
+  <div class="section-head">
+    <span class="section-icon">🚫</span>
+    <span class="section-title">장소별 입장 규정</span>
+  </div>
+
+  <!-- 쇤브룬 -->
+  <div class="rules-card">
+    <div class="rules-head" onclick="toggle(this)">
+      <div class="rules-city-dot" style="background:#9b6dff"></div>
+      <span class="rules-place">쇤브룬 궁전</span>
+      <span class="rules-date">7/26 (일)</span>
+      <span class="rules-chev">›</span>
+    </div>
+    <div class="rules-body">
+      <div class="rule-row"><span class="rule-icon">🎒</span><span class="rule-text"><strong>배낭 클로크룸 의무 보관</strong> (입구 클로크룸 이용)</span></div>
+      <div class="rule-row"><span class="rule-icon">🍔</span><span class="rule-text">궁전 내부 음식·음료 반입 불가</span></div>
+      <div class="rule-row"><span class="rule-icon">📸</span><span class="rule-text">삼각대·셀카봉·플래시 사용 불가</span></div>
+      <div class="rule-row"><span class="rule-icon">🐶</span><span class="rule-text">반려동물 궁전·공원 내 입장 불가</span></div>
+      <div class="rule-row"><span class="rule-icon">⏰</span><span class="rule-text"><span class="danger">타임슬롯 지각 시 환불 없이 실효</span></span></div>
+    </div>
+  </div>
+
+  <!-- 벨베데레 -->
+  <div class="rules-card">
+    <div class="rules-head" onclick="toggle(this)">
+      <div class="rules-city-dot" style="background:#9b6dff"></div>
+      <span class="rules-place">벨베데레 상궁</span>
+      <span class="rules-date">7/25 (토) 14:00</span>
+      <span class="rules-chev">›</span>
+    </div>
+    <div class="rules-body">
+      <div class="rule-row"><span class="rule-icon">🎒</span><span class="rule-text">음식·음료 반입 불가</span></div>
+      <div class="rule-row"><span class="rule-icon">👜</span><span class="rule-text">수하물·대형 가방 반입 불가</span></div>
+      <div class="rule-row"><span class="rule-icon">🤳</span><span class="rule-text">셀카봉 반입 불가</span></div>
+      <div class="rule-row"><span class="rule-icon">⏰</span><span class="rule-text"><span class="danger">예약 시간에만 유효 · 15분 전 도착 권장</span></span></div>
+    </div>
+  </div>
+
+  <!-- 시시 뮤지엄 -->
+  <div class="rules-card">
+    <div class="rules-head" onclick="toggle(this)">
+      <div class="rules-city-dot" style="background:#9b6dff"></div>
+      <span class="rules-place">시시 뮤지엄 (호프부르크)</span>
+      <span class="rules-date">7/27 (월) 13:30</span>
+      <span class="rules-chev">›</span>
+    </div>
+    <div class="rules-body">
+      <div class="rule-row"><span class="rule-icon">🧳</span><span class="rule-text"><span class="danger">캐리어·가방·스쿠터 등 부피 있는 짐 반입 불가 · 보관함 없음</span></span></div>
+      <div class="rule-row"><span class="rule-icon">📸</span><span class="rule-text">삼각대·셀카봉·플래시 사용 불가</span></div>
+      <div class="rule-row"><span class="rule-icon">⏰</span><span class="rule-text"><span class="danger">지정 시간 지각 시 티켓 무효</span></span></div>
+      <div class="rule-row"><span class="rule-icon">🎧</span><span class="rule-text">오디오 가이드 13개 언어 무료 제공</span></div>
+    </div>
+  </div>
+
+  <!-- 알베르티나 -->
+  <div class="rules-card">
+    <div class="rules-head" onclick="toggle(this)">
+      <div class="rules-city-dot" style="background:#9b6dff"></div>
+      <span class="rules-place">알베르티나 미술관</span>
+      <span class="rules-date">7/27 (월)</span>
+      <span class="rules-chev">›</span>
+    </div>
+    <div class="rules-body">
+      <div class="rule-row"><span class="rule-icon">🎒</span><span class="rule-text">가방·배낭·코트 입구에서 의무 보관</span></div>
+      <div class="rule-row"><span class="rule-icon">💧</span><span class="rule-text">액체류 반입 불가</span></div>
+      <div class="rule-row"><span class="rule-icon">🎧</span><span class="rule-text">본인 이어폰+스마트폰으로 웹 오디오 가이드 이용</span></div>
+    </div>
+  </div>
+
+  <!-- 마차슈 성당 -->
+  <div class="rules-card">
+    <div class="rules-head" onclick="toggle(this)">
+      <div class="rules-city-dot" style="background:#4f8ef7"></div>
+      <span class="rules-place">마차슈 성당</span>
+      <span class="rules-date">7/24 (금)</span>
+      <span class="rules-chev">›</span>
+    </div>
+    <div class="rules-body">
+      <div class="rule-row"><span class="rule-icon">👗</span><span class="rule-text"><strong>복장 규정 있음</strong> — 민소매·짧은 바지 불가, 어깨 가리기 필요</span></div>
+      <div class="rule-row"><span class="rule-icon">🎫</span><span class="rule-text">성당 티켓은 당해 연도 자유 사용 · 타워 티켓은 지정 일시만 유효</span></div>
+    </div>
+  </div>
+
+  <!-- 다흐슈타인 -->
+  <div class="rules-card">
+    <div class="rules-head" onclick="toggle(this)">
+      <div class="rules-city-dot" style="background:#3ecf8e"></div>
+      <span class="rules-place">다흐슈타인 5핑거즈</span>
+      <span class="rules-date">7/30 (목)</span>
+      <span class="rules-chev">›</span>
+    </div>
+    <div class="rules-body">
+      <div class="rule-row"><span class="rule-icon">🌡️</span><span class="rule-text"><span class="danger">정상 기온 12~17°C — 바람막이·후리스 필수</span></span></div>
+      <div class="rule-row"><span class="rule-icon">⏰</span><span class="rule-text"><span class="danger">마지막 상행 17:00 → 15:30 이전 하산 탑승 필수</span></span></div>
+      <div class="rule-row"><span class="rule-icon">🚌</span><span class="rule-text">소금광산 미개장 · 오베르트라운까지 버스로 이동</span></div>
+    </div>
+  </div>
+
+  <!-- 프라하 성 -->
+  <div class="rules-card">
+    <div class="rules-head" onclick="toggle(this)">
+      <div class="rules-city-dot" style="background:#f7c94f"></div>
+      <span class="rules-place">프라하 성 Main Circuit</span>
+      <span class="rules-date">8/5 (수)</span>
+      <span class="rules-chev">›</span>
+    </div>
+    <div class="rules-body">
+      <div class="rule-row"><span class="rule-icon">📍</span><span class="rule-text">집합장소 없음 · 각 건물 입구에서 개별 스캔</span></div>
+      <div class="rule-row"><span class="rule-icon">🏛️</span><span class="rule-text">역사 건물 16:00 마감 · 마지막 입장 15:40</span></div>
+      <div class="rule-row"><span class="rule-icon">🚁</span><span class="rule-text">드론 금지</span></div>
+      <div class="rule-row"><span class="rule-icon">📸</span><span class="rule-text">플래시 사용 금지</span></div>
+      <div class="rule-row"><span class="rule-icon">🐶</span><span class="rule-text">반려동물 불가 (보조견 허용)</span></div>
+      <div class="rule-row"><span class="rule-icon">🏰</span><span class="rule-text">로브코비츠 궁전 별도 시설 · 본 티켓 미포함</span></div>
+    </div>
+  </div>
+
+  <!-- 카페 자허 -->
+  <div class="rules-card">
+    <div class="rules-head" onclick="toggle(this)">
+      <div class="rules-city-dot" style="background:#9b6dff"></div>
+      <span class="rules-place">카페 자허</span>
+      <span class="rules-date">7/28 (화) 09:15</span>
+      <span class="rules-chev">›</span>
+    </div>
+    <div class="rules-body">
+      <div class="rule-row"><span class="rule-icon">⏰</span><span class="rule-text"><span class="danger">1시간 이용 제한 · 15분 이상 지각 시 자동 취소</span></span></div>
+      <div class="rule-row"><span class="rule-icon">💳</span><span class="rule-text">노쇼 시 €15/인 청구 (3인 총 €45)</span></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggle(head) {
+  head.closest('.rules-card').classList.toggle('open');
+}
+</script>
+</body>
+</html>
