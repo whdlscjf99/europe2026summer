@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>동유럽 출발 전 최종 체크리스트 v3</title>
+<style>
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --card2: #162032;
+  --border: #2d3f5a;
+  --text: #e8edf5;
+  --sub: #94a3b8;
+  --muted: #4a5f7a;
+  --red: #f87171;
+  --red-bg: #1f1118;
+  --red-bd: #4a1f2a;
+  --orange: #fb923c;
+  --orange-bg: #1f1508;
+  --orange-bd: #4a3010;
+  --yellow: #fbbf24;
+  --yellow-bg: #1a1505;
+  --yellow-bd: #3d3008;
+  --green: #34d399;
+  --green-bg: #0a1f16;
+  --green-bd: #1a4030;
+  --blue: #60a5fa;
+  --blue-bg: #0d1528;
+  --blue-bd: #1a2d50;
+  --purple: #a78bfa;
+  --purple-bg: #160d28;
+  --purple-bd: #2d1a50;
+  --teal: #2dd4bf;
+  --teal-bg: #0a1f1e;
+  --teal-bd: #1a3d3a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Malgun Gothic','맑은 고딕',-apple-system,sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 28px 16px 80px;
+}
+.page-header { text-align: center; margin-bottom: 8px; }
+.page-header h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; }
+.page-header p { font-size: .75rem; color: var(--muted); margin-top: 4px; }
+
+.progress-wrap { max-width: 720px; margin: 14px auto 4px; background: var(--border); border-radius: 99px; height: 6px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--green); border-radius: 99px; transition: width .3s; }
+.progress-text { text-align: center; font-size: .7rem; color: var(--muted); margin-bottom: 24px; }
+
+.section { max-width: 720px; margin: 0 auto 28px; }
+.section-title {
+  font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); padding: 0 2px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.section-title::after { content:''; flex:1; height:1px; background: var(--border); }
+
+.item {
+  border-radius: 9px; border: 1px solid var(--border);
+  background: var(--card); padding: 11px 13px;
+  margin-bottom: 6px; display: flex; gap: 10px;
+  align-items: flex-start; cursor: pointer;
+  transition: opacity .15s, background .15s;
+}
+.item:hover { background: #243050; }
+.item.done { opacity: .4; }
+.item.done .item-title { text-decoration: line-through; color: var(--muted); }
+
+.item.urgent  { border-left: 3px solid var(--red);    background: var(--red-bg);    border-color: var(--red-bd); }
+.item.caution { border-left: 3px solid var(--orange);  background: var(--orange-bg); border-color: var(--orange-bd); }
+.item.info    { border-left: 3px solid var(--blue);    background: var(--blue-bg);   border-color: var(--blue-bd); }
+.item.print   { border-left: 3px solid var(--yellow);  background: var(--yellow-bg); border-color: var(--yellow-bd); }
+.item.pack    { border-left: 3px solid var(--purple);  background: var(--purple-bg); border-color: var(--purple-bd); }
+.item.tip     { border-left: 3px solid var(--teal);    background: var(--teal-bg);   border-color: var(--teal-bd); }
+.item.done-fixed { border-left: 3px solid var(--green); background: var(--green-bg); border-color: var(--green-bd); opacity: .5; cursor: default; }
+
+.cb {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0; margin-top: 2px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, border-color .15s;
+}
+.item.done .cb { background: var(--green); border-color: var(--green); }
+.item.done .cb::after { content: '✓'; color: #0a1f16; font-size: 10px; font-weight: 800; }
+.item.done-fixed .cb { background: var(--green); border-color: var(--green); }
+.item.done-fixed .cb::after { content: '✓'; color: #0a1f16; font-size: 10px; font-weight: 800; }
+
+.item-body { flex: 1; min-width: 0; }
+.item-top { display: flex; align-items: flex-start; gap: 7px; flex-wrap: wrap; margin-bottom: 4px; }
+.cat { font-size: .58rem; font-weight: 700; border-radius: 3px; padding: 2px 6px; white-space: nowrap; margin-top: 2px; }
+.cat-mail  { background: rgba(248,113,113,.18); color: var(--red); }
+.cat-book  { background: rgba(251,146,60,.18); color: var(--orange); }
+.cat-info  { background: rgba(96,165,250,.18); color: var(--blue); }
+.cat-print { background: rgba(251,191,36,.18); color: var(--yellow); }
+.cat-pack  { background: rgba(167,139,250,.18); color: var(--purple); }
+.cat-tip   { background: rgba(45,212,191,.18); color: var(--teal); }
+.cat-done  { background: rgba(52,211,153,.18); color: var(--green); }
+
+.item-title { font-size: .83rem; font-weight: 600; line-height: 1.35; flex: 1; }
+.item-desc { font-size: .7rem; color: var(--sub); line-height: 1.65; margin-top: 2px; }
+.item-desc strong { color: var(--text); }
+
+.note { font-size: .65rem; color: var(--yellow); background: rgba(251,191,36,.07); border: 1px solid rgba(251,191,36,.2); border-radius: 4px; padding: 4px 8px; margin-top: 6px; line-height: 1.5; }
+.note.blue { color: var(--blue); background: rgba(96,165,250,.07); border-color: rgba(96,165,250,.2); }
+.note.green { color: var(--green); background: rgba(52,211,153,.07); border-color: rgba(52,211,153,.2); }
+
+.reset-btn {
+  display: block; margin: 24px auto 0; font-size: .68rem; color: var(--muted);
+  background: none; border: 1px solid var(--border); border-radius: 7px;
+  padding: 7px 18px; cursor: pointer; transition: color .15s, border-color .15s;
+}
+.reset-btn:hover { color: var(--red); border-color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>🧳 동유럽 출발 전 최종 체크리스트</h1>
+  <p>2026년 7월 23일 출발 · 부다페스트→빈→잘츠부르크→바트이슐→체스키크룸로프→프라하 · v3 (7/14 업데이트)</p>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="pf" style="width:0%"></div></div>
+<div class="progress-text" id="pt">0 / 0 완료</div>
+
+
+<!-- 1. 이메일 발송 -->
+<div class="section">
+  <div class="section-title">📧 이메일 발송 / 확인 — 지금 당장</div>
+
+  <div class="item done-fixed" data-id="mail-b40">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">B40 Green ApartRooms — 체크인/아웃 절차 확인 완료 (Adam Blayer)</span></div>
+      <div class="item-desc">
+        체크인 <strong>15:00~</strong> · 셀프 체크인 · 출발 전 코드 이메일 발송 · 리셉션 방문 불필요<br>
+        체크아웃 <strong>10:00</strong> · 나가고 문 닫으면 끝 · 카드·키 반납 없음 (코드 자동 만료)
+      </div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="mail-albertina">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">알베르티나 바우처 — 수령 확인 완료</span></div>
+      <div class="item-desc">
+        Trip.com / Tiqets 발행 · 성인 3장 (TC-ALB-a-0000045079211-001~003)<br>
+        <strong>주의:</strong> GYG가 아닌 Tiqets 발행 — Day 5 HTML 제작 시 수정 필요
+      </div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="mail-strahov">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">스트라호프 양조장 — 예약 확인 완료 (Ondřej Biebl)</span></div>
+      <div class="item-desc">
+        <strong>예약 내용:</strong> 8/5(수) 18:00 · 3인 · 스크린샷 저장 완료
+      </div>
+    </div>
+  </div>
+
+  <div class="item caution" data-id="mail-gallery-check">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-mail">답장대기</span><span class="item-title">The Gallery Bad Ischl — 웹폼 발송 완료, 답장 대기 중</span></div>
+      <div class="item-desc">
+        <strong>발송 완료 (7/14)</strong> · Salzkammergut 관광청 웹폼 경유<br>
+        ① 살츠카머구트 카드 발급 여부 ② 8/2 09:00 조기 체크아웃 절차<br>
+        <strong>무응답 시 직접 이메일:</strong> galleryapartments@gmx.at · 전화: +43 664 4642494
+      </div>
+    </div>
+  </div>
+
+  <div class="item caution" data-id="mail-garni-checkout">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-mail">답장대기</span><span class="item-title">가르니 호텔 캐슬 브리지 — 발송 완료, 답장 대기 중</span></div>
+      <div class="item-desc">
+        <strong>발송 완료 (7/14)</strong> · hotel@castlebridge.cz<br>
+        8/4 08:20 출발 (08:35 CK셔틀) — 조기 체크아웃 절차 + 짐 보관 가능 여부 문의
+      </div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="mail-grand-checkin">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">Grand Hotel International 프라하 — 체크인/아웃 확인 완료 (Yuliia Serzheniuk)</span></div>
+      <div class="item-desc">
+        체크인 <strong>15:00</strong> · 체크아웃 <strong>11:00</strong> · 리셉션 24/7<br>
+        얼리 체크인 당일 상황에 따라 가능 (도착 시 직접 문의) · 짐 보관 무료<br>
+        8/4 12:00~12:30 도착 → 짐 맡기고 비셰흐라드 출발
+      </div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="mail-salzwelten">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅확정</span><span class="item-title">Salzwelten Hallstatt — 2026년 여름 전체 폐쇄 확정</span></div>
+      <div class="item-desc">
+        공식 사이트 기준 2026년 여름 내내 폐쇄 확정 — 문의 불필요<br>
+        <strong>대체 확정:</strong> 다흐슈타인 5핑거스(예약 완료) + 고사우 버스(예약 완료)
+      </div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="mail-villa">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">빌라 엘리사 — Guest Mobility Ticket 온라인 체크인 제출 완료</span></div>
+      <div class="item-desc">
+        3인(조인철·한수연·한시현) 폼 제출 확인 (Booking ref: B/6178459293/w1770561131)<br>
+        <strong>체크인 시 반드시 요청:</strong> "Guest Mobility Ticket for 3 persons"
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 2. 사전 예약 -->
+<div class="section">
+  <div class="section-title">🎫 사전 예약</div>
+
+  <div class="item done-fixed" data-id="book-gosau">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">고사우 버스 티켓 — 예약 완료</span></div>
+      <div class="item-desc">
+        <strong>경로:</strong> Bad Ischl ↔ Vorderer Gosausee (541→542번 왕복)<br>
+        <strong>티켓:</strong> OÖVV Freizeit-Ticket OÖ + Day Ticket · <strong>3인 왕복 €62.40</strong><br>
+        <strong>사용일:</strong> 8/1(토) 13:14 출발 / 17:45 복귀 · <strong>취소 기한:</strong> 7/31 23:59<br>
+        <strong>티켓:</strong> <a href="https://shop.oebbtickets.at/en/ticket/postcheckout/153710b4-dd85-4b73-ba1a-34784a633b3c" target="_blank" style="color:#34d399;">ÖBB 링크 열기 →</a>
+      </div>
+      <div class="note">⚠️ PDF 발급은 8/1 아침에만 — PDF 생성 즉시 환불 불가</div>
+    </div>
+  </div>
+
+  <div class="item caution" data-id="book-dachstein">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-book">예약권장</span><span class="item-title">다흐슈타인 5핑거스 파노라마 티켓 — 7/30(목)</span></div>
+      <div class="item-desc">
+        <strong>가격:</strong> 온라인 €46.70 / 현장 €47.90 · <strong>구매:</strong> dachstein-salzkammergut.com<br>
+        <strong>탑승장:</strong> Obertraun Dachsteinseilbahn, Winkl 86 (543번 버스 종점)<br>
+        <strong>마지막 상행:</strong> 17:00 — 15:30 이전 탑승 권장
+      </div>
+      <div class="note blue">Salzwelten 2026년 여름 전체 폐쇄 확정 — 5핑거스 + 고사우로 확정</div>
+    </div>
+  </div>
+
+  <div class="item caution" data-id="book-badischl-taxi">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-book">현장예약</span><span class="item-title">Bad Ischl 캐트린 케이블카 택시 — The Gallery 체크인 시 요청</span></div>
+      <div class="item-desc">
+        <strong>구간:</strong> The Gallery (Berggasse 8) → 캐트린 케이블카 탑승장 (Kaltenbachstraße 62) · 3.4km<br>
+        <strong>시간:</strong> 8/1(토) 08:30 출발 · 요금 €5~8 예상<br>
+        <strong>방법:</strong> 7/31 체크인 시 프런트에 "다음날 08:30 택시 예약" 부탁<br>
+        토요일 시내버스(551/552) 운행 없음 — 택시 외 대안 없음
+      </div>
+    </div>
+  </div>
+
+  <!-- 완료된 예약들 -->
+  <div class="item done-fixed" data-id="book-cruise">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">다뉴브강 야경 크루즈 (Legenda) — 7/23(목) 20:15</span></div>
+      <div class="item-desc">예약 완료 · Reservation ID: 5118346 · Dock 7 (Jane Haining rakpart, Vigadó tér)</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-matthias">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">마차시 성당 — 7/24(금), 3인</span></div>
+      <div class="item-desc">예약 완료 · 3,400 HUF/인 · 2026 연간 유효 (날짜 유연)</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-belvedere">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">벨베데레 상궁 — 7/25(토) 14:00, 3인</span></div>
+      <div class="item-desc">예약 완료 · GYG GYGRFQL3AW7N · 15분 전 도착 필수 · 백팩·음식·셀카봉 반입 불가</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-leopold">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">레오폴트 미술관 — 7/26(일), 3인</span></div>
+      <div class="item-desc">예약 완료 · Trip.com VQV-BG9P5R · Fast Track · 스마트폰 제시</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-schoenbrunn">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">쇤부른 Classic Pass — 7/26(일) 09:30~09:45, 3인</span></div>
+      <div class="item-desc">예약 완료 · €49/인 · 주문번호 260712000247 · 지각 즉시 실효, 환불 없음</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-hofburg">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">호프부르크 시시뮤지엄 — 7/27(월) 13:30~13:45, 3인</span></div>
+      <div class="item-desc">예약 완료 · €20/인 · 주문번호 260712000354 · Michaelerkuppel 입구</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-sacher">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">카페 자허 — 예약 완료</span></div>
+      <div class="item-desc">예약 완료 · 노쇼 €15/인 패널티 주의</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-hellbrunn">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">헬브룬 트릭분수 — 7/29(수) 10:00, 3인</span></div>
+      <div class="item-desc">예약 완료 · €16.50/인 · 인보이스번호 1784136 · 10분 전 도착 필수</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-festung">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">호엔잘츠부르크 푸니쿨라+성 — 7/29(수), 3인</span></div>
+      <div class="item-desc">예약 완료 · Basicticket · 시리얼번호 7/96/6508~6510</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-vivaldi">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">카를 성당 비발디 사계 공연 — 7/27(월) 20:15</span></div>
+      <div class="item-desc">예약 완료</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-prague-castle">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">프라하성 Main Circuit — 8/5(수), 3인</span></div>
+      <div class="item-desc">예약 완료 · GYG GYG996ZXHK8G · 각 건물 입구에서 개별 스캔</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-clock-tower">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">프라하 천문시계탑 (Old Town Hall Tower) — Skip the line</span></div>
+      <div class="item-desc">
+        prague.eu 공식 구매 완료 · 성인 3장 · 450 Kč/인<br>
+        티켓번호: 10573062161 / 10573062409 / 10573062410<br>
+        유효기간: 구매일로부터 30일 · <strong>엘리베이터 현장 +100 Kč 별도</strong><br>
+        바우처: <code>vouchers/prague_clock_tickets.pdf</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-ck1">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">CK셔틀 바트이슐→체스키크룸로프 — 8/2(일) 09:15</span></div>
+      <div class="item-desc">예약 완료 · 픽업: Berggasse 8 (The Gallery 앞) · 3,600 CZK 선결제</div>
+    </div>
+  </div>
+
+  <div class="item done-fixed" data-id="book-ck2">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-done">✅완료</span><span class="item-title">CK셔틀 체스키크룸로프→프라하 — 8/4(화) 08:35</span></div>
+      <div class="item-desc">예약 완료 · 픽업: Hradební 174 (가르니 호텔 앞) · 3,600 CZK 선결제</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 3. 앱 설치 -->
+<div class="section">
+  <div class="section-title">📱 앱 설치 — 출발 전 설치+카드 등록</div>
+
+  <div class="item caution" data-id="app-bolt">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-book">필수</span><span class="item-title">Bolt — 부다페스트 택시 (Day 1 공항→숙소)</span></div>
+      <div class="item-desc">미리 설치 + 카드 등록 필수 / 현지 도착 후 즉시 호출 가능</div>
+    </div>
+  </div>
+
+  <div class="item caution" data-id="app-budago">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-book">필수</span><span class="item-title">BudapestGO — 부다페스트 대중교통</span></div>
+      <div class="item-desc">단회권 구매 가능 / 지하철 QR 오류 사례 있음 → 자판기 종이 티켓 병행</div>
+    </div>
+  </div>
+
+  <div class="item caution" data-id="app-oebb">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-book">필수</span><span class="item-title">ÖBB 앱 — 빈 교통권 + 고사우 버스 티켓 구매</span></div>
+      <div class="item-desc">
+        빈 7일권 €25.20 현지 구매 (빈 도착 후) · 고사우 버스 티켓 사전 구매 (7/31 취소 무료) · 150번 버스
+      </div>
+    </div>
+  </div>
+
+  <div class="item caution" data-id="app-pid">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-book">필수</span><span class="item-title">PID Lítačka — 프라하 대중교통</span></div>
+      <div class="item-desc">24h권 140 CZK / Day 13, 14 각 1장 활성화</div>
+    </div>
+  </div>
+
+  <div class="item info" data-id="app-maps">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-info">권장</span><span class="item-title">Google Maps — 오프라인 지도 다운로드</span></div>
+      <div class="item-desc">부다페스트 / 빈 / 잘츠부르크 / 바트이슐 / 체스키크룸로프 / 프라하 — 출발 전 Wi-Fi에서 미리 다운로드</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 4. 출력물 -->
+<div class="section">
+  <div class="section-title">🖨️ 출력 또는 오프라인 저장</div>
+
+  <div class="item print" data-id="print-ck1">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-print">출력</span><span class="item-title">CK셔틀 예약 확인서 2매 (8/2, 8/4) — 이미 있음, 지참 확인</span></div>
+      <div class="item-desc">티켓번호 20260802405764 / 출발 당일 지참</div>
+    </div>
+  </div>
+
+  <div class="item print" data-id="print-oebb">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-print">저장</span><span class="item-title">고사우 버스 티켓 — 8/1 아침에만 PDF 생성</span></div>
+      <div class="item-desc">
+        ÖBB 앱에서 PDF 생성 즉시 환불 불가 → <strong>8/1 아침에만 저장</strong><br>
+        스크린샷 백업 권장
+      </div>
+      <div class="note">7/31 23:59까지는 취소 무료 — 그 이전에 PDF 생성하지 말 것</div>
+    </div>
+  </div>
+
+  <div class="item print" data-id="print-tickets">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-print">저장</span><span class="item-title">예약된 티켓 전체 스크린샷 백업</span></div>
+      <div class="item-desc">
+        레겐다 크루즈 / 마차시 성당(3장) / 벨베데레(3장) / 레오폴트(3장) / 쇤부른 / 호프부르크 시시뮤지엄 / 헬브룬(3장) / 호엔잘츠부르크(3장) / 프라하성 / 카를 성당 · 알베르티나(수령 확인 후)
+      </div>
+    </div>
+  </div>
+
+  <div class="item print" data-id="print-insurance">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-print">출력</span><span class="item-title">여행자 보험 증권 + 긴급 연락처</span></div>
+      <div class="item-desc">의료비·분실·항공 지연 커버 여부 확인 / 보험사 긴급 연락처 별도 메모</div>
+    </div>
+  </div>
+
+  <div class="item print" data-id="print-emergency">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-print">출력</span><span class="item-title">긴급 연락처 메모 (지갑에 보관)</span></div>
+      <div class="item-desc">
+        헝가리 경찰: 107 / 빈 한국대사관: +43-1-426-8721 / 체코 한국대사관: +420-234-090-411<br>
+        카드사 해외 분실 신고 번호 / 보험사 긴급번호
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 5. 준비물 -->
+<div class="section">
+  <div class="section-title">🎒 준비물 — 챙겨야 할 것</div>
+
+  <div class="item pack" data-id="pack-docs">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-pack">서류</span><span class="item-title">여권 3인 유효기간 확인 (귀국일 기준 6개월 이상)</span></div>
+      <div class="item-desc">귀국일 8/6 기준 → 2027년 2월 이후까지 유효해야 함</div>
+    </div>
+  </div>
+
+  <div class="item pack" data-id="pack-cash">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-pack">환전</span><span class="item-title">현금 준비 — 카드 기본 사용 기준 최소 환전</span></div>
+      <div class="item-desc">
+        <strong>🇭🇺 HUF — 1인당 7,000 HUF (약 27,000원)</strong> · 3인 합계 21,000 HUF<br>
+        &nbsp;소규모 식당·마켓 예비 5,000 + 팁·기타 2,000 (교통권·관광지 카드 가능)<br><br>
+        <strong>🇦🇹 EUR — 1인당 €50 (약 77,000원)</strong> · 3인 합계 €150<br>
+        &nbsp;납골당 €2 (현금 필수) + 캐트린 택시 €8 + 아우구스티너 €15 (현금만) + 벨베데레 동전 €2 + 소액 예비 €23<br><br>
+        <strong>🇨🇿 CZK — 1인당 1,200 Kč (약 77,000원)</strong> · 3인 합계 3,600 Kč<br>
+        &nbsp;비셰흐라드 성당 130 + 카세메이트 150 (현장결정) + 기타 예비 500 (천문시계탑·비셰흐라드 성당 제외)
+      </div>
+    </div>
+  </div>
+
+  <div class="item pack" data-id="pack-swimsuit">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-pack">복장</span><span class="item-title">수영복 3벌 (유로데르멘 온천 Day 9·10)</span></div>
+      <div class="item-desc">래시가드 입수 불가 / 수건은 현장 €8.50 대여 가능</div>
+    </div>
+  </div>
+
+  <div class="item pack" data-id="pack-jacket">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-pack">복장</span><span class="item-title">바람막이 or 후리스 (다흐슈타인 5핑거스 Day 8 필수)</span></div>
+      <div class="item-desc">정상 해발 2,109m → 기온 12~17°C 예상, 바람 강함</div>
+    </div>
+  </div>
+
+  <div class="item pack" data-id="pack-dress">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-pack">복장</span><span class="item-title">성당 방문용 복장 (어깨·무릎 가리기)</span></div>
+      <div class="item-desc">마차시 성당·슈테판 대성당·카를 성당·비셰흐라드 성당 — 민소매·반바지 불가 / 스카프 지참 권장</div>
+    </div>
+  </div>
+
+  <div class="item pack" data-id="pack-adapter">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-pack">전자기기</span><span class="item-title">유럽형 플러그 어댑터 + 멀티탭</span></div>
+      <div class="item-desc">3인 기기 동시 충전 · Type C (유럽 표준)</div>
+    </div>
+  </div>
+
+  <div class="item pack" data-id="pack-roaming">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-pack">통신</span><span class="item-title">데이터 로밍 or 유럽 유심/이심 (3인)</span></div>
+      <div class="item-desc">ÖBB 앱·BudapestGO·Bolt·PID Lítačka 모두 데이터 필요 / 지도 앱 실시간 사용</div>
+    </div>
+  </div>
+
+  <div class="item pack" data-id="pack-coin">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-pack">기타</span><span class="item-title">동전 지갑 (€2 동전 보관함용)</span></div>
+      <div class="item-desc">벨베데레·호프부르크 — 백팩 보관함 €2 동전 필요</div>
+    </div>
+  </div>
+
+  <div class="item pack" data-id="pack-sunscreen">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-pack">기타</span><span class="item-title">선크림 + 모자 + 물통</span></div>
+      <div class="item-desc">7~8월 부다페스트·빈 최고 35°C+ / 겔레르트 언덕·쇤브룬 정원 그늘 없음</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 6. 미리 알고 가면 좋은 것 -->
+<div class="section">
+  <div class="section-title">💡 미리 알고 가면 좋은 것</div>
+
+  <div class="item tip" data-id="tip-forint">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">부다페스트 팁 문화 — 10~15% 관행</span></div>
+      <div class="item-desc">식당에서 카드 결제 시 팁 별도 요청 있음 / 현금 팁이 더 확실하게 전달됨</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-ruin">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">루인펍 심플라 케르트 — 19:00 전 입장 권장</span></div>
+      <div class="item-desc">금요일 성수기 21:00 이후 만석 / 22:00~22:30 퇴장 목표 (3일차 09:40 기차 역산)</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-gelarto">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">Gelarto Rosa 장미 아이스크림 — 먼저 계산 후 수령</span></div>
+      <div class="item-desc">계산 → 영수증 → 아이스크림 수령 순서 / 콘에 주문해야 장미 모양 / 받자마자 사진 먼저</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-schoenbrunn">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">쇤부른 — 09:30 슬롯 엄수, 지각 시 실효</span></div>
+      <div class="item-desc">글로리에테까지 언덕 도보 15분 / 정오 전 올라가는 게 체력상 유리</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-belvedere-note">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">벨베데레 — 14:00 슬롯, 15분 전 도착 필수</span></div>
+      <div class="item-desc">백팩·음식·음료·셀카봉 반입 불가 · 큰 가방은 입구 보관소에 맡길 것</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-augustiner">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">아우구스티너 브로이 뮐른 — 현금만, 셀프 시스템</span></div>
+      <div class="item-desc">맥주 받은 뒤 계산 / 카드 안 됨 / 안주 셀프 바 / 맥주잔 헹굼 수도 있음</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-hallstatt">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">할슈타트 — 버스 갈 때 왼쪽 자리 추천</span></div>
+      <div class="item-desc">150번 버스 호수·산 뷰 왼쪽 / Hallstatt Lahn 하차 후 오른쪽 이동 / 마지막 복귀 버스 17:30 이전 필수</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-dachstein">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">다흐슈타인 5핑거스 — 마지막 상행 17:00 엄수</span></div>
+      <div class="item-desc">케이블카 마지막 하강 19:00 / 5핑거스 최소 1.5시간 필요 → 15:30 이전 탑승 / 정상 기온 12~17°C</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-gosau">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">고사우 버스 — Stand C 탑승, 541→542 환승</span></div>
+      <div class="item-desc">
+        Bad Ischl Busterminal Stand C → 541번 → Hallstatt Gosaumühle 환승(4분) → 542번 → Vorderer Gosausee<br>
+        토요일 시간표: 11:14 / 13:14 / 15:14 / 17:14 출발 / 복귀: 16:50 or 17:45 권장
+      </div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-festung">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">호엔잘츠부르크 — 성수기 오전 20~30분 대기 가능</span></div>
+      <div class="item-desc">FestungsBahn (Festungsgasse) / 오전 일찍 또는 오후 늦게 방문이 줄 적음</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-elevator">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">묀히스베르크 엘리베이터 — 21:00 마감 엄수</span></div>
+      <div class="item-desc">20:40 이전 탑승 필수 / Anton-Neumayr-Platz 탑승장</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-eurothermen">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">유로데르멘 살츠카머구트 카드 할인 — 카운터 직접 제시</span></div>
+      <div class="item-desc">키오스크 할인 불가 / 카운터에서 카드 제시 / 토요일 €32.50→€29.25 (10% 할인)</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-villa-ticket">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">빌라 엘리사 — 체크인 시 Guest Mobility Ticket 3장 요청</span></div>
+      <div class="item-desc">온라인 체크인 완료됨 / 체크인 현장에서 "Guest Mobility Ticket for 3 persons" 명시 요청 / 잘츠부르크 체류 기간 버스 전체 무료</div>
+    </div>
+  </div>
+
+  <div class="item tip" data-id="tip-praguegate">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-tip">정보</span><span class="item-title">프라하 성 — 2번 정문 입장, 줄 훨씬 짧음</span></div>
+      <div class="item-desc">트램 22번 Pražský hrad 하차 → 2번 정문 / 역사 건물 오후 4시 마감, 마지막 입장 15:40</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 7. 있으면 좋은 것 -->
+<div class="section">
+  <div class="section-title">✨ 있으면 좋은 것</div>
+
+  <div class="item info" data-id="nice-ecopad">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-info">선택</span><span class="item-title">작은 노트 + 펜</span></div>
+      <div class="item-desc">현지 메모, 주소 적기 / 스마트폰 배터리 걱정 없이 기록</div>
+    </div>
+  </div>
+
+  <div class="item info" data-id="nice-powerbank">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-info">선택</span><span class="item-title">보조배터리 (기내 반입 가능 용량)</span></div>
+      <div class="item-desc">Day 8 할슈타트·다흐슈타인 장시간 외출 시 필수급 / 100Wh 이하 확인</div>
+    </div>
+  </div>
+
+  <div class="item info" data-id="nice-reusable-bag">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-info">선택</span><span class="item-title">에코백 or 장바구니</span></div>
+      <div class="item-desc">나슈마르크트·율리우스 마이늘·SPAR 쇼핑 시 / 유럽 마트 비닐봉투 유료</div>
+    </div>
+  </div>
+
+  <div class="item info" data-id="nice-towel">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-info">선택</span><span class="item-title">수건 (유로데르멘 대여 €8.50 절약)</span></div>
+      <div class="item-desc">Day 9·10 온천 2회 → 현장 대여 대신 가져오면 3인 기준 최대 €51 절약</div>
+    </div>
+  </div>
+
+  <div class="item info" data-id="nice-umbrella">
+    <div class="cb"></div>
+    <div class="item-body">
+      <div class="item-top"><span class="cat cat-info">선택</span><span class="item-title">경량 우산 or 우비</span></div>
+      <div class="item-desc">7~8월 중부 유럽 소나기 빈번 / 잘츠부르크·바트이슐 산악 지역 / 다흐슈타인 정상 날씨 급변 가능</div>
+    </div>
+  </div>
+</div>
+
+<button class="reset-btn" onclick="resetAll()">체크 초기화</button>
+
+<script>
+const KEY = 'eu_final_checklist_2026_v2';
+function get() { try { return JSON.parse(localStorage.getItem(KEY)||'{}'); } catch(e){return{};} }
+function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} }
+function updateProgress() {
+  const all = document.querySelectorAll('.item[data-id]:not(.done-fixed)');
+  const done = document.querySelectorAll('.item[data-id]:not(.done-fixed).done').length;
+  const pct = all.length ? Math.round(done/all.length*100) : 0;
+  document.getElementById('pf').style.width = pct + '%';
+  document.getElementById('pt').textContent = done + ' / ' + all.length + ' 완료 (' + pct + '%)';
+}
+function apply() {
+  const s = get();
+  document.querySelectorAll('.item[data-id]:not(.done-fixed)').forEach(el => {
+    el.classList.toggle('done', !!s[el.dataset.id]);
+  });
+  updateProgress();
+}
+function toggle(el) {
+  if (el.classList.contains('done-fixed')) return;
+  const s = get(); s[el.dataset.id] = !s[el.dataset.id]; save(s);
+  el.classList.toggle('done', s[el.dataset.id]); updateProgress();
+}
+function resetAll() {
+  if (!confirm('모든 체크를 초기화할까요?')) return;
+  save({}); apply();
+}
+document.querySelectorAll('.item[data-id]').forEach(el => {
+  el.addEventListener('click', e => { if(e.target.tagName==='A') return; toggle(el); });
+});
+apply();
+</script>
+</body>
+</html>
